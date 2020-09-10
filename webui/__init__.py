@@ -54,7 +54,7 @@ webui = Blueprint('webui', __name__, static_folder='static', static_url_path='/s
 @require_login
 def index():
 	if request.method == 'POST':
-		
+
 		if request.form.get('Valid') == 'Valid':
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
 			data.instance_validated= 1
@@ -86,7 +86,7 @@ def index():
 		db.session.add(data)
 		db.session.commit()
 		
-		data.file_path=os.path.join('Dataset',data.file_path)
+		data.file_path=os.path.join('Dataset',data.file_path).replace("\\","/")
 
 		return render_template('index.html',dataset=data)
 
