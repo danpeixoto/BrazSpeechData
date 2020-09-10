@@ -1,0 +1,6 @@
+EasyProcess==0.2.3
+Flask_Script==2.0.6
+Flask==1.1.1
+Flask_SQLAlchemy==2.4.1
+asposestorage==1.0.2
+waitress

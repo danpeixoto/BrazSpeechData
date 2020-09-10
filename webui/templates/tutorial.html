@@ -1,0 +1,34 @@
+{% with title="Audio Validation" %}
+{% include "header.html" %}
+{% endwith %}
+
+
+<div class="container" style="text-align: center">
+	<section id="main_content">
+
+<p style="text-align: center;"><strong>Tutorial - Tarefa de alinhamento &aacute;udio-texto</strong><br><br><br> </p>
+  <p style="text-align: justify;">Voc&ecirc; foi convidado para avaliar alinhamentos &aacute;udio-texto de v&aacute;rios c&oacute;rpus. Os trechos de texto (ou enunciados) vem de 4 c&oacute;rpus p&uacute;blicos da literatura: ALIP, NURC-RECIFE, C-ORAL Brasil, SP2010.<br>As normas de transcri&ccedil;&atilde;o s&atilde;o diferentes para os diferentes c&oacute;rpus acima. As marcas de truncamento, prolongamentos de vogal/consoante, pausas e algumas outras foram removidas.</p>
+<p style="text-align: justify;"><br>A tarefa &eacute; composta da audi&ccedil;&atilde;o de um arquivo de &aacute;udio (que pode ser ouvido quantas vezes se deseja) e da anota&ccedil;&atilde;o bin&aacute;ria: VALID/INVALID. Ap&oacute;s anota&ccedil;&atilde;o, um novo &aacute;udio &eacute; fornecido, e assim por diante at&eacute; o usu&aacute;rio desejar parar a anota&ccedil;&atilde;o e/ou se desconectar.</p>
+<p style="text-align: justify;"><br>Essas anota&ccedil;&otilde;es julgam a qualidade/validade do pareamento para a compila&ccedil;&atilde;o de um dataset para o Reconhecimento de Fala e n&atilde;o para o prop&oacute;sito original para o qual os c&oacute;rpus foram criados.<br><br>Seguem alguns crit&eacute;rios para ajudar na avalia&ccedil;&atilde;o:</p>
+<ol>
+    <li style="text-align: justify;">&nbsp;Pausas preenchidas ficaram e aparecem de v&aacute;rias formas. Para a tarefa de alinhamento &aacute;udio-texto n&atilde;o julgamos essas formas utilizadas.</li>
+    <li style="text-align: justify;">Na sobreposi&ccedil;&atilde;o de voz, se a segunda voz for baixa anotar como valid. Por&eacute;m se for em um volume pr&oacute;ximo do volume do locutor principal anotar a senten&ccedil;a como invalid.</li>
+    <li style="text-align: justify;">Locutor com voz baixa, mas compreens&iacute;vel anotar como valid.</li>
+    <li style="text-align: justify;">&nbsp;Senten&ccedil;a composta por uma &uacute;nica palavra e essa palavra est&aacute; truncada e/ou sem silencio no final, anotar como invalid.</li>
+    <li style="text-align: justify;">Se na transcri&ccedil;&atilde;o perdeu-se partes do audio marcar como invalid .</li>
+    <li style="text-align: justify;">&nbsp;Se alguma palavra da senten&ccedil;a n&atilde;o foi pronunciada no &aacute;udio e vice versa, anotar a senten&ccedil;a como invalid.</li>
+</ol>
+
+
+   
+    <form method="post" action="/tutorial">
+      <input type="submit" value="Ir Para Anotação" name="Ir Para Anotação"/>
+
+    </form>
+
+  </section>
+</div>
+
+
+{% include "footer.html" %}
+

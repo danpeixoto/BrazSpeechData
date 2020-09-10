@@ -1,0 +1,28 @@
+{% with custom_header=True %}
+{% include "header.html" %}
+{% endwith %}
+
+<header>
+<div class="container">
+<div style="white-space: pre;color:  #b5e853;font-weight: bold">
+   _____            .___.__         ____   ____      .__  .__    .___       __  .__               
+  /  _  \  __ __  __| _/|__| ____   \   \ /   /____  |  | |__| __| _/____ _/  |_|__| ____   ____  
+ /  /_\  \|  |  \/ __ | |  |/  _ \   \   Y   /\__  \ |  | |  |/ __ |\__  \\   __\  |/  _ \ /    \ 
+/    |    \  |  / /_/ | |  (  <_> )   \     /  / __ \|  |_|  / /_/ | / __ \|  | |  (  <_> )   |  \
+\____|__  /____/\____ | |__|\____/     \___/  (____  /____/__\____ |(____  /__| |__|\____/|___|  /
+        \/           \/                            \/             \/     \/                    \/ 
+</div>
+</div>
+</header>
+
+<div class="container">
+  <section id="main_content">
+    <form method="POST">
+
+    <h2>Username: </h2><input type="text" name="username" style="width: 50%">
+    <h2>Password: </h2><input type="password" name="password" style="width: 50%"> <input type="submit" value="OK">
+    </form>
+  </section>
+</div>
+
+{% include "footer.html" %}

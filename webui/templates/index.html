@@ -1,0 +1,89 @@
+{% with title="Audio Validation" %}
+{% include "header.html" %}
+{% endwith %}
+
+<head>
+
+	<meta charset="utf-8">
+	<style>
+		.listado {
+			display: grid;
+			grid-template-columns: 1fr 0.5fr;
+			grid-template-rows: repeat(5, 1fr);
+			gap: 5px 5px;
+			grid-template-areas:
+				". ."
+				". ."
+				". ."
+				". ."
+				". .";
+			margin-left: 30%;
+		}
+
+		label {
+			text-align: center;
+			font-size: 0.9em;
+			outline: 3px solid #efefef;
+			outline-offset: 0px;
+		}
+	</style>
+</head>
+
+<div class="container" style="text-align: center">
+	<section id="main_content">
+
+		<p>Sentence: {{dataset.text}}</p>
+
+		<audio controls autoplay>
+			<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"  media="(min-width: 900px)" preload>
+
+			Your browser does not support the audio element.
+		</audio>
+		<br>
+		<br>
+		<br>
+		<form id="form" method="post" action="/">
+
+			<input type="submit" value="Valid" name="Valid" style="height:35px; width:130px" />
+			<input id="invalido" type="button" onclick="mostrarClassesInvalidas()" value="Invalid" name="ShowInvalidList"
+				style="height:35px; width:130px" />
+			<p id="pEscondido" hidden>Selecione o motivo da invalidação:</p>
+			<div id="divEscondido" hidden>
+				<label for="Invalid1">Sobreposição de voz, a segunda voz está em um volume próximo, ou superior, do
+					volume do locutor.</label>
+				<input type="radio" name="Invalid" value="Invalid1" checked>
+				<label for="Invalid2">Locutor com voz baixa e incompreensível.</label>
+				<input type="radio" name="Invalid" value="Invalid2">
+				<label for="Invalid3">A sentença é composta por uma única palavra e essa palavra está truncada</label>
+				<input type="radio" name="Invalid" value="Invalid3">
+				<label for="Invalid4">A transcrição perdeu partes contínuas do áudio.</label>
+				<input type="radio" name="Invalid" value="Invalid4">
+				<label for="Invalid5">Alguma palavra da sentença não foi pronunciada no áudio.</label>
+				<input type="radio" name="Invalid" value="Invalid5">
+			</div>
+			<input id="inputEscondido" type="submit" onclick="selecionaValorRadio()" value="Submit" name="Submit"
+				style="height: 35px; width: 130px; margin-top: 15px;" hidden>
+		</form>
+		</form>
+
+	</section>
+
+
+	<script>
+
+		function mostrarClassesInvalidas() {
+			// Desabilita o input
+			document.getElementById("invalido").disabled = true;
+			document.getElementById("pEscondido").removeAttribute("hidden")
+			let div = document.getElementById("divEscondido")
+			div.removeAttribute("hidden");
+			div.className = "listado";
+			document.getElementById("inputEscondido").removeAttribute("hidden")
+		}
+
+	</script>
+
+</div>
+
+
+{% include "footer.html" %}
