@@ -6,6 +6,15 @@
 
 	<meta charset="utf-8">
 	<style>
+
+		.botaoForm{
+			margin: 0 40px;
+		}
+
+		audio{
+			margin-bottom: 70px;
+		}
+
 		label {
 			text-align: center;
 			font-size: 0.9em;
@@ -23,15 +32,18 @@
 			align-items: center;
 			justify-content: center;
 			margin-left: 30%;
-			height: 300px;
+			height: 250px;
 		}
-		table{
+
+		table {
 			width: 100%;
 		}
-		tbody{
+
+		tbody {
 			width: 940px;
 		}
-		tr{
+
+		tr {
 			float: left;
 		}
 	</style>
@@ -53,9 +65,10 @@
 		<br>
 		<form id="form" method="post" action="/">
 
-			<input type="submit" value="Valid" name="Valid" style="height:35px; width:130px" />
-			<input id="invalido" type="button" onclick="mostrarClassesInvalidas()" value="Invalid"
-				name="ShowInvalidList" style="height:35px; width:130px" />
+			<input class="botaoForm" type="submit" value="Valid" name="Valid"  style="height: 35px; width: 130px; margin-top: 15px;"/>
+
+			<input class="botaoForm"  id="invalido" type="button" onclick="mostrarClassesInvalidas()" value="Invalid"
+				name="ShowInvalidList" style="height: 35px; width: 130px; margin-top: 15px;" />
 			<p id="pEscondido" hidden>Selecione o motivo da invalidação:</p>
 			<div id="divEscondido" hidden>
 
@@ -63,7 +76,8 @@
 					<tbody>
 						<tr>
 							<td>
-								<input type="radio" name="Invalid" value="Invalid1" checked>
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid1"
+									checked>
 								<label for="Invalid1">Sobreposição de voz, a segunda voz está em um volume próximo, ou
 									superior, do volume do locutor.</label>
 							</td>
@@ -71,21 +85,31 @@
 						</tr>
 						<tr>
 							<td>
-								<input type="radio" name="Invalid" value="Invalid2">
-								<label for="Invalid2">Locutor com voz incompreensível &#40;ruído de fundo alto, voz muito baixa&#41;</label>
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid2">
+								<label for="Invalid2">Locutor com voz incompreensível &#40;ruído de fundo alto, voz
+									muito baixa&#41;</label>
 							</td>
 						</tr>
 						<tr>
 							<td>
-								<input type="radio" name="Invalid" value="Invalid3">
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid3">
 								<label for="Invalid3">A sentença é composta por uma única palavra e essa palavra está
-									truncada</label> 
-								</td>
+									truncada</label>
+							</td>
 						</tr>
 						<tr>
 							<td>
-								<input type="radio" name="Invalid" value="Invalid4">
-								<label for="Invalid4">Erro na transcrição: palavras a mais, a menos ou trocadas.</label> 
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid4">
+								<label for="Invalid4">Erro na transcrição: palavras a mais, a menos ou trocadas.</label>
+							</td>
+
+						</tr>
+						<tr>
+							<td>
+								<input type="radio" id="radio5" name="Invalid" onclick="lidaClickRadio(this)" on
+									value="Invalid5">
+								<input type="text" name="InvalidReason" id="razaoInvalido"
+									placeholder="Digite o erro aqui." style="width: 830px;" disabled>
 							</td>
 						</tr>
 					</tbody>
@@ -102,6 +126,7 @@
 
 
 	<script>
+
 		function mostrarClassesInvalidas() {
 			// Desabilita o input
 			document.getElementById("invalido").disabled = true;
@@ -110,6 +135,20 @@
 			div.removeAttribute("hidden");
 			div.className = "listado";
 			document.getElementById("inputEscondido").removeAttribute("hidden")
+		}
+
+		function lidaClickRadio(radioButton) {
+			// Desabilita o input text caso o radioButton seja o 5 
+			// e remove qualquer valor dele quando esse for desselecionado
+			if (radioButton.getAttribute("value") === "Invalid5") {
+				document.getElementById("razaoInvalido").disabled = false;
+			} else {
+				let textInput = document.querySelector("#razaoInvalido");
+				textInput.value = "";
+				textInput.disabled = true;
+			}
+
+
 		}
 
 	</script>
