@@ -2,23 +2,54 @@
 {% include "header_admin.html" %}
 {% endwith %}
 
+<head>
+
+	<style>
+		ol{
+			list-style-type: none;
+		}
+		li{
+			margin: 10px;
+		}
+
+		input:hover{
+			background-color:#4a4a4a;
+			color:#e3e3e3;
+			border-radius: 5px;
+		}
+	</style>
+
+</head>
+
 <div class="container" style="text-align: center">
 	<section id="main_content">
 
-    <p>Welcome to BrazSpeechData.</p>
-    <ul>
-    </ul>
-    <form method="post">  
+		<p>Welcome to BrazSpeechData.</p>
+		<ul>
+		</ul>
+		<form method="post">
 
-      <input type="submit" value="Download Valid instances" name="Download Valid instances"/>
-	  <input type="submit" value="Download Invalid instances 1" name="Download Invalid instances 1"  />
-	  <input type="submit" value="Download Invalid instances 2" name="Download Invalid instances 2"  />
-	  <input type="submit" value="Download Invalid instances 3" name="Download Invalid instances 3"  />
-	  <input type="submit" value="Download Invalid instances 4" name="Download Invalid instances 4"  />
-	  <input type="submit" value="Download Invalid instances 5" name="Download Invalid instances 5"  />
+			<ol>
+				<li><input type="submit" value="Download Valid instances" name="Download Valid instances" /></li>
+				<li><input type="submit" value="Download Invalid instances 1" name="Download Invalid instances 1" /></li>
+				<li><input type="submit" value="Download Invalid instances 2" name="Download Invalid instances 2" /></li>
+				<li><input type="submit" value="Download Invalid instances 3" name="Download Invalid instances 3" /></li>
+				<li><input type="submit" value="Download Invalid instances 4" name="Download Invalid instances 4" /></li>
+				<li><input type="submit" value="Download Invalid instances 5" name="Download Invalid instances 5" /></li>
+				<li><input type="submit" value="Download Invalid instances 6" name="Download Invalid instances 6" /></li>
+				<li><input type="submit" value="Download Invalid instances 7" name="Download Invalid instances 7" /></li>
+			</ol>
 
-  </form>
-  </section>
+			
+			
+			
+			
+			
+			
+			
+
+		</form>
+	</section>
 </div>
 
 {% include "footer.html" %}

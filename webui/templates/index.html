@@ -17,9 +17,10 @@
 
 		label {
 			text-align: center;
-			font-size: 0.9em;
+			font-size: 1em;
 			outline: 3px solid #efefef;
 			outline-offset: 0px;
+			padding: 2px;
 		}
 
 		input[type="radio"]:checked+label {
@@ -104,10 +105,26 @@
 							</td>
 
 						</tr>
+
 						<tr>
 							<td>
-								<input type="radio" id="radio5" name="Invalid" onclick="lidaClickRadio(this)" on
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" on
 									value="Invalid5">
+									<label for="Invalid5">Sentença com a última palavra <strong>TRUNCADA</strong>.</label>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" on
+									value="Invalid6">
+									<label for="Invalid6">Junção de mais de um problema da lista de <strong>INVALID</strong>.</label>
+							</td>
+						</tr>
+
+						<tr>
+							<td>
+								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" on
+									value="Invalid7">
 								<input type="text" name="InvalidReason" id="razaoInvalido"
 									placeholder="Digite o erro aqui." style="width: 830px;" disabled>
 							</td>
@@ -140,7 +157,7 @@
 		function lidaClickRadio(radioButton) {
 			// Desabilita o input text caso o radioButton seja o 5 
 			// e remove qualquer valor dele quando esse for desselecionado
-			if (radioButton.getAttribute("value") === "Invalid5") {
+			if (radioButton.getAttribute("value") === "Invalid7") {
 				document.getElementById("razaoInvalido").disabled = false;
 			} else {
 				let textInput = document.querySelector("#razaoInvalido");
