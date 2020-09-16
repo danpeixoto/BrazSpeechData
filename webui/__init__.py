@@ -16,7 +16,7 @@ from flask import send_from_directory
 from flask import current_app, Response
 
 from models import db
-from models import User, Dataset
+from models import User, Dataset, TimeValidated
 import os
 
 def hash_and_salt(password):
@@ -56,26 +56,42 @@ def index():
 	if request.method == 'POST':
 
 		if request.form.get('Valid') == 'Valid':
+			new_time = TimeValidated()
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
 			data.instance_validated= 1
 			data.file_with_user = 0
 			data.instance_valid= 1
+			data.number_validated += 1
+			new_time.user_validated = session['username']
+			new_time.id_data = data.id
+			new_time.time_validated = datetime.now()
 			data.user_validated = session['username']
 			db.session.add(data)
+			db.session.add(new_time)
 			db.session.commit()
 		elif request.form.get('Invalid')[:-1] == 'Invalid':
 			invalidClass = -int(request.form.get('Invalid')[-1])
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
+			new_time = TimeValidated()
 			data.instance_validated= 1
 			data.file_with_user = 0
+			data.number_validated += 1
 			data.instance_valid= invalidClass
+			new_time.user_validated = session['username']
+			new_time.id_data = data.id
+			new_time.time_validated = datetime.now()
 			data.user_validated = session['username']
 			db.session.add(data)
+			db.session.add(new_time)
 			db.session.commit()
 		
 		return redirect(url_for('webui.index'))
 
-	data = Dataset.query.filter_by(instance_validated=0,file_with_user=0).first()
+	if session['username'] == 'sandra' or session['username'] == 'edresson':
+		data = Dataset.query.filter_by(instance_validated=0,file_with_user=0, data_gold = 1).first()
+	else:
+		data = Dataset.query.filter_by(instance_validated=0,file_with_user=0, data_gold = 0).first()
+		
 	if data is None:
 		return render_template('index-finish.html')
 	else:
@@ -146,6 +162,20 @@ def admin():
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+'\n'
 				csv+=string
 			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_5.csv"})
+		elif request.form.get("Download Invalid instances 6") == "Download Invalid instances 6":
+			data = Dataset.query.filter_by(instance_valid=-6,instance_validated=1)
+			csv = ""
+			for dt in data: 
+				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+'\n'
+				csv+=string
+			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_6.csv"})	
+		elif request.form.get("Download Invalid instances 7") == "Download Invalid instances 7":
+			data = Dataset.query.filter_by(instance_valid=-7,instance_validated=1)
+			csv = ""
+			for dt in data: 
+				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+'\n'
+				csv+=string
+			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_7.csv"})	
 	return render_template('admin.html')
 
 
@@ -167,16 +197,20 @@ def login():
 		return render_template('create_password.html')
 	if request.method == 'POST':
 		if request.form['password'] and request.form['username']:
-				user = User.query.filter_by(username=request.form['username']).first()
-				password_hash = hashlib.sha256()
-				password_hash.update((user.salt + request.form['password']).encode())
-				if user is  not None:
+				try:
+					user = User.query.filter_by(username=request.form['username']).first()
+					password_hash = hashlib.sha256()
+					password_hash.update((user.salt + request.form['password']).encode())
+				except:
+					flash('User is not identified, try again!')
+					return redirect(url_for('webui.login'))
+				if user is not None:
 					if user.password == password_hash.hexdigest():
 						session['username'] = request.form['username']
 						last_login_time =  user.last_login_time
 						last_login_ip = user.last_login_ip
 						user.last_login_time = datetime.now()
-						user.last_login_ip = request.remote_addr
+						user.last_login_ip = request.remote_addr 
 						db.session.commit()
 						flash('Logged in successfully.') 
 						if last_login_ip:

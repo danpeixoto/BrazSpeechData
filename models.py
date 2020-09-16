@@ -29,6 +29,15 @@ class Dataset(db.Model):
     user_validated = db.Column(db.String(100))
     instance_validated = db.Column(db.Integer()) #1 if human validated this instance
     instance_valid = db.Column(db.Integer())# 1 if instance is ok
+    number_validated = db.Column(db.Integer()) # Number of validations
+    data_gold = db.Column(db.Integer()) # Verificar se o dataset é gold ou nao
+
+class TimeValidated(db.Model):
+    __tablename__ = 'TimeValidated'
+    id = db.Column(db.Integer, primary_key=True)
+    user_validated = db.Column(db.String(100))
+    id_data = db.Column(db.Integer)
+    time_validated = db.Column(db.DateTime())
     
 
 

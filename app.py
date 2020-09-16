@@ -9,17 +9,28 @@ import shutil
 import tempfile
 
 from flask import Flask
+from flask import session
 from flask_script import Manager
+from flask import Blueprint
+from flask import abort
+from flask import request
+from flask import redirect
+from flask import render_template
+from flask import url_for
+from flask import flash
+from flask import send_from_directory
+from flask import current_app, Response
 
-from models import db, Dataset
+from models import db, Dataset, User, TimeValidated
 from webui import webui
-#from api import api
-from config import config
+from config import config 
+
 
 
 # csv data from make dataset
 data_csv = 'static/Dataset/metadata.csv'
 data_validated_csv = 'static/Dataset/metadata_validated.csv'
+data_csv_gold = 'static/Dataset/metadata_gold.csv' # Criar o csv correspondente ao corpus gold
 
 app = Flask(__name__)
 app.config.from_object(config['dev'])
@@ -44,8 +55,21 @@ def initdb():
 
 @manager.command
 def initdataset():
-    lines = list(open(data_csv).readlines())
 
+    #if (User.query.filter_by(username='sandra').first() == 'sandra' or User.query.filter_by(username='edresson').first() == 'edresson'):
+     #   lines = list(open(data_csv_gold).readlines())
+      #  gold = 1
+    #else:
+     #   lines = list(open(data_csv).readlines())
+      #  gold = 0
+
+    if (session['username'] == 'sandra' or session['username'] == 'edresson'):
+       lines = list(open(data_csv_gold).readlines())
+       gold = 1
+    else:
+       lines = list(open(data_csv).readlines()) 
+       gold = 0       
+    
     for line in lines:
         audio_path,lenght,text = line.split(',')
         text = text.replace('\n','')
@@ -57,10 +81,12 @@ def initdataset():
         new_data.instance_validated = 0 #1 if human validated this instance
         new_data.user_validated = ''
         new_data.instance_valid = 0 # 1 if instance is ok
+        new_data.number_validated = 0 
+        new_data.data_gold = gold
         db.session.add(new_data)
     db.session.commit()
 
-
+# TALVEZ SEJA PRECISO COLOCAR O MESMO IF NESSA FUNCAO,MAS NAO VI NECESSIDADE PQ ESSE CSV CORRESPONDE AOS DADOS VALIDADOS.
 @manager.command
 def initvalidateddataset():
     lines = list(open(data_validated_csv).readlines())
@@ -75,7 +101,9 @@ def initvalidateddataset():
         new_data.file_with_user = 0 # 1 if user validating this instance
         new_data.instance_validated = 1 #1 if human validated this instance
         new_data.instance_valid = 1 # 1 if instance is ok
-        new_data.user_validated = 'edresson'
+        new_data.user_validated = ''
+        new_data.number_validated = new_data.number_validated 
+        new_data.data_gold = new_data.data_gold
         db.session.add(new_data)
     db.session.commit()
 
