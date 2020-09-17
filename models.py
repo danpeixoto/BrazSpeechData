@@ -26,11 +26,14 @@ class Dataset(db.Model):
     audio_lenght = db.Column(db.Integer())
     file_path= db.Column(db.String(250), unique=True)
     file_with_user = db.Column(db.Integer()) # true if 
-    user_validated = db.Column(db.String(100))
+    user_validated = db.Column(db.String(200))
+    user_validated2 = db.Column(db.String(200))
+    user_validated3 = db.Column(db.String(200))
     instance_validated = db.Column(db.Integer()) #1 if human validated this instance
     instance_valid = db.Column(db.Integer())# 1 if instance is ok
     number_validated = db.Column(db.Integer()) # Number of validations
     data_gold = db.Column(db.Integer()) # Verificar se o dataset é gold ou nao
+    invalid_reason = db.Column(db.String(2000))
 
 class TimeValidated(db.Model):
     __tablename__ = 'TimeValidated'
