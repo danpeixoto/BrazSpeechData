@@ -1,4 +1,4 @@
-
+# coding: utf-8
 import random
 import string
 import hashlib
@@ -30,19 +30,19 @@ from config import config
 # csv data from make dataset
 data_csv = 'static/Dataset/metadata.csv'
 data_validated_csv = 'static/Dataset/metadata_validated.csv'
-data_csv_gold = 'static/Dataset/metadata_gold.csv' 
+data_csv_gold = 'static/Gold/metadata_gold.csv' 
 
 app = Flask(__name__)
 app.config.from_object(config['dev'])
 app.register_blueprint(webui)
-#app.register_blueprint(api, url_prefix="/api")
+#app.register_blueprint(api, url_prefix='/api')
 db.init_app(app)
 manager = Manager(app)
 
 
 @app.after_request
 def headers(response):
-    response.headers["Server"] = "Audio-Validation"
+    response.headers['Server'] = 'Audio-Validation'
     return response
 
 
@@ -63,7 +63,7 @@ def initdataset():
         text = text.replace('\n','')
         new_data= Dataset()
         new_data.text = text
-        new_data.invalid_reason = ""
+        new_data.invalid_reason = ''
         new_data.audio_lenght = lenght
         new_data.file_path= audio_path
         new_data.file_with_user = 0 # 1 if user validating this instance
@@ -76,14 +76,14 @@ def initdataset():
         new_data.data_gold = 0
         db.session.add(new_data)
 
-    lines = list(open(data_csv_gold).readlines())   
+    lines_gold = list(open(data_csv_gold).readlines())   
     
-    for line in lines:
+    for line in lines_gold :
         audio_path,lenght,text = line.split(',')
         text = text.replace('\n','')
         new_data= Dataset()
         new_data.text = text
-        new_data.invalid_reason = ""
+        new_data.invalid_reason = ''
         new_data.audio_lenght = lenght
         new_data.file_path= audio_path
         new_data.file_with_user = 0 # 1 if user validating this instance
@@ -122,5 +122,5 @@ def initvalidateddataset():
 
 if __name__ == '__main__':
     from waitress import serve
-    #serve(app, host="0.0.0.0", port=80) # for product server
+    #serve(app, host='0.0.0.0', port=80) # for product server
     manager.run()

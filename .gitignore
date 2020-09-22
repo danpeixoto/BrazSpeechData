@@ -1,0 +1,4 @@
+static/Dataset/*
+static/Gold/*
+database.db
+.vscode

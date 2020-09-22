@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import random
 import string
 from functools import wraps
@@ -86,7 +88,7 @@ def index():
 			data.file_with_user = 0
 			data.number_validated += 1
 			data.instance_valid= invalidClass
-			data.invalid_reason = request.form.get("InvalidReason")
+			data.invalid_reason = request.form.get('InvalidReason')
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()	
@@ -112,7 +114,7 @@ def index():
 		db.session.add(data)
 		db.session.commit()
 		
-		data.file_path=os.path.join('Dataset',data.file_path).replace("\\","/")
+		data.file_path=os.path.join('Dataset',data.file_path).replace('\\','/')
 
 		return render_template('index.html',dataset=data)
 
@@ -132,60 +134,60 @@ def admin():
 	if request.method == 'POST':
 		if request.form.get('Download Valid instances') == 'Download Valid instances':
 			data = Dataset.query.filter_by(instance_valid=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=valid_instances.csv"})
-		elif request.form.get("Download Invalid instances 1") == "Download Invalid instances 1":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=valid_instances.csv'})
+		elif request.form.get('Download Invalid instances 1') == 'Download Invalid instances 1':
 			data = Dataset.query.filter_by(instance_valid=-1,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_1.csv"})
-		elif request.form.get("Download Invalid instances 2") == "Download Invalid instances 2":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_1.csv'})
+		elif request.form.get('Download Invalid instances 2') == 'Download Invalid instances 2':
 			data = Dataset.query.filter_by(instance_valid=-2,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_2.csv"})
-		elif request.form.get("Download Invalid instances 3") == "Download Invalid instances 3":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_2.csv'})
+		elif request.form.get('Download Invalid instances 3') == 'Download Invalid instances 3':
 			data = Dataset.query.filter_by(instance_valid=-3,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_3.csv"})
-		elif request.form.get("Download Invalid instances 4") == "Download Invalid instances 4":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_3.csv'})
+		elif request.form.get('Download Invalid instances 4') == 'Download Invalid instances 4':
 			data = Dataset.query.filter_by(instance_valid=-4,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_4.csv"})
-		elif request.form.get("Download Invalid instances 5") == "Download Invalid instances 5":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_4.csv'})
+		elif request.form.get('Download Invalid instances 5') == 'Download Invalid instances 5':
 			data = Dataset.query.filter_by(instance_valid=-5,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_5.csv"})
-		elif request.form.get("Download Invalid instances 6") == "Download Invalid instances 6":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_5.csv'})
+		elif request.form.get('Download Invalid instances 6') == 'Download Invalid instances 6':
 			data = Dataset.query.filter_by(instance_valid=-6,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_6.csv"})	
-		elif request.form.get("Download Invalid instances 7") == "Download Invalid instances 7":
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_6.csv'})	
+		elif request.form.get('Download Invalid instances 7') == 'Download Invalid instances 7':
 			data = Dataset.query.filter_by(instance_valid=-7,instance_validated=1)
-			csv = ""
+			csv = ''
 			for dt in data: 
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
 				csv+=string
-			return Response(csv,mimetype="text/csv", headers={"Content-disposition":"attachment; filename=invalid_instances_7.csv"})	
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_7.csv'})	
 	return render_template('admin.html')
 
 
@@ -224,7 +226,7 @@ def login():
 						db.session.commit()
 						flash('Logged in successfully.') 
 						if last_login_ip:
-							flash('Last login from ' + last_login_ip + ' on ' + last_login_time.strftime("%d/%m/%y %H:%M"))
+							flash('Last login from ' + last_login_ip + ' on ' + last_login_time.strftime('%d/%m/%y %H:%M'))
 						if session['username'] == 'admin':
 							return redirect(url_for('webui.admin'))
 						else:
