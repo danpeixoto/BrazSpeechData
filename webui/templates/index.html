@@ -32,7 +32,7 @@
 			padding: 2px;
 		}
 
-		input[type="radio"]:checked+label {
+		input[type="radio"]:checked+label,input[type="checkbox"]:checked+label {
 			background: #d1d1d1;
 			color: black;
 		}
@@ -65,7 +65,8 @@
 
 		@media screen and (max-width: 800px) {
 
-			.cntainer, label {
+			.cntainer,
+			label {
 				font-size: 0.8em;
 			}
 		}
@@ -86,96 +87,59 @@
 		<br>
 		<br>
 		<br>
-		<form id="form" method="post" action="/">
 
-			<input class="botaoForm" type="submit" value="Valid" name="Valid"
-				style="height: 35px; width: 130px; margin-top: 15px;" />
 
-			<input class="botaoForm" id="invalido" type="button" onclick="mostrarClassesInvalidas()" value="Invalid"
-				name="ShowInvalidList" style="height: 35px; width: 130px; margin-top: 15px;" />
-			<p id="pEscondido" hidden>Selecione o motivo da invalidação:</p>
-			<div id="divEscondido" hidden>
+		<input class="botaoForm" id="valido" type="button" onclick="mostrarClassesSelecionada('Valido')" value="Valid"
+			name="ShowValidList" style="height: 35px; width: 130px; margin-top: 15px;" />
 
-				<table>
-					<tbody>
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid1"
-									checked>
-								<label for="Invalid1">Sobreposição de voz: a segunda voz está em um volume próximo, ou
-									superior, ao do locutor principal.</label>
-							</td>
+		<input class="botaoForm" id="invalido" type="button" onclick="mostrarClassesSelecionada('Invalido')"
+			value="Invalid" name="ShowInvalidList" style="height: 35px; width: 130px; margin-top: 15px;" />
 
-						</tr>
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid2">
-								<label for="Invalid2">Locutor com voz incompreensível: com ruído de fundo alto ou voz
-									muito baixa.</label>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid3">
-								<label for="Invalid3">A sentença com uma única palavra e essa palavra está
-									truncada.</label>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid4">
-								<label for="Invalid4">Sentença com a última palavra truncada.</label>
-							</td>
 
-						</tr>
+		{% include "classes_valido.html" %}
+		{% include "classes_invalido.html" %}
 
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid5">
-								<label for="Invalid5">Junção de mais de um problema no áudio.</label>
-							</td>
-						</tr>
 
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid6">
-								<input type="text" name="InvalidReason" id="razaoInvalido"
-									placeholder="Outro problema no áudio." style="width: 830px;" disabled>
-							</td>
-						</tr>
 
-						<tr>
-							<td>
-								<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid7">
-								<label for="Invalid7">Erro na transcrição: palavras a mais, a menos ou trocadas.</label>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-
-			</div>
-
-			<input id="inputEscondido" type="submit" value="Submit" name="Submit"
-				style="height: 35px; width: 130px; margin-top: 100px;" hidden>
-		</form>
-		</form>
 
 	</section>
 
 
 	<script>
 
-		function mostrarClassesInvalidas() {
-			// Desabilita o input
-			document.getElementById("invalido").disabled = true;
-			document.getElementById("pEscondido").removeAttribute("hidden")
-			let div = document.getElementById("divEscondido")
+		function esconderClassesNaoSelecionadas(classe) {
+
+			document.getElementById(`pEscondido${classe}`).hidden = true;
+
+			document.getElementById(`inputEscondido${classe}`).hidden = true;
+
+			let div = document.getElementById(`divEscondido${classe}`);
+			div.hidden = true;
+			div.className = "";
+
+		}
+
+		function mostrarClassesSelecionada(classe) {
+
+			// Desabilita o input da classe selecionada e habilita o outro
+			document.getElementById(classe.toLowerCase()).disabled = true;
+			let classeInversa = classe === "Valido" ? "Invalido" : "Valido";
+			document.getElementById(classeInversa.toLowerCase()).disabled = false;
+
+			// Mostra o conteudo da classe selecionada e esconde da outra
+			document.getElementById(`pEscondido${classe}`).removeAttribute("hidden");
+			let div = document.getElementById(`divEscondido${classe}`);
 			div.removeAttribute("hidden");
 			div.className = "listado";
-			document.getElementById("inputEscondido").removeAttribute("hidden")
+			esconderClassesNaoSelecionadas(classeInversa);
+
+			// Mostra o input de submit escondido
+			document.getElementById(`inputEscondido${classe}`).removeAttribute("hidden");
+
 		}
 
 		function lidaClickRadio(radioButton) {
+
 			// Desabilita o input text caso o radioButton seja o 5 
 			// e remove qualquer valor dele quando esse for desselecionado
 			if (radioButton.getAttribute("value") === "Invalid6") {
@@ -185,7 +149,6 @@
 				textInput.value = "";
 				textInput.disabled = true;
 			}
-
 
 		}
 

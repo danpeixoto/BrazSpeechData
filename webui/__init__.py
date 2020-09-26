@@ -65,7 +65,7 @@ def checkcurrentuser(data):
 def index():
 	if request.method == 'POST':
 
-		if request.form.get('Valid') == 'Valid':
+		if request.form.get('Valid')[:-1] == 'Valid':
 			new_time = TimeValidated()
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
 			checkcurrentuser(data)	
