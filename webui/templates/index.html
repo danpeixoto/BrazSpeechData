@@ -96,9 +96,9 @@
 			value="Invalid" name="ShowInvalidList" style="height: 35px; width: 130px; margin-top: 15px;" />
 
 
-		{% include "classes_valido.html" %}
+		
 		{% include "classes_invalido.html" %}
-
+		{% include "classes_valido.html" %}
 
 
 
@@ -115,7 +115,7 @@
 
 			let div = document.getElementById(`divEscondido${classe}`);
 			div.hidden = true;
-			div.className = "";
+			div.className = null;
 
 		}
 
@@ -131,6 +131,7 @@
 			let div = document.getElementById(`divEscondido${classe}`);
 			div.removeAttribute("hidden");
 			div.className = "listado";
+			console.log(div)
 			esconderClassesNaoSelecionadas(classeInversa);
 
 			// Mostra o input de submit escondido
@@ -138,20 +139,7 @@
 
 		}
 
-		function lidaClickRadio(radioButton) {
-
-			// Desabilita o input text caso o radioButton seja o 5 
-			// e remove qualquer valor dele quando esse for desselecionado
-			if (radioButton.getAttribute("value") === "Invalid6") {
-				document.getElementById("razaoInvalido").disabled = false;
-			} else {
-				let textInput = document.querySelector("#razaoInvalido");
-				textInput.value = "";
-				textInput.disabled = true;
-			}
-
-		}
-
+		
 	</script>
 
 </div>

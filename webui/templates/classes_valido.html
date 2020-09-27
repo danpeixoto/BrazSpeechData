@@ -2,54 +2,66 @@
 
 	<p id="pEscondidoValido" hidden>Selecione o motivo da validação:</p>
 	<div id="divEscondidoValido" hidden>
-	
+
 		<table>
 			<tbody>
 				<tr>
 					<td>
-						<input type="checkbox" name="Valid1" onclick="lidaClickRadio(this)" value="Valid1" >
+						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid1">
 						<label for="Valid1">Valid (áudio limpo).</label>
 					</td>
-	
+
 				</tr>
 				<tr>
 					<td>
-						<input type="checkbox" name="Valid2" onclick="lidaClickRadio(this)" value="Valid2">
+						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid2">
 						<label for="Valid2">Valid com pausa preenchida.</label>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<input type="checkbox" name="Valid3" onclick="lidaClickRadio(this)" value="Valid3">
+						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid3">
 						<label for="Valid3">Valid com hesitação.</label>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<input type="checkbox" name="Valid4" onclick="lidaClickRadio(this)" value="Valid4">
+						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid4">
 						<label for="Valid4">Valid com ruído/voz baixa, mas compreensível.</label>
 					</td>
-	
+
 				</tr>
-	
+
 				<tr>
 					<td>
-						<input type="checkbox" name="Valid5" onclick="lidaClickRadio(this)" value="Valid5">
+						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid5">
 						<label for="Valid5">Valid com segunda voz baixa.</label>
 					</td>
 				</tr>
-	
-	
+
+
 			</tbody>
 		</table>
-	
+
 	</div>
 
 
-	<input id="inputEscondidoValido" type="submit" value="Submit" name="Submit"
-				style="height: 35px; width: 130px; margin-top: 100px;" hidden>
+	<input id="inputEscondidoValido" type="submit" value="Submit" style="height: 35px; width: 130px; margin-top: 100px;"
+		disabled="true" hidden>
 </form>
 
 
 
+<script>
+	function lidaClickCheck() {
+		//Habilita o submit caso algum esteja marcado, e, desabilita caso desmarcar todos
+		let checkBoxArray = document.querySelectorAll("input[type='checkbox']:checked")
 
+		if (checkBoxArray.length > 0) {
+			document.getElementById("inputEscondidoValido").disabled = false;
+		} else {
+			document.getElementById("inputEscondidoValido").disabled = true;
+		}
+	}
+
+</script>

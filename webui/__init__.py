@@ -64,8 +64,11 @@ def checkcurrentuser(data):
 @require_login
 def index():
 	if request.method == 'POST':
-
-		if request.form.get('Valid')[:-1] == 'Valid':
+		#Esse comando lucas, request.form.getlist(<string>) retorna uma lista, é utilizado quando tem checkbox no form
+		#ele vai ter uma lista com os valores marcados
+		#no nosso caso se tudo for marcado vai estar assim ['Valid1', 'Valid2', 'Valid3', 'Valid4', 'Valid5']
+		#o if abaixo verifica se a lista ta vazia
+		if request.form.getlist("Valid"):
 			new_time = TimeValidated()
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
 			checkcurrentuser(data)	
