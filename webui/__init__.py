@@ -51,7 +51,7 @@ def require_login(func):
 
 webui = Blueprint('webui', __name__, static_folder='static', static_url_path='/static/webui', template_folder='templates')
 
-def checkcurrentuser(data):
+def check_current_user(data):
 	if (data.number_validated == 0):
 		data.user_validated = session['username']
 	elif (data.number_validated == 1):
@@ -59,45 +59,81 @@ def checkcurrentuser(data):
 	elif (data.number_validated == 2):
 		data.user_validated3 = session['username']
 
+def check_current_valids(data, valid_list):
+
+	if (data.valids_user1 == ''):
+		data.valids_user1  = valid_list
+	elif (data.valids_user2 == ''):
+		data.valids_user2 = valid_list
+	else :
+		data.valids_user3 = valid_list
+
+def check_current_invalids(data, invalidClass):
+
+	if (data.invalid_user1 == 0):
+		data.invalid_user1 = invalidClass
+	elif (data.invalid_user2== 0):
+		data.invalid_user2 = invalidClass
+	else :
+		data.invalid_user3 = invalidClass
+
+def check_current_reason(data, invalid_reason):
+
+	if (data.invalid_reason1 == ''):
+		data.invalid_reason1 = invalid_reason
+	elif (data.invalid_reason2 == ''):
+		data.invalid_reason2 = invalid_reason
+	else :
+		data.invalid_reason3 = invalid_reason
+
+def check_invalid_reason(invalid_reason):
+	return invalid_reason if invalid_reason != None else 'None'
+
+
+def check_valids(values_list):
+	valid_list = [0,0,0,0,0]
+	
+	for i in range(5):
+		valid_list[i-1] = i if "Valid"+str(i) in values_list else 0
+
+	return str(valid_list)
 
 @webui.route('/', methods=['GET','POST'])
 @require_login
 def index():
 	if request.method == 'POST':
-		#Esse comando lucas, request.form.getlist(<string>) retorna uma lista, é utilizado quando tem checkbox no form
-		#ele vai ter uma lista com os valores marcados
-		#no nosso caso se tudo for marcado vai estar assim ['Valid1', 'Valid2', 'Valid3', 'Valid4', 'Valid5']
-		#o if abaixo verifica se a lista ta vazia
+
 		if request.form.getlist('Valid'):
+			values_list = request.form.getlist('Valid')
+			print("LISTA = ", values_list)
+			valid_list = check_valids(values_list)
 			new_time = TimeValidated()
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
-			checkcurrentuser(data)	
+			check_current_user(data)
+			check_current_valids(data,valid_list)
+			check_current_reason(data,check_invalid_reason(request.form.get('InvalidReason')))
 			data.instance_validated += 1
 			data.file_with_user = 0
-			data.instance_valid= 1
+			data.instance_valid = 1
 			data.number_validated += 1
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()
-			data.type_validated_1 = data.Valid1
-			data.type_validated_2 = data.Valid2
-			data.type_validated_3 = data.Valid3
-			data.type_validated_4 = data.Valid4
-			data.type_validated_5 = data.Valid5
-			data.type_validated_6 = data.Valid6
 			db.session.add(data)
 			db.session.add(new_time)
 			db.session.commit()
+
 		elif request.form.get('Invalid')[:-1] == 'Invalid':
 			invalidClass = -int(request.form.get('Invalid')[-1])
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
-			checkcurrentuser(data)	
+			check_current_user(data)
+			check_current_valids(data,'None')	
+			check_current_invalids(data, invalidClass)
+			check_current_reason(data,check_invalid_reason(request.form.get('InvalidReason')))
 			new_time = TimeValidated()
 			data.instance_validated += 1
 			data.file_with_user = 0
 			data.number_validated += 1
-			data.instance_valid= invalidClass
-			data.invalid_reason = request.form.get('InvalidReason')
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()	
@@ -141,62 +177,33 @@ def tutorial():
 def admin():
 	instances = []
 	if request.method == 'POST':
-		if request.form.get('Download Valid instances') == 'Download Valid instances':
-			data = Dataset.query.filter_by(instance_valid=1)
+		if request.form.get('Download Valid instances'):
+			if request.form.get('Download Valid instances')[-5:] == 'Valid':
+				
+				gold = 0 if "Gold" not in request.form.get('Download Valid instances') else 1
+				print(gold)
+				data = Dataset.query.filter(Dataset.number_validated  >= 3-gold , Dataset.valids_user1 is '[1, 2, 0, 0, 0]', Dataset.data_gold == gold)
+				csv = ''
+				print(data)
+				for dt in data:
+					string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.valids_user1+','+dt.valids_user2+','+dt.valids_user3+','+str(dt.invalid_user1)+','+str(dt.invalid_user2)+','+str(dt.invalid_user3)+\
+						','+dt.invalid_reason1+','+dt.invalid_reason2+','+dt.invalid_reason3+','+\
+						str(dt.data_gold)+','+str(dt.number_validated)+'\n'
+				return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=valid_instances.csv'})
+
+		elif request.form.get('Download Invalid instances')[-9:-2]== 'Invalid':
+
+			classe_invalid = -int(request.form.get('Download Invalid instances')[-1])
+			gold = 0 if "Gold" not in request.form.get('Download Valid instances') else 1
+
+			data = Dataset.query.filter(Dataset.number_validated  >= 3-gold, Dataset.invalid_user1 == classe_invalid or Dataset.invalid_user2 == classe_invalid or Dataset.invalid_user3 == classe_invalid, Dataset.data_gold == gold) 
 			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
+			for dt in data:
+				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.valids_user1+','+dt.valids_user2+','+dt.valids_user3+','+str(dt.invalid_user1)+','+str(dt.invalid_user2)+','+str(dt.invalid_user3)+\
+					','+dt.invalid_reason1+','+dt.invalid_reason2+','+dt.invalid_reason3+','+\
+					str(dt.data_gold)+','+str(dt.number_validated)+'\n'
 				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=valid_instances.csv'})
-		elif request.form.get('Download Invalid instances 1') == 'Download Invalid instances 1':
-			data = Dataset.query.filter_by(instance_valid=-1,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_1.csv'})
-		elif request.form.get('Download Invalid instances 2') == 'Download Invalid instances 2':
-			data = Dataset.query.filter_by(instance_valid=-2,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_2.csv'})
-		elif request.form.get('Download Invalid instances 3') == 'Download Invalid instances 3':
-			data = Dataset.query.filter_by(instance_valid=-3,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_3.csv'})
-		elif request.form.get('Download Invalid instances 4') == 'Download Invalid instances 4':
-			data = Dataset.query.filter_by(instance_valid=-4,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_4.csv'})
-		elif request.form.get('Download Invalid instances 5') == 'Download Invalid instances 5':
-			data = Dataset.query.filter_by(instance_valid=-5,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_5.csv'})
-		elif request.form.get('Download Invalid instances 6') == 'Download Invalid instances 6':
-			data = Dataset.query.filter_by(instance_valid=-6,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_6.csv'})	
-		elif request.form.get('Download Invalid instances 7') == 'Download Invalid instances 7':
-			data = Dataset.query.filter_by(instance_valid=-7,instance_validated=1)
-			csv = ''
-			for dt in data: 
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.invalid_reason+','+dt.data_gold+','+dt.number_validated+'\n'
-				csv+=string
-			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_7.csv'})	
+			return Response(csv,mimetype='text/csv', headers={'Content-disposition':'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
 	return render_template('admin.html')
 
 
