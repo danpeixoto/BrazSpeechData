@@ -68,7 +68,7 @@ def index():
 		#ele vai ter uma lista com os valores marcados
 		#no nosso caso se tudo for marcado vai estar assim ['Valid1', 'Valid2', 'Valid3', 'Valid4', 'Valid5']
 		#o if abaixo verifica se a lista ta vazia
-		if request.form.getlist("Valid"):
+		if request.form.getlist('Valid'):
 			new_time = TimeValidated()
 			data = Dataset.query.filter_by(file_path =  session['file_path']).first()
 			checkcurrentuser(data)	
@@ -79,6 +79,12 @@ def index():
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()
+			data.type_validated_1 = data.Valid1
+			data.type_validated_2 = data.Valid2
+			data.type_validated_3 = data.Valid3
+			data.type_validated_4 = data.Valid4
+			data.type_validated_5 = data.Valid5
+			data.type_validated_6 = data.Valid6
 			db.session.add(data)
 			db.session.add(new_time)
 			db.session.commit()

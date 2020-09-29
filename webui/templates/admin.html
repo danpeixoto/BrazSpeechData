@@ -1,55 +1,111 @@
-{% with title="BrazSpeechData" %}
-{% include "header_admin.html" %}
+{% with title='BrazSpeechData' %}
+{% include 'header_admin.html' %}
 {% endwith %}
 
 <head>
 
 	<style>
-		ol{
+		ol {
 			list-style-type: none;
 		}
-		li{
+
+		li {
 			margin: 10px;
 		}
 
-		input:hover{
-			background-color:#4a4a4a;
-			color:#e3e3e3;
+		input:hover {
+			background-color: #4a4a4a;
+			color: #e3e3e3;
 			border-radius: 5px;
 		}
 	</style>
 
 </head>
 
-<div class="container" style="text-align: center">
-	<section id="main_content">
+<div class='container' style='text-align: center'>
+	<section id='main_content'>
 
 		<p>Welcome to BrazSpeechData.</p>
 		<ul>
 		</ul>
-		<form method="post">
 
+
+
+		<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
+			value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
+
+		<input class="botaoForm" id="botaoValidados" type="button" onclick="mostrarFormSelecionado(this.id,'naoGold')"
+			value="Validados" style="height: 35px; width: 130px; margin-top: 15px;" />
+
+
+		<form id="gold" method='post' hidden>
 			<ol>
-				<li><input type="submit" value="Download Valid instances" name="Download Valid instances" /></li>
-				<li><input type="submit" value="Download Invalid instances 1" name="Download Invalid instances 1" /></li>
-				<li><input type="submit" value="Download Invalid instances 2" name="Download Invalid instances 2" /></li>
-				<li><input type="submit" value="Download Invalid instances 3" name="Download Invalid instances 3" /></li>
-				<li><input type="submit" value="Download Invalid instances 4" name="Download Invalid instances 4" /></li>
-				<li><input type="submit" value="Download Invalid instances 5" name="Download Invalid instances 5" /></li>
-				<li><input type="submit" value="Download Invalid instances 6" name="Download Invalid instances 6" /></li>
-				<li><input type="submit" value="Download Invalid instances 7" name="Download Invalid instances 7" /></li>
+				<li><input type='submit' value='Gold Valid' name='Download Valid instances' /></li>
+				<li><input type='submit' value='Gold Invalid 1' name='Download Invalid instances 1' />
+				</li>
+				<li><input type='submit' value='Gold Invalid 2' name='Download Invalid instances 2' />
+				</li>
+				<li><input type='submit' value='Gold Invalid 3' name='Download Invalid instances 3' />
+				</li>
+				<li><input type='submit' value='Gold Invalid 4' name='Download Invalid instances 4' />
+				</li>
+				<li><input type='submit' value='Gold Invalid 5' name='Download Invalid instances 5' />
+				</li>
+				<li><input type='submit' value='Gold Invalid 6' name='Download Invalid instances 6' />
+				</li>
+				<li><input type='submit' value='Gold Invalid 7' name='Download Invalid instances 7' />
+				</li>
 			</ol>
+		</form>
 
-			
-			
-			
-			
-			
-			
-			
-
+		<form id="naoGold" method='post' hidden>
+			<ol>
+				<li><input type='submit' value='Valid' name='Download Valid instances' /></li>
+				<li><input type='submit' value='Invalid 1' name='Download Invalid instances 1' />
+				</li>
+				<li><input type='submit' value='Invalid 2' name='Download Invalid instances 2' />
+				</li>
+				<li><input type='submit' value='Invalid 3' name='Download Invalid instances 3' />
+				</li>
+				<li><input type='submit' value='Invalid 4' name='Download Invalid instances 4' />
+				</li>
+				<li><input type='submit' value='Invalid 5' name='Download Invalid instances 5' />
+				</li>
+				<li><input type='submit' value='Invalid 6' name='Download Invalid instances 6' />
+				</li>
+				<li><input type='submit' value='Invalid 7' name='Download Invalid instances 7' />
+				</li>
+			</ol>
 		</form>
 	</section>
 </div>
 
-{% include "footer.html" %}
+<script>
+
+	function controlarBotoes(inputId) {
+
+		document.getElementById(inputId).disabled = true;
+
+		
+		let botaoInverso = inputId === 'botaoGold' ? 'botaoValidados' : 'botaoGold';
+
+		document.getElementById(botaoInverso).disabled = false;
+
+	}
+
+	function mostrarFormSelecionado(inputId, id) {
+
+		let formEscolhido = document.getElementById(id);
+		formEscolhido.removeAttribute("hidden");
+
+		let idInverso = id === "gold" ? "naoGold" : "gold";
+
+		let formInverso = document.getElementById(idInverso);
+		formInverso.hidden = true;
+
+		controlarBotoes(inputId);
+	}
+</script>
+
+
+{% include 'footer.html' %}
