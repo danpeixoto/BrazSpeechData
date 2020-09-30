@@ -26,6 +26,14 @@
 			padding: 5px;
 		}
 
+		.presteAtencao{
+			color:#db0000
+		}
+
+		.obs:hover{
+			color: #b5e853;
+		}
+
 		span#obsValido:hover,
 		h3.valido {
 			color: #0387e6;
@@ -67,37 +75,14 @@
 
 
 		<p>
-
-			Você foi convidado para avaliar <strong>alinhamentos áudio-texto</strong> de vários córpus. Os trechos de
-
-			texto (ou enunciados)
-
-			vem de 4 córpus públicos da literatura: ALIP, NURC-RECIFE, C-ORAL Brasil, SP2010. Outros 2 córpus estão em
-
-			fase de processamento e negociação: ted talks brasil e Museu da Pessoa.
-
+			Você foi convidado para avaliar alinhamentos áudio-texto de vários córpus. Os trechos de texto (ou
+			enunciados) vem de 4 córpus públicos da literatura: ALIP, NURC-RECIFE, C-ORAL Brasil, SP2010. Outros 2
+			córpus estão em fase de processamento e negociação: Ted Talks Brasil e Museu da Pessoa.
 		</p>
-
-
 
 		<p>
 
-			As normas de transcrição são diferentes para os diferentes córpus acima. As marcas de truncamento,
-
-			prolongamentos de vogal/consoante, pausas, comentários e algumas outras foram removidas.
-
-			<strong>Pausas preenchidas ficaram e aparecem de várias formas. Para a tarefa de alinhamento áudio-texto não
-				julgamos essas formas utilizadas, por exemplo: ahn, hum, eh, hã. Elas vão aparecer naturalmente na
-				transcrição. Não invalide uma sentença SEM a transcrição da pausa preenchida. Quanto à hesitação,
-				invalide e depois as hesitações serão inseridas.</strong>
-
-		</p>
-
-
-
-		<p>
-
-			A tarefa de avaliação é composta da:
+			<strong>A tarefa de avaliação é composta da:</strong>
 
 		</p>
 
@@ -105,14 +90,13 @@
 
 
 
-		<ol type="a">
+		<ol type="i">
 
 
 
 			<li>
 
-				audição de um arquivo de áudio (que pode ser ouvido quantas vezes se desejar) e leitura de transcrição
-
+				audição de um arquivo de áudio (que pode ser ouvido quantas vezes se desejar) e leitura de transcrição.
 			</li>
 
 
@@ -131,9 +115,10 @@
 
 		<p>
 
-			Sendo que para os pares anotados como <strong>INVALID</strong> ainda é necessário indicar a razão de serem
+			Sendo que para os pares anotados como <strong>VALID ou INVALID </strong> ainda é necessário indicar a razão
+			da escolha.
 
-			inválidos.
+
 
 		</p>
 
@@ -213,7 +198,12 @@
 
 			</li>
 
+			<p class="obs"><strong>NOTA 1: NA SOBREPOSIÇÃO de VOZES SÓ a FALA do LOCUTOR PRINCIPAL É TRANCRITA.</strong></p>
+			<p class="obs"><strong>NOTA 2: INDICAMOS ERRO na TRANSCRIÇÃO quando houver apenas um LOCUTOR FALANDO.</strong></p>	
 		</ol>
+		
+
+
 
 
 
@@ -228,18 +218,29 @@
 
 
 		<p>
-
-			A anotação deve julgar a <strong>qualidade/validade</strong> do pareamento para a compilação de um dataset
-
-			para o
-
-			Reconhecimento de Fala e não para o propósito original para o qual os córpus foram criados.
-
+			As normas de transcrição são diferentes para os diferentes córpus acima. As marcas de truncamento, prolongamentos de vogal/consoante, pausas, comentários e algumas outras foram removidas.
 		</p>
 
+		<p>
+			Pausas preenchidas ficaram e aparecem de várias formas. Para a tarefa de alinhamento áudio-texto não julgamos essas formas utilizadas, por exemplo: ahn, hum, eh, hã. Elas vão aparecer naturalmente na transcrição. Encontramos também trechos de hesitação.
+		</p>
 
-
-
+		<p class="presteAtencao">
+			DEVEMOS INDICAR SE um PAR VÁLIDO que TRAZ uma PAUSA PREENCHIDA ou uma HESI-TAÇÃO !!!
+			OUTRAS OPÇÕES para PARES VÁLIDOS SÃO:
+		</p>
+		<ol class="presteAtencao">
+			<li>Válidos sem problemas</li>
+			<li>Válidos com ruído de fundo/voz baixa</li>
+			<li>Válidos com sobreposição de voz baixa</li>
+		</ol>
+			
+		<p><strong>REGRA 1:</strong> <span class="presteAtencao">Não invalide</span>  uma sentença se FALTAR a transcrição da pausa preenchida, pois ela é muito curta.</p>
+		<p><strong>REGRA 2:</strong>  Quanto à hesitação, por exemplo: ...o mole o o o moleton …., <span class="presteAtencao">invalide se ela não for transcrita</span> , para que o trecho de hesitações seja inserido. Geralmente as hesitações são mais longas e se faltar a transcrição haverá desalinhamento do áudio-transcrição.</p>
+		<p>A anotação deve julgar a qualidade/validade do pareamento para a compilação de um dataset para o Reconhecimento de Fala e não para o propósito original para o qual os córpus foram criados.</p>
+		
+		
+		
 
 		<div class="casosAnotacao">
 
