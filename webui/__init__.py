@@ -101,7 +101,7 @@ def check_valids(values_list):
 	valid_list = [0, 0, 0, 0, 0]
 
 	for i in range(5):
-		valid_list[i-1] = i if "Valid"+str(i) in values_list else 0
+		valid_list[i-1] = i if 'Valid'+str(i) in values_list else 0
 
 	return str(valid_list)
 
@@ -113,7 +113,6 @@ def index():
 
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
-			print("LISTA = ", values_list)
 			valid_list = check_valids(values_list)
 			new_time = TimeValidated()
 			data = Dataset.query.filter_by(
@@ -195,7 +194,7 @@ def admin():
 		if request.form.get('Download Valid instances'):
 			if request.form.get('Download Valid instances')[-5:] == 'Valid':
 
-				gold = 0 if "Gold" not in request.form.get(
+				gold = 0 if 'Gold' not in request.form.get(
 					'Download Valid instances') else 1
 				total_pessoas = 3-(gold*2) #tive que colocar dessa maneira, pq tinhamos decidido que a sandra e o edresson validariam audios diferentes
 				data = Dataset.query.filter(
@@ -212,12 +211,11 @@ def admin():
 		elif request.form.get('Download Invalid instances')[-9:-2] == 'Invalid':
 
 			classe_invalid = - int(request.form.get('Download Invalid instances')[-1])
-			gold = 0 if "Gold" not in request.form.get('Download Invalid instances') else 1
+			gold = 0 if 'Gold' not in request.form.get('Download Invalid instances') else 1
 			total_pessoas = 3-(gold*2) #tive que colocar dessa maneira, pq tinhamos decidido que a sandra e o edresson validariam audios diferentes
 			data = Dataset.query.filter(Dataset.number_validated >= total_pessoas, (Dataset.invalid_user1 == classe_invalid) | (Dataset.invalid_user2 == classe_invalid) | (Dataset.invalid_user3 == classe_invalid), Dataset.data_gold == gold)
 			csv = ''
 			for dt in data:
-				print(dt.invalid_user1)
 				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.valids_user1+','+dt.valids_user2+','+dt.valids_user3+','+str(dt.invalid_user1)+','+str(dt.invalid_user2)+','+str(dt.invalid_user3) +\
 						','+dt.invalid_reason1+','+dt.invalid_reason2+','+dt.invalid_reason3+',' +\
 						str(dt.data_gold)+','+str(dt.number_validated)+'\n'
