@@ -25,7 +25,7 @@ class Dataset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	text = db.Column(db.String(2000))
 	audio_lenght = db.Column(db.Integer())
-	file_path= db.Column(db.String(250), unique=True)# Alterar aqui depois de resolver o problema do sp
+	file_path= db.Column(db.String(250), unique=False)# Alterar aqui depois de resolver o problema do sp
 	file_with_user = db.Column(db.Integer()) # true if 
 	user_validated = db.Column(db.String(200))
 	user_validated2 = db.Column(db.String(200))
@@ -49,6 +49,8 @@ class TimeValidated(db.Model):
 	user_validated = db.Column(db.String(100))
 	id_data = db.Column(db.Integer)
 	time_validated = db.Column(db.DateTime())
+	duration = db.Column(db.DateTime())
+	
 	
 
 
