@@ -1,0 +1,17 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html" %}
+{% endwith %}
+
+
+<div class="contentContainer" style="text-align: center">
+
+	<h1>Horas trabalhadas</h1>
+
+	<span id="horasTrabalhadas"> {{hours.hours_listened}} horas trabalhadas</span>
+	<br/>
+	<span id="horasRestantes">
+		de {{40 - hours.total_hours}}  horas semanais.
+	</span>
+
+</div>
+

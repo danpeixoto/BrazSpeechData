@@ -92,6 +92,11 @@ def check_current_reason(data, invalid_reason):
 	else:
 		data.invalid_reason3 = invalid_reason
 
+def Duration_calculation(last_time, present_time):
+	previous = present_time - last_time
+	duration = min(previous, 60)
+	return duration
+
 
 def check_invalid_reason(invalid_reason):
 	return invalid_reason if invalid_reason != None else 'None'
@@ -117,6 +122,8 @@ def index():
 			new_time = TimeValidated()
 			data = Dataset.query.filter_by(
 				file_path=session['file_path']).first()
+			last_time = TimeValidated.query.filter_by(
+				user_validated=session['username']).first() # Caso de erro, checar se o username nao seria user_validated
 			check_current_user(data)
 			check_current_valids(data, valid_list)
 			check_current_reason(data, check_invalid_reason(
@@ -128,6 +135,7 @@ def index():
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()
+			new_time.duration = Duration_calculation(last_time, new_time.time_validated)
 			db.session.add(data)
 			db.session.add(new_time)
 			db.session.commit()
@@ -136,6 +144,8 @@ def index():
 			invalidClass = -int(request.form.get('Invalid')[-1])
 			data = Dataset.query.filter_by(
 				file_path=session['file_path']).first()
+			last_time = TimeValidated.query.filter_by(
+				user_validated=session['username']).first() # Caso de erro, checar se o username nao seria user_validated
 			check_current_user(data)
 			check_current_valids(data, 'None')
 			check_current_invalids(data, invalidClass)
@@ -148,6 +158,7 @@ def index():
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()
+			new_time.duration = Duration_calculation(last_time, new_time.time_validated)
 			db.session.add(data)
 			db.session.add(new_time)
 			db.session.commit()
@@ -184,6 +195,11 @@ def tutorial():
 		return redirect(url_for('webui.index'))
 		# if request.form.get('sairtutorial') == 'Ir para Anotação':
 	return render_template('tutorial.html')
+
+
+@webui.route('/hours_worked', methods=['GET', 'POST'])
+def hours_worked():
+	return render_template('hours_worked.html', hours = {"total_hours": 40, "hours_listened":20})
 
 
 @webui.route('/admin', methods=['GET', 'POST'])
