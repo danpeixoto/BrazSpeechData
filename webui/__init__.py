@@ -5,7 +5,7 @@ import string
 from functools import wraps
 import hashlib
 from datetime import datetime
-
+import datetime as dt
 from flask import Blueprint
 from flask import abort
 from flask import request
@@ -105,8 +105,8 @@ def Duration_calculation(last_time, present_time):
 	return int(duration)
 
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo exigido.
-def Total_duration_user(date_1, date_2):
-	all_duration = TimeValidated.query.filter_by(user_validated=session['username']).all()
+def Total_duration_user(date_1, date_2, current_user):
+	all_duration = TimeValidated.query.filter_by(user_validated=current_user).all()
 	total_duration = 0
 	for total in all_duration:
 		if (total.time_validated >= date_1 and total.time_validated <= date_2):
@@ -230,7 +230,12 @@ def tutorial():
 
 @webui.route('/hours_worked', methods=['GET', 'POST'])
 def hours_worked():
-	return render_template('hours_worked.html', hours = {"total_hours": 40, "hours_listened":20})
+	today= dt.date.today()
+	last_monday =  today - dt.timedelta(days=today.weekday())
+
+	hours_listened = Total_duration_user(last_monday,today,session['username'])
+
+	return render_template('hours_worked.html', hours = {"total_hours": 40, "hours_listened":0})
 
 
 @webui.route('/admin', methods=['GET', 'POST'])

@@ -5,12 +5,18 @@
 
 <div class="contentContainer" style="text-align: center">
 
+	<form id="formValid" method="post" action="/">
+
+		<input type="button" value="Teste">
+	</form>
+	
 	<h1>Horas trabalhadas</h1>
 
 	<span id="horasTrabalhadas"> {{hours.hours_listened}} horas trabalhadas</span>
 	<br/>
 	<span id="horasRestantes">
 		de {{40 - hours.total_hours}}  horas semanais.
+		{{hours.teste}}
 	</span>
 
 </div>
