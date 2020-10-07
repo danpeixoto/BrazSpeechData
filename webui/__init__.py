@@ -92,10 +92,41 @@ def check_current_reason(data, invalid_reason):
 	else:
 		data.invalid_reason3 = invalid_reason
 
+
+# Parte de contagem de tempo
+
+# Função que calcula e armazena o tempo gasto por cada usuário.
 def Duration_calculation(last_time, present_time):
 	previous = present_time - last_time
+	# Se necessario, transforma o resultado em minutos, caso seja, alterar o 60 para 1
+	#previous_on_seconds = previous.total_seconds()
+	#previous = divmod(previous_on_seconds, 60)[0]  
 	duration = min(previous, 60)
-	return duration
+	return int(duration)
+
+# Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo exigido.
+def Total_duration_user(date_1, date_2):
+	all_duration = TimeValidated.query.filter_by(user_validated=session['username']).all()
+	total_duration = 0
+	for total in all_duration:
+		if (total.time_validated >= date_1 and total.time_validated <= date_2):
+			total_duration += total.duration
+	
+	return total_duration
+
+
+# Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
+def Total_duration_admin(date_1, date_2):
+	all_users = User.query.all()
+	for user in all_users:
+		all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
+		total_duration = 0
+		for total in all_duration:
+			if (total.time_validated >= date_1 and total.time_validated <= date_2):
+				total_duration += total.duration
+		
+		return total_duration
+
 
 
 def check_invalid_reason(invalid_reason):
@@ -135,7 +166,7 @@ def index():
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()
-			new_time.duration = Duration_calculation(last_time, new_time.time_validated)
+			new_time.duration = Duration_calculation(last_time.time_validated, new_time.time_validated)
 			db.session.add(data)
 			db.session.add(new_time)
 			db.session.commit()
@@ -158,7 +189,7 @@ def index():
 			new_time.user_validated = session['username']
 			new_time.id_data = data.id
 			new_time.time_validated = datetime.now()
-			new_time.duration = Duration_calculation(last_time, new_time.time_validated)
+			new_time.duration = Duration_calculation(last_time.time_validated, new_time.time_validated)
 			db.session.add(data)
 			db.session.add(new_time)
 			db.session.commit()

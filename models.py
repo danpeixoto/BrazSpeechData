@@ -49,7 +49,7 @@ class TimeValidated(db.Model):
 	user_validated = db.Column(db.String(100))
 	id_data = db.Column(db.Integer)
 	time_validated = db.Column(db.DateTime())
-	duration = db.Column(db.DateTime())
+	duration = db.Column(db.Integer)
 	
 	
 
