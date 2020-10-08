@@ -7,17 +7,18 @@
 
 	<form id="formValid" method="post" action="/hours_worked">
 
-		<input type="submit" value="Teste">
+		<input type="submit" value="Essa semana." name="segunda">
+		<input type="submit" value="Desde o início do projeto." name="comeco">
+
 	</form>
 	
 	<h1>Horas trabalhadas</h1>
 
-	<span id="horasTrabalhadas"> {{hours.hours_listened}} horas trabalhadas</span>
-	<br/>
-	<span id="horasRestantes">
-		de {{40 - hours.total_hours}}  horas semanais.
-		{{hours.teste}}
-	</span>
+	<span>{{hours.response_string}}</span>
+
 
 </div>
 
+<script>
+
+</script>

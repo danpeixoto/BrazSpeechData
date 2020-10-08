@@ -5,7 +5,7 @@ import string
 from functools import wraps
 import hashlib
 from datetime import datetime
-import datetime as dt
+import datetime as dtt
 from flask import Blueprint
 from flask import abort
 from flask import request
@@ -118,14 +118,16 @@ def Total_duration_user(date_1, date_2, current_user):
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
 def Total_duration_admin(date_1, date_2):
 	all_users = User.query.all()
+	users_data= []
 	for user in all_users:
-		all_duration = TimeValidated.query.filter_by(user_validated=user).all()
-		total_hours = 0
-		for total in all_duration:
-			if (total.time_validated >= date_1 and total.time_validated <= date_2):
-				total_hours += total.duration
-
-	return math.floor(total_hours/3600)
+		if(len(user.username) > 10):
+			all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
+			total_hours = 0
+			for total in all_duration:
+				if (total.time_validated >= date_1 and total.time_validated <= date_2):
+					total_hours += total.duration
+			users_data.append("{},{}".format(user.username,math.floor(total_hours/3600)))
+	return users_data
 
 
 
@@ -232,14 +234,23 @@ def tutorial():
 
 @webui.route('/hours_worked', methods=['GET', 'POST'])
 def hours_worked():
-	today= dt.datetime.today()
-	last_monday =  today - dt.timedelta(days=today.weekday())
+	response_string = ' '
 	if request.method == 'POST':
-		hours_listened = Total_duration_user(last_monday,today,session['username'])
-	else:
-		hours_listened = 0
+		today= dtt.datetime.today()
+		if request.form.get('segunda'):
+			last_monday =  today - dtt.timedelta(days=today.weekday())
+			hours_listened = Total_duration_user(last_monday,today,session['username'])
+			total_hours = 20
+			response_string = 'Você trabalhou {} essa semana. O total de horas para essa semana é : {}'.format(hours_listened, total_hours)
+		elif request.form.get('comeco'):
+			comeco = datetime(2020,10,1,0,0,0)
+			total_hours =  today - comeco
+			total_hours =  total_hours.days*24.0
+			hours_listened = Total_duration_user(comeco,today,session['username'])
+			response_string = 'Você trabalhou {} essa desde a data 01/10/2020.'.format(hours_listened)
+
 	
-	return render_template('hours_worked.html', hours = {"total_hours": 20, "hours_listened":hours_listened})
+	return render_template('hours_worked.html', hours = {'response_string':response_string})
 
 
 @webui.route('/admin', methods=['GET', 'POST'])
@@ -277,7 +288,11 @@ def admin():
 						str(dt.data_gold)+','+str(dt.number_validated)+'\n'
 				csv += string
 			return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
-	return render_template('admin.html')
+	
+	today= dtt.datetime.today()
+	last_monday =  today - dtt.timedelta(days=today.weekday())
+
+	return render_template('admin.html', hours = {'user_list':Total_duration_admin(last_monday,today)})
 
 
 @webui.route('/login', methods=['GET', 'POST'])
