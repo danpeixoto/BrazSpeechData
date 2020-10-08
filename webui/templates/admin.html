@@ -81,12 +81,20 @@
 
 
 
-		<form method="post">
-			<input class="botaoForm"  type="button" 
-			value="Listar total horas usuarios" style="height: 35px; width: 170px; margin-top: 15px;"/>
+		<div id="divListaDeUsuarios">
+			<input class="botaoForm" id="listarUsuarios"  type="button" 
+			value="Listar total horas usuarios" style="height: 35px; width: 170px; margin-top: 15px;" onclick="mostrarListaUsuarios()"/>
+
+
+
+
+
+
 
 
 			<p id="todosUsuarios" hidden>{{hours.user_list}}</p>
+		</div>
+			
 		</form>
 	</section>
 </div>
@@ -116,6 +124,35 @@
 
 		controlarBotoes(inputId);
 	}
+
+
+	function mostrarListaUsuarios(){
+		document.getElementById("listarUsuarios").disabled = true;
+
+		let listaUsuariosNaoProcessada = document.getElementById("todosUsuarios").innerHTML;
+
+		const regex = /[\w\.@]+\,[\d\.@]+\;/gi;
+
+		let listaUsuariosProcessada = listaUsuariosNaoProcessada.match(regex);
+		let ul = document.createElement("ul");
+
+		listaUsuariosProcessada.forEach(elemento=>{
+			let dados = elemento.split(",");
+			let nome = dados[0];
+			let horas = dados[1].slice(0,-1);
+
+			let li = document.createElement("li");
+			li.innerHTML= `<strong>${nome.toUpperCase()}</strong> anotou <strong>${horas}</strong> horas essa semana.`
+
+			ul.appendChild(li);
+
+		});
+
+		let div = document.getElementById("divListaDeUsuarios");
+		div.appendChild(ul);
+
+	}
+
 </script>
 
 

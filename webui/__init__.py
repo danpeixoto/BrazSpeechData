@@ -126,7 +126,7 @@ def Total_duration_admin(date_1, date_2):
 			for total in all_duration:
 				if (total.time_validated >= date_1 and total.time_validated <= date_2):
 					total_hours += total.duration
-			users_data.append("{},{}".format(user.username,math.floor(total_hours/3600)))
+			users_data.append("{},{};".format(user.username,math.floor(total_hours/3600)))
 	return users_data
 
 

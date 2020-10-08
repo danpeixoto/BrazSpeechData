@@ -2,17 +2,36 @@
 {% include "header.html" %}
 {% endwith %}
 
+<style>
+	span{
+		font-size: 1.2em;
+	}
+	form{
+		margin-bottom: 50px;
+	}
+
+	input{
+		font-size: 1.1em;
+	}
+
+	input:hover{
+		transition: 0.5s;
+		color: aliceblue;
+		background-color: #363636;
+	}
+</style>
+
 
 <div class="contentContainer" style="text-align: center">
-
+	<h1>Horas trabalhadas</h1>
 	<form id="formValid" method="post" action="/hours_worked">
 
-		<input type="submit" value="Essa semana." name="segunda">
-		<input type="submit" value="Desde o início do projeto." name="comeco">
+		<input class="botaoForm" type="submit" value="Essa semana." name="segunda" style="height: 35px; width: 220px; margin-top: 15px;">
+		<input class="botaoForm" type="submit" value="Desde o início do projeto." name="comeco" style="height: 35px; width: 220px; margin-top: 15px;">
 
 	</form>
 	
-	<h1>Horas trabalhadas</h1>
+	
 
 	<span>{{hours.response_string}}</span>
 
