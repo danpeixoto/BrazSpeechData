@@ -234,7 +234,24 @@ def tutorial():
 
 @webui.route('/hours_worked', methods=['GET', 'POST'])
 def hours_worked():
-	response_string = ' '
+
+	response_string = ''
+	 
+	first_week = Total_duration_user(datetime(2020,10,1,0,0,0),datetime(2020,10,2,23,59,59),session['username'])
+	today= dtt.datetime.today()
+	start = datetime(2020,10,5,0,0,0)
+	response_string += "2020-10-01 até 2020-10-02 você anotou {} horas.;".format(first_week)
+	num_weeks = abs(today-start).days//7 + 1
+
+	for i in range(num_weeks):
+
+		monday =  start + dtt.timedelta(days=i*7)
+		friday =  monday + dtt.timedelta( (4-monday.weekday()) % 7 )
+		hours_listened = Total_duration_user(monday,friday,session['username'])
+		response_string += '{} até {} você anotou {} horas.;'.format( str(monday)[:10],str(friday)[:10],hours_listened)
+		
+	
+	'''
 	if request.method == 'POST':
 		today= dtt.datetime.today()
 		if request.form.get('segunda'):
@@ -249,7 +266,7 @@ def hours_worked():
 			total_hours =  total_hours.days*24.0
 			hours_listened = Total_duration_user(comeco,today,session['username'])
 			response_string = 'Você trabalhou {} essa desde a data 01/10/2020. O total de horas desde o inicio do projeto foi de {} horas'.format(hours_listened,total_hours)
-
+	'''
 	
 	return render_template('hours_worked.html', hours = {'response_string':response_string})
 

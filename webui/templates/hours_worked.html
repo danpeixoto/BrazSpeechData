@@ -24,20 +24,26 @@
 
 <div class="contentContainer" style="text-align: center">
 	<h1>Horas trabalhadas</h1>
-	<form id="formValid" method="post" action="/hours_worked">
-
-		<input class="botaoForm" type="submit" value="Essa semana." name="segunda" style="height: 35px; width: 220px; margin-top: 15px;">
-		<input class="botaoForm" type="submit" value="Desde o início do projeto." name="comeco" style="height: 35px; width: 220px; margin-top: 15px;">
-
-	</form>
 	
-	
-
-	<span>{{hours.response_string}}</span>
-
+	<span id="todasDatas" hidden>{{hours.response_string}}</span>
+	<div id="listaDatas"></div>
 
 </div>
 
 <script>
 
+		let listaDatasNaoProcessada = document.getElementById("todasDatas").innerHTML;
+		let listaDatasProcessada = listaDatasNaoProcessada.split(";").slice(0,-1);
+		let ul = document.createElement("ul");
+
+		listaDatasProcessada.forEach(elemento=>{
+			let li = document.createElement("li");
+			li.innerHTML= elemento;
+			ul.appendChild(li);
+		});
+
+		let div = document.getElementById("listaDatas");
+		div.appendChild(ul);
+
+	
 </script>
