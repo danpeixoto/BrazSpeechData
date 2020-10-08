@@ -239,15 +239,16 @@ def hours_worked():
 		today= dtt.datetime.today()
 		if request.form.get('segunda'):
 			last_monday =  today - dtt.timedelta(days=today.weekday())
+			next_monday = today + dtt.timedelta(days=-today.weekday(), weeks=1)
 			hours_listened = Total_duration_user(last_monday,today,session['username'])
 			total_hours = 20
-			response_string = 'Você trabalhou {} essa semana. O total de horas para essa semana é : {}'.format(hours_listened, total_hours)
+			response_string = 'Você trabalhou {} essa semana. Semana atual: {} até {}'.format(hours_listened, str(last_monday)[:10],str(next_monday)[:10])
 		elif request.form.get('comeco'):
 			comeco = datetime(2020,10,1,0,0,0)
 			total_hours =  today - comeco
 			total_hours =  total_hours.days*24.0
 			hours_listened = Total_duration_user(comeco,today,session['username'])
-			response_string = 'Você trabalhou {} essa desde a data 01/10/2020.'.format(hours_listened)
+			response_string = 'Você trabalhou {} essa desde a data 01/10/2020. O total de horas desde o inicio do projeto foi de {} horas'.format(hours_listened,total_hours)
 
 	
 	return render_template('hours_worked.html', hours = {'response_string':response_string})
