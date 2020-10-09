@@ -239,20 +239,22 @@ def hours_worked():
 	first_week = Total_duration_user(datetime(2020,10,1,0,0,0),datetime(2020,10,2,23,59,59),session['username'])
 	today= dtt.datetime.today()
 	start = datetime(2020,10,5,0,0,0)
-	response_string += u'O total de horas entre a data 10-01 até 10-02 você anotou {:.2f} horas.;'.format(first_week)
+	response_string += u'O total de horas,  entre a data 10-01 até 10-02, que você anotou {:.2f} horas.;'.format(first_week)
 	num_weeks = abs(today-start).days//7 + 1
 
 	total_listened_since_start = 0
 	total_listened_since_start += first_week
 	for i in range(num_weeks):
-
+		
 		monday =  start + dtt.timedelta(days=i*7)
 		friday =  monday + dtt.timedelta( (4-monday.weekday()) % 7 )
-		hours_listened = Total_duration_user(monday,friday,session['username'])
+		saturday =  monday + dtt.timedelta( (5-monday.weekday()) % 7 )
+		print(saturday)
+		hours_listened = Total_duration_user(monday,saturday,session['username'])
 		total_listened_since_start += hours_listened
-		response_string += u'O total de horas entre a data {} até {} você anotou {:.2f} horas.;'.format( str(monday)[5:10],str(friday)[5:10],hours_listened)
+		response_string += u'O total de horas, entre a data {} até {}, que você anotou foi de: {:.2f} horas.;'.format(str(monday)[5:10],str(friday)[5:10],hours_listened)
 	
-	response_string += u'O total de horas entre a data {} até {} você anotou {:.2f} horas.;'.format( str(datetime(2020,10,1,0,0,0))[5:10],str(today)[5:10],total_listened_since_start)
+	response_string += u'O total de horas, entre a data {} até {}, que você anotou foi de: {:.2f} horas.;'.format( str(datetime(2020,10,1,0,0,0))[5:10],str(today)[5:10],total_listened_since_start)
 	
 	'''
 	if request.method == 'POST':
@@ -420,6 +422,7 @@ def logout():
 #		i = 0
 #		last_time = 0 
 #		for time in all_times:
+#			if(i == 0)
 #				time.duration = 60
 #				i += 1
 #				last_time = time.time_validated
