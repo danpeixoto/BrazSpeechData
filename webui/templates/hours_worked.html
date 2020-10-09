@@ -34,27 +34,27 @@
 </style>
 
 
-<div class="contentContainer" style="text-align: center">
+<div class='contentContainer' style='text-align: center'>
 	<h1>Horas trabalhadas</h1>
 	
-	<span id="todasDatas" hidden>{{hours.response_string}}</span>
-	<div id="listaDatas"></div>
+	<span id='todasDatas' hidden>{{hours.response_string}}</span>
+	<div id='listaDatas'></div>
 
 </div>
 
 <script>
 
-		let listaDatasNaoProcessada = document.getElementById("todasDatas").innerHTML;
-		let listaDatasProcessada = listaDatasNaoProcessada.split(";").slice(0,-1);
-		let ul = document.createElement("ul");
+		let listaDatasNaoProcessada = document.getElementById('todasDatas').innerHTML;
+		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0,-1);
+		let ul = document.createElement('ul');
 
 		listaDatasProcessada.forEach(elemento=>{
-			let li = document.createElement("li");
+			let li = document.createElement('li');
 			li.innerHTML= elemento;
 			ul.appendChild(li);
 		});
 
-		let div = document.getElementById("listaDatas");
+		let div = document.getElementById('listaDatas');
 		div.appendChild(ul);
 
 	
