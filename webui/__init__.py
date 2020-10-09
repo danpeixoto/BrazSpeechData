@@ -111,8 +111,7 @@ def Total_duration_user(date_1, date_2, current_user):
 		if (total.time_validated >= date_1 and total.time_validated <= date_2):
 			total_hours += total.duration
 	
-
-	return math.floor(total_hours/3600)
+	return total_hours/3600.0
 
 
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
@@ -126,7 +125,7 @@ def Total_duration_admin(date_1, date_2):
 			for total in all_duration:
 				if (total.time_validated >= date_1 and total.time_validated <= date_2):
 					total_hours += total.duration
-			users_data.append("{},{};".format(user.username,math.floor(total_hours/3600)))
+			users_data.append('{},{:.2f};'.format(user.username,total_hours/3600.0))
 	return users_data
 
 
@@ -240,16 +239,20 @@ def hours_worked():
 	first_week = Total_duration_user(datetime(2020,10,1,0,0,0),datetime(2020,10,2,23,59,59),session['username'])
 	today= dtt.datetime.today()
 	start = datetime(2020,10,5,0,0,0)
-	response_string += "2020-10-01 até 2020-10-02 você anotou {} horas.;".format(first_week)
+	response_string += 'O total de horas entre a data 10-01 até 10-02 você anotou {:.2f} horas.;'.format(first_week)
 	num_weeks = abs(today-start).days//7 + 1
 
+	total_listened_since_start = 0
+	total_listened_since_start += first_week
 	for i in range(num_weeks):
 
 		monday =  start + dtt.timedelta(days=i*7)
 		friday =  monday + dtt.timedelta( (4-monday.weekday()) % 7 )
 		hours_listened = Total_duration_user(monday,friday,session['username'])
-		response_string += '{} até {} você anotou {} horas.;'.format( str(monday)[:10],str(friday)[:10],hours_listened)
-		
+		total_listened_since_start += hours_listened
+		response_string += 'O total de horas entre a data {} até {} você anotou {:.2f} horas.;'.format( str(monday)[5:10],str(friday)[5:10],hours_listened)
+	
+	response_string += 'O total de horas entre a data {} até {} você anotou {:.2f} horas.;'.format( str(datetime(2020,10,1,0,0,0))[5:10],str(today)[5:10],total_listened_since_start)
 	
 	'''
 	if request.method == 'POST':
@@ -267,6 +270,7 @@ def hours_worked():
 			hours_listened = Total_duration_user(comeco,today,session['username'])
 			response_string = 'Você trabalhou {} essa desde a data 01/10/2020. O total de horas desde o inicio do projeto foi de {} horas'.format(hours_listened,total_hours)
 	'''
+	
 	
 	return render_template('hours_worked.html', hours = {'response_string':response_string})
 
@@ -404,3 +408,38 @@ def logout():
 	session.pop('username', None)
 	flash('Logged out successfully.')
 	return redirect(url_for('webui.login'))
+
+
+
+# ESSA FUNÇÂO É PARA ARRUMAR A COLUNA DURATION DO TIMEVALIDATED
+#def funcao_soma_valores_anotadore():
+#	all_users = User.query.all()
+#
+#	for user in all_users:
+#		all_times = TimeValidated.query.filter_by(user_validated = user.username)
+#		i = 0
+#		last_time = 0 
+#		for time in all_times:
+#				time.duration = 60
+#				i += 1
+#				last_time = time.time_validated
+#			else:
+#				time.duration = Duration_calculation(last_time,time.time_validated)
+#				last_time = time.time_validated
+#			
+#			db.session.commit()
+	#for user in all_user:
+	#	all_times = TimeValidated.query.filter(user_validated = user.username)
+	#	i = 0
+	#	last_time = 0
+	#   for time in all_times:
+	#		if i == 0 :
+	#			novo_duration = 60
+	#			i += 1
+	#			last_time = time.time_validated
+	#		else:
+	#			duration = Duration_calculation(last_time, time)
+	#			last_time = time
+	#			
+	#       db.commit()
+	#
