@@ -3,59 +3,96 @@
 {% endwith %}
 
 <style>
-	li{
+	li {
 		font-size: 1.2em;
 		margin: 10px;
 	}
 
-	li:hover{
+	li:hover {
 		transition: 0.5s;
 		color: aliceblue;
 		font-size: 1.8em;
 		background-color: #363636;
 	}
 
-	h1{
+	h1 {
 		font-size: 3em;
 	}
-	form{
+
+	form {
 		margin-bottom: 50px;
 	}
 
-	input{
+	input {
 		font-size: 1.1em;
 	}
 
-	input:hover{
+	input:hover {
 		transition: 0.5s;
 		color: aliceblue;
 		background-color: #363636;
+	}
+
+
+	table {
+		font-family: arial, sans-serif;
+		border-collapse: collapse;
+		width: 50%;
+		margin-left: 25%;
+	}
+
+	th{
+		color: #b5e853;
+	}
+
+	td,
+	th {
+		border: 1px solid #dddddd;
+		text-align: center;
+		padding: 8px;
+		font-size: 1.2em;
+	}
+
+	tr:nth-child(even) {
+		background-color: #474747;
 	}
 </style>
 
 
 <div class='contentContainer' style='text-align: center'>
-	<h1>Horas trabalhadas</h1>
-	
-	<span id='todasDatas' hidden>{{hours.response_string}}</span>
+	<h1>Horas anotadas</h1>
+
+	<span id='todasSemanas' hidden>{{hours.response_string}}</span>
 	<div id='listaDatas'></div>
 
+	<div id='tabelaSemanas'>
+		<table>
+			<tr>
+				<th>Data de inicio</th>
+				<th>Data de fim</th>
+				<th>Carga horária anotada</th>
+			</tr>
+		</table>
+	</div>
 </div>
 
 <script>
 
-		let listaDatasNaoProcessada = document.getElementById('todasDatas').innerHTML;
-		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0,-1);
-		let ul = document.createElement('ul');
+	let listaDatasNaoProcessada = document.getElementById('todasSemanas').innerHTML;
+	let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
+	let table = document.querySelector("div > table");
 
-		listaDatasProcessada.forEach(elemento=>{
-			let li = document.createElement('li');
-			li.innerHTML= elemento;
-			ul.appendChild(li);
+	listaDatasProcessada.forEach(elemento => {
+		let listaDados = elemento.split(",");
+		let tr = document.createElement("tr");
+
+		listaDados.forEach(dado =>{
+			let td = document.createElement("td");
+			td.textContent = dado;
+			tr.appendChild(td);
 		});
+		table.appendChild(tr);
+	});
 
-		let div = document.getElementById('listaDatas');
-		div.appendChild(ul);
-
-	
 </script>
+{% include 'footer.html' %}

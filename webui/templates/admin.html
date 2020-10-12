@@ -14,28 +14,35 @@
 		}
 
 
-
-		
-
-
 		input:hover {
 			background-color: #4a4a4a;
 			color: #e3e3e3;
 			border-radius: 5px;
 		}
 
-		#divListaDeUsuarios li{
-			text-align: justify;
-			margin-left: 35%;
+		table {
+			font-family: arial, sans-serif;
+			border-collapse: collapse;
+			width: 70%;
+			margin-left: 15%;
+			margin-top: 30px;
 		}
 
-		#divListaDeUsuarios  li:hover{
-			transition: 0.5s;
-			color: aliceblue;
-			font-size: 1.4em;
-			background-color: #363636;
+		th {
+			color: #b5e853;
 		}
 
+		td,
+		th {
+			border: 1px solid #dddddd;
+			text-align: center;
+			padding: 8px;
+			font-size: 1.1em;
+		}
+
+		tr:nth-child(even) {
+			background-color: #474747;
+		}
 	</style>
 
 </head>
@@ -79,7 +86,7 @@
 		<form id="naoGold" method='post' hidden>
 			<ol>
 				<li><input type='submit' value='Valid' name='Download Valid instances' /></li>
-				<li><input type='submit' value='Invalid 1' name='Download Invalid instances'/>
+				<li><input type='submit' value='Invalid 1' name='Download Invalid instances' />
 				</li>
 				<li><input type='submit' value='Invalid 2' name='Download Invalid instances' />
 				</li>
@@ -97,22 +104,22 @@
 		</form>
 
 
-
-
-		<div id="divListaDeUsuarios">
-			<input class="botaoForm" id="listarUsuarios"  type="button" 
-			value="Listar total horas usuarios" style="height: 35px; width: 170px; margin-top: 15px;" onclick="mostrarListaUsuarios()"/>
-
-
-
-
-
-
-
-
+		<div id='divListaDeUsuarios'>
+			<input class="botaoForm" id="listarUsuarios" type="button" value="Listar total horas usuarios"
+				style="height: 35px; width: 170px; margin-top: 15px;" onclick="mostrarListaUsuarios()" />
 			<p id="todosUsuarios" hidden>{{hours.user_list}}</p>
+			<p id="diaAtual" hidden>{{hours.today}}</p>
+			<p id="diaComeco" hidden>{{hours.start}}</p>
+			<table hidden>
+				<tr>
+					<th>Usuário</th>
+					<th>Data de inicio</th>
+					<th>Data de fim</th>
+					<th>Carga horária anotada</th>
+				</tr>
+			</table>
 		</div>
-			
+
 		</form>
 	</section>
 </div>
@@ -123,7 +130,7 @@
 
 		document.getElementById(inputId).disabled = true;
 
-		
+
 		let botaoInverso = inputId === 'botaoGold' ? 'botaoValidados' : 'botaoGold';
 
 		document.getElementById(botaoInverso).disabled = false;
@@ -144,31 +151,44 @@
 	}
 
 
-	function mostrarListaUsuarios(){
+	function subtraiHoras(elemento1, elemento2) {
+		let hora1 = elemento1.split(",")[1];
+		let hora2 = elemento2.split(",")[1];
+
+		return hora2 - hora1;
+	}
+
+	function mostrarListaUsuarios() {
 		document.getElementById("listarUsuarios").disabled = true;
 
-		let listaUsuariosNaoProcessada = document.getElementById("todosUsuarios").innerHTML;
+		let listaDatasNaoProcessada = document.getElementById('todosUsuarios').innerHTML;
+		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
 
-		const regex = /[\w\.@]+\,[\d\.@]+\;/gi;
+		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
 
-		let listaUsuariosProcessada = listaUsuariosNaoProcessada.match(regex);
-		let ul = document.createElement("ul");
+		let table = document.querySelector("div > table");
+		let diaAtual = document.getElementById("diaAtual").innerHTML;
+		let diaComeco = document.getElementById("diaComeco").innerHTML;
 
-		listaUsuariosProcessada.forEach(elemento=>{
-			let dados = elemento.split(",");
-			let nome = dados[0];
-			let horas = dados[1].slice(0,-1);
+		listaDatasOrdenada.forEach(elemento => {
 
-			let li = document.createElement("li");
-			li.innerHTML= `<strong>${nome.toUpperCase()}</strong> anotou <strong>${horas}</strong> horas essa semana.`
+			let listaDados = elemento.split(",");
+			let tr = document.createElement("tr");
 
-			ul.appendChild(li);
+			listaDados[3] = listaDados[1];
+			listaDados[2] = diaAtual;
+			listaDados[1] = diaComeco;
 
+			listaDados.forEach(dado => {
+				let td = document.createElement("td");
+				td.textContent = dado;
+				tr.appendChild(td);
+			});
+
+			table.appendChild(tr);
 		});
 
-		let div = document.getElementById("divListaDeUsuarios");
-		div.appendChild(ul);
-
+		table.hidden = false;
 	}
 
 </script>

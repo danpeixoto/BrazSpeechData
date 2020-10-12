@@ -60,8 +60,8 @@
 		</table>
 
 	</div>
-	<input id="inputEscondidoInvalido" type="submit" value="Submit" name="Submit"
-		style="height: 35px; width: 130px; margin-top: 100px;" hidden>
+	<input id="inputEscondidoInvalido" type="button" value="Submit" style="height: 35px; width: 130px; margin-top: 100px;"
+	 onclick="formSubmitInvalido()" hidden>
 </form>
 
 
@@ -78,6 +78,14 @@
 			textInput.disabled = true;
 		}
 
+	}
+
+	function formSubmitInvalido(){
+		let button = document.getElementById("inputEscondidoInvalido");
+		if(!button.disabled){
+			button.disabled = true;
+			document.getElementById("formInvalid").submit();
+		}
 	}
 
 </script>

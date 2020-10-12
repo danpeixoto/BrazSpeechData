@@ -46,8 +46,8 @@
 	</div>
 
 
-	<input id="inputEscondidoValido" type="submit" value="Submit" style="height: 35px; width: 130px; margin-top: 100px;"
-		disabled="true" hidden>
+	<input id="inputEscondidoValido" type="button" value="Submit" style="height: 35px; width: 130px; margin-top: 100px;"
+		disabled="true" onclick="formSubmitValido()" hidden>
 </form>
 
 
@@ -61,6 +61,14 @@
 			document.getElementById("inputEscondidoValido").disabled = false;
 		} else {
 			document.getElementById("inputEscondidoValido").disabled = true;
+		}
+	}
+
+	function formSubmitValido(){
+		let button = document.getElementById("inputEscondidoValido")
+		if(!button.disabled){
+			button.disabled = true;
+			document.getElementById("formValid").submit();
 		}
 	}
 
