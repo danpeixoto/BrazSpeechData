@@ -120,11 +120,13 @@ def Total_duration_admin(date_1, date_2):
 	users_data= []
 	for user in all_users:
 		if(len(user.username) > 10):
-			all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
+			#all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
+			all_duration = TimeValidated.query.filter(TimeValidated.user_validated==user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
 			total_hours = 0
 			for total in all_duration:
-				if (total.time_validated >= date_1 and total.time_validated <= date_2):
-					total_hours += total.duration
+				#if (total.time_validated >= date_1 and total.time_validated <= date_2):
+				#	total_hours += total.duration
+				total_hours += total.duration
 			users_data.append('{},{:.2f};'.format(user.username,total_hours/3600.0))
 	return users_data
 
@@ -147,56 +149,34 @@ def check_valids(values_list):
 @require_login
 def index():
 	if request.method == 'POST':
+		data = Dataset.query.filter_by(file_path=session['file_path']).first()
+		last_time = TimeValidated.query.filter_by(user_validated=session['username']).order_by(desc(TimeValidated.id)).first()
+		check_current_user(data)
+		
+		check_current_reason(data, check_invalid_reason(request.form.get('InvalidReason')))
+		new_time = TimeValidated()
+		data.instance_validated += 1
+		data.file_with_user = 0
+		data.number_validated += 1
 
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
 			valid_list = check_valids(values_list)
-			new_time = TimeValidated()
-			data = Dataset.query.filter_by(
-				file_path=session['file_path']).first()
-			last_time = TimeValidated.query.filter_by(
-				user_validated=session['username']).order_by(desc(TimeValidated.id)).first()# Caso de erro, checar se o username nao seria user_validated
-			check_current_user(data)
 			check_current_valids(data, valid_list)
-			check_current_reason(data, check_invalid_reason(
-				request.form.get('InvalidReason')))
-			data.instance_validated += 1
-			data.file_with_user = 0
 			data.instance_valid = 1
-			data.number_validated += 1
-			new_time.user_validated = session['username']
-			new_time.id_data = data.id
-			new_time.time_validated = datetime.now()
-			last_time_value = last_time.time_validated if last_time != None else datetime.now()
-			new_time.duration = Duration_calculation(last_time_value, new_time.time_validated)
-			db.session.add(data)
-			db.session.add(new_time)
-			db.session.commit()
-
 		elif request.form.get('Invalid')[:-1] == 'Invalid':
 			invalidClass = -int(request.form.get('Invalid')[-1])
-			data = Dataset.query.filter_by(
-				file_path=session['file_path']).first()
-			last_time = TimeValidated.query.filter_by(
-				user_validated=session['username']).first() # Caso de erro, checar se o username nao seria user_validated
-			check_current_user(data)
 			check_current_valids(data, 'None')
 			check_current_invalids(data, invalidClass)
-			check_current_reason(data, check_invalid_reason(
-				request.form.get('InvalidReason')))
-			new_time = TimeValidated()
-			data.instance_validated += 1
-			data.file_with_user = 0
-			data.number_validated += 1
-			new_time.user_validated = session['username']
-			new_time.id_data = data.id
-			new_time.time_validated = datetime.now()
-			last_time_value = last_time.time_validated if last_time != None else dt.timedelta(days=datetime.now().weekday())
-			new_time.duration = Duration_calculation(last_time_value, new_time.time_validated)
-			db.session.add(data)
-			db.session.add(new_time)
-			db.session.commit()
-
+		
+		new_time.user_validated = session['username']
+		new_time.id_data = data.id
+		new_time.time_validated = datetime.now()
+		last_time_value = last_time.time_validated if last_time != None else datetime.now()
+		new_time.duration = Duration_calculation(last_time_value, new_time.time_validated)
+		db.session.add(data)
+		db.session.add(new_time)
+		db.session.commit()
 		return redirect(url_for('webui.index'))
 
 	if session['username'] == 'sandra' or session['username'] == 'edresson':
@@ -235,27 +215,36 @@ def tutorial():
 def hours_worked():
 
 	response_string = ''
-	 
-	first_week = Total_duration_user(datetime(2020,10,1,0,0,0),datetime(2020,10,2,23,59,59),session['username'])
+	
+	first_week = Total_duration_user(datetime(2020,10,1,0,0,0),datetime(2020,10,4,23,59,59),session['username'])
 	today= dtt.datetime.today()
 	start = datetime(2020,10,5,0,0,0)
-	response_string += u'O total de horas,  entre a data 10-01 até 10-02, que você anotou {:.2f} horas.;'.format(first_week)
+	response_string += u'O total de horas, entre a data 10-01 até 10-04, que você anotou foi de: {:.2f} horas.;'.format(first_week)
 	num_weeks = abs(today-start).days//7 + 1
 
 	total_listened_since_start = 0
 	total_listened_since_start += first_week
-	for i in range(num_weeks):
+	for i in range(num_weeks-1):
 		
 		monday =  start + dtt.timedelta(days=i*7)
-		friday =  monday + dtt.timedelta( (4-monday.weekday()) % 7 )
-		saturday =  monday + dtt.timedelta( (5-monday.weekday()) % 7 )
-		print(saturday)
-		hours_listened = Total_duration_user(monday,saturday,session['username'])
+		sunday =  monday + dtt.timedelta(days=6)
+		next_monday =  monday + dtt.timedelta(days=7)
+		print("next_monday",next_monday)
+		print("sunday",sunday)
+		print("monday",monday)
+		hours_listened = Total_duration_user(monday,next_monday,session['username'])
 		total_listened_since_start += hours_listened
-		response_string += u'O total de horas, entre a data {} até {}, que você anotou foi de: {:.2f} horas.;'.format(str(monday)[5:10],str(friday)[5:10],hours_listened)
-	
+		response_string += u'O total de horas, entre a data {} até {}, que você anotou foi de: {:.2f} horas.;'.format(str(monday)[5:10],str(sunday)[5:10],hours_listened)
+
+	today= dtt.datetime.today()
+	last_monday =  today - dtt.timedelta(days=today.weekday(),hours = today.hour, minutes = today.minute, seconds= today.second, microseconds = today.microsecond )
+	hours_listened = Total_duration_user(last_monday,today,session['username'])
+
+	total_listened_since_start += hours_listened
+
+	response_string += u'O total de horas, nessa semana (segunda até domingo), que você anotou foi de: {:.2f} horas.;'.format(hours_listened)
 	response_string += u'O total de horas, entre a data {} até {}, que você anotou foi de: {:.2f} horas.;'.format( str(datetime(2020,10,1,0,0,0))[5:10],str(today)[5:10],total_listened_since_start)
-	
+	#funcao_soma_valores_anotadore()
 	'''
 	if request.method == 'POST':
 		today= dtt.datetime.today()
@@ -314,8 +303,7 @@ def admin():
 			return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
 	
 	today= dtt.datetime.today()
-	last_monday =  today - dtt.timedelta(days=today.weekday())
-
+	last_monday =  today - dtt.timedelta(days=today.weekday(),hours = today.hour, minutes = today.minute, seconds= today.second, microseconds = today.microsecond )
 	return render_template('admin.html', hours = {'user_list':Total_duration_admin(last_monday,today)})
 
 
@@ -414,35 +402,21 @@ def logout():
 
 
 # ESSA FUNÇÂO É PARA ARRUMAR A COLUNA DURATION DO TIMEVALIDATED
-#def funcao_soma_valores_anotadore():
-#	all_users = User.query.all()
-#
-#	for user in all_users:
-#		all_times = TimeValidated.query.filter_by(user_validated = user.username)
-#		i = 0
-#		last_time = 0 
-#		for time in all_times:
-#			if(i == 0)
-#				time.duration = 60
-#				i += 1
-#				last_time = time.time_validated
-#			else:
-#				time.duration = Duration_calculation(last_time,time.time_validated)
-#				last_time = time.time_validated
-#			
-#			db.session.commit()
-	#for user in all_user:
-	#	all_times = TimeValidated.query.filter(user_validated = user.username)
-	#	i = 0
-	#	last_time = 0
-	#   for time in all_times:
-	#		if i == 0 :
-	#			novo_duration = 60
-	#			i += 1
-	#			last_time = time.time_validated
-	#		else:
-	#			duration = Duration_calculation(last_time, time)
-	#			last_time = time
-	#			
-	#       db.commit()
-	#
+def funcao_soma_valores_anotadore():
+	all_users = User.query.all()
+
+	for user in all_users:
+		all_times = TimeValidated.query.filter_by(user_validated = user.username)
+		i = 0
+		last_time = 0 
+		for time in all_times:
+			if(i == 0):
+				time.duration = 60
+				i += 1
+				last_time = time.time_validated
+			else:
+				time.duration = Duration_calculation(last_time,time.time_validated)
+				last_time = time.time_validated
+			
+			db.session.commit()
+
