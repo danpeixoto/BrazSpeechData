@@ -298,9 +298,9 @@ def admin():
 				csv = ''
 
 				for dt in data:
-					string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.valids_user1+','+dt.valids_user2+','+dt.valids_user3+','+str(dt.invalid_user1)+','+str(dt.invalid_user2)+','+str(dt.invalid_user3) +\
-						','+dt.invalid_reason1+','+dt.invalid_reason2+','+dt.invalid_reason3+',' +\
-						str(dt.data_gold)+','+str(dt.number_validated)+'\n'
+					string = dt.file_path+';'+str(dt.audio_lenght)+';'+dt.text+';'+dt.valids_user1+';'+dt.valids_user2+';'+dt.valids_user3+';'+str(dt.invalid_user1)+';'+str(dt.invalid_user2)+';'+str(dt.invalid_user3) +\
+						';'+dt.invalid_reason1+';'+dt.invalid_reason2+';'+dt.invalid_reason3+';' +\
+						str(dt.data_gold)+';'+str(dt.number_validated)+'\n'
 					csv += string
 				return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=valid_instances_{}.csv'.format(gold)})
 
@@ -316,9 +316,9 @@ def admin():
 				Dataset.invalid_user2 == classe_invalid) | (Dataset.invalid_user3 == classe_invalid), Dataset.data_gold == gold)
 			csv = ''
 			for dt in data:
-				string = dt.file_path+','+str(dt.audio_lenght)+','+dt.text+','+dt.valids_user1+','+dt.valids_user2+','+dt.valids_user3+','+str(dt.invalid_user1)+','+str(dt.invalid_user2)+','+str(dt.invalid_user3) +\
-					','+dt.invalid_reason1+','+dt.invalid_reason2+','+dt.invalid_reason3+',' +\
-					str(dt.data_gold)+','+str(dt.number_validated)+'\n'
+				string = dt.file_path+';'+str(dt.audio_lenght)+';'+dt.text+';'+dt.valids_user1+';'+dt.valids_user2+';'+dt.valids_user3+';'+str(dt.invalid_user1)+';'+str(dt.invalid_user2)+';'+str(dt.invalid_user3) +\
+					';'+dt.invalid_reason1+';'+dt.invalid_reason2+';'+dt.invalid_reason3+';' +\
+					str(dt.data_gold)+';'+str(dt.number_validated)+'\n'
 				csv += string
 			return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
 
