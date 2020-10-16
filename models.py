@@ -19,6 +19,7 @@ class User(db.Model):
 	salt = db.Column(db.String(100))
 	last_login_time = db.Column(db.DateTime())
 	last_login_ip = db.Column(db.String(100))
+	carga_horaria = db.Column(db.Integer)
 
 class Dataset(db.Model):
 	__tablename__ = 'Dataset'
