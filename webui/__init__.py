@@ -100,7 +100,7 @@ def check_current_reason(data, invalid_reason):
 def Duration_calculation(last_time, present_time):
 	time_difference = present_time - last_time
 	time_difference_on_seconds = time_difference.seconds
-	duration = min(time_difference_on_seconds, 60)
+	duration = min(time_difference_on_seconds, 120)
 	return int(duration)
 
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo exigido.
@@ -198,17 +198,22 @@ def index():
 	if data is None:
 		return render_template('index-finish.html')
 	else:
+
 		data.file_with_user = 0
 		session['text'] = data.text
 		session['audio_lenght'] = data.audio_lenght
 		session['file_path'] = data.file_path
 		db.session.add(data)
 		db.session.commit()
-
+		
 		data.file_path = os.path.join(
 			'Dataset', data.file_path).replace('\\', '/')
 
+
+
+
 		return render_template('index.html', dataset=data)
+
 
 
 @webui.route('/tutorial', methods=['GET', 'POST'])
@@ -239,12 +244,9 @@ def hours_worked():
 		monday = start + dtt.timedelta(days=i*7)
 		sunday = monday + dtt.timedelta(days=6)
 		next_monday = monday + dtt.timedelta(days=7)
-		print("next_monday", next_monday)
-		print("sunday", sunday)
-		print("monday", monday)
 		hours_listened = Total_duration_user(
 			monday, next_monday, session['username'])
-		total_listened_since_start += hours_listened
+		#total_listened_since_start += hours_listened
 		response_string += u'{},{},{:.2f};'.format(monday.strftime(
 			'%d-%m-%Y'), sunday.strftime('%d-%m-%Y'), hours_listened)
 
@@ -254,13 +256,11 @@ def hours_worked():
 	hours_listened = Total_duration_user(
 		last_monday, today, session['username'])
 
-	total_listened_since_start += hours_listened
+	#total_listened_since_start += hours_listened
 
-	response_string += u'{},{},{:.2f};'.format(last_monday.strftime(
-		'%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened)
-	response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime(
-		'%d-%m-%Y'), today.strftime('%d-%m-%Y'), total_listened_since_start)
-	# funcao_soma_valores_anotadore()
+	response_string += u'{},{},{:.2f};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened)
+	#response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), total_listened_since_start)
+
 	'''
 	if request.method == 'POST':
 		today= dtt.datetime.today()
@@ -277,8 +277,12 @@ def hours_worked():
 			hours_listened = Total_duration_user(comeco,today,session['username'])
 			response_string = 'Você trabalhou {} essa desde a data 01/10/2020. O total de horas desde o inicio do projeto foi de {} horas'.format(hours_listened,total_hours)
 	'''
-
-	return render_template('hours_worked.html', hours={'response_string': response_string})
+	#Aqui eu pesquiso a carga horaria do anotador, caso ele não seja anotador comum recebe 20
+	user_data = User.query.filter(User.username == session['username'])
+	for user in user_data:
+		workload = user.carga_horaria if user.carga_horaria else 20
+	
+	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload})
 
 
 @webui.route('/admin', methods=['GET', 'POST'])
@@ -429,7 +433,7 @@ def funcao_soma_valores_anotadore():
 		last_time = 0
 		for time in all_times:
 			if(i == 0):
-				time.duration = 60
+				time.duration = 120
 				i += 1
 				last_time = time.time_validated
 			else:

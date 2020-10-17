@@ -39,9 +39,10 @@
 		border-collapse: collapse;
 		width: 50%;
 		margin-left: 25%;
+		overflow: scroll;
 	}
 
-	th{
+	th {
 		color: #b5e853;
 	}
 
@@ -56,6 +57,30 @@
 	tr:nth-child(even) {
 		background-color: #474747;
 	}
+
+
+	.tooltip .tooltiptext {
+		visibility: hidden;
+		width: 0px;
+		background-color: #474747;
+		color: #fff;
+		text-align: center;
+		border: 0.5px solid #dddddd;
+		border-radius: 6px;
+		padding: 5px 0;
+		position: absolute;
+		z-index: 10;
+		margin-left: -30%;
+		top: 30%;
+		opacity: 0;
+		transition: opacity 0.6s;
+	}
+
+	.tooltip:hover .tooltiptext {
+		visibility: visible;
+		opacity: 1;
+		width: 600px;
+	}
 </style>
 
 
@@ -63,6 +88,7 @@
 	<h1>Horas anotadas</h1>
 
 	<span id='todasSemanas' hidden>{{hours.response_string}}</span>
+	<span id='cargaHoraria' hidden>{{hours.workload}}</span>
 	<div id='listaDatas'></div>
 
 	<div id='tabelaSemanas'>
@@ -70,7 +96,19 @@
 			<tr>
 				<th>Data de inicio</th>
 				<th>Data de fim</th>
-				<th>Carga horária anotada</th>
+				<th>Horas anotadas</th>
+				<th class="tooltip">
+					Horas anotadas + descanso
+					<span class="tooltiptext">Horas anotadas somadas com o tempo do descanso semanal 
+						(o descanso corresponde a 15 minutos a cada 4 horas trabalhadas).						
+					</span>
+				</th>
+
+				<th>Carga horária</th>
+				<th class="tooltip">
+					Saldo
+					<span class='tooltiptext'> Vermelho = Negativo; Verde = Positivo. </span>
+				</th>
 			</tr>
 		</table>
 	</div>
@@ -78,21 +116,106 @@
 
 <script>
 
-	let listaDatasNaoProcessada = document.getElementById('todasSemanas').innerHTML;
-	let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
-	let table = document.querySelector("div > table");
+	function calcularDescanso(cargaHoraria) {
+		return (1.25 / 20) * cargaHoraria
+	}
 
-	listaDatasProcessada.forEach(elemento => {
+
+	function converteFloatParaHoras(horaEmFLoat) {
+
+		let horas = Math.floor(horaEmFLoat);
+		let minutos = Math.trunc((horaEmFLoat - horas) * 60);
+
+		horas = `${horas}`.length > 1 ? horas : `0${horas}`;
+		minutos = `${minutos}`.length > 1 ? minutos : `0${minutos}`;
+
+		return `${horas}:${minutos}`;
+
+	}
+
+	function styleTdSaldo(tr,saldo){
+		let tamanhoCells = tr.cells.length
+		if (saldo <= 0) {
+			tr.cells[tamanhoCells-1].style.color = "#ff0000";
+		} else if (saldo > 0) {
+			tr.cells[tamanhoCells-1].style.color = "#00ff37";
+		}
+		return tr;
+	}
+
+	function processaElementoLista(elemento, cargaHoraria, table) {
+		
 		let listaDados = elemento.split(",");
 		let tr = document.createElement("tr");
 
-		listaDados.forEach(dado =>{
+		let descanso = calcularDescanso(cargaHoraria)
+		let horaMaisDescanso = parseFloat(listaDados[2]) + descanso;
+
+		let saldo = (cargaHoraria - horaMaisDescanso) * -1;
+		
+
+
+		horaMaisDescanso = converteFloatParaHoras(horaMaisDescanso);
+		cargaHoraria = converteFloatParaHoras(cargaHoraria);
+
+		listaDados.push(horaMaisDescanso);
+		listaDados.push(cargaHoraria);
+		listaDados.push(saldo);
+
+		listaDados[2] = converteFloatParaHoras(listaDados[2])
+		
+
+		listaDados.forEach(dado => {
 			let td = document.createElement("td");
 			td.textContent = dado;
 			tr.appendChild(td);
 		});
-		table.appendChild(tr);
-	});
 
+		tr.cells[5].textContent = converteFloatParaHoras(Math.abs(saldo));
+
+		table.appendChild(styleTdSaldo(tr,saldo));
+		return saldo;
+	}
+
+	function criaTabelaHoras() {
+
+		let listaDatasNaoProcessada = document.getElementById('todasSemanas').innerHTML;
+		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
+		let table = document.querySelector("div > table");
+
+		let cargaHoraria = document.getElementById('cargaHoraria').textContent;
+		let saldoTotal = 0;
+		let cargaHorariaPrimeiraSemana = cargaHoraria == 20 ? 8 : 4;
+
+		listaDatasProcessada.forEach((elemento, index) => {
+			
+			if(index === 0){
+				saldoTotal += processaElementoLista(elemento, cargaHorariaPrimeiraSemana, table);
+			}else{
+				saldoTotal += processaElementoLista(elemento, cargaHoraria, table);
+			}
+			
+		});
+
+		let lastRow = document.createElement("tr");
+		let total = document.createElement("td");
+		let tdSaldoTotal = document.createElement("td");
+
+
+					
+		total.innerHTML = "<strong>Saldo total</strong>";
+		total.colSpan = "5";
+		total.style.textAlign = "center";
+		
+		lastRow.appendChild(total);
+		lastRow.appendChild(tdSaldoTotal);
+		table.appendChild(styleTdSaldo(lastRow,saldoTotal));
+		
+		tdSaldoTotal.textContent = converteFloatParaHoras(Math.abs(saldoTotal));
+		
+	}
+
+
+	criaTabelaHoras()
 </script>
 {% include 'footer.html' %}
