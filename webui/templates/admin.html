@@ -114,7 +114,9 @@
 					<th>Usuário</th>
 					<th>Data de inicio</th>
 					<th>Data de fim</th>
-					<th>Carga horária anotada</th>
+					<th>Horas anotadas</th>
+					<th>Horas anotadas + descanso</th>
+					<th>Carga horária</th>
 				</tr>
 			</table>
 		</div>
@@ -150,6 +152,10 @@
 	}
 
 
+	function calcularDescanso(cargaHoraria) {
+		return (1.25 / 20) * cargaHoraria
+	}
+
 	function subtraiHoras(elemento1, elemento2) {
 		let hora1 = elemento1.split(",")[1];
 		let hora2 = elemento2.split(",")[1];
@@ -170,13 +176,17 @@
 		let diaComeco = document.getElementById("diaComeco").innerHTML;
 
 		listaDatasOrdenada.forEach(elemento => {
-
+			
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
 
+			listaDados[5] = listaDados[3];
+			listaDados[2] = parseFloat(listaDados[2]);
+			listaDados[2] = (listaDados[2]+calcularDescanso(listaDados[2]));
+			listaDados[4] = listaDados[2].toFixed(2);
 			listaDados[3] = listaDados[1];
-			listaDados[2] = diaAtual;
 			listaDados[1] = diaComeco;
+			listaDados[2] = diaAtual;
 
 			listaDados.forEach(dado => {
 				let td = document.createElement("td");

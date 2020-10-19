@@ -100,7 +100,7 @@ def check_current_reason(data, invalid_reason):
 def Duration_calculation(last_time, present_time):
 	time_difference = present_time - last_time
 	time_difference_on_seconds = time_difference.seconds
-	duration = min(time_difference_on_seconds, 120)
+	duration = min(time_difference_on_seconds, 180)
 	return int(duration)
 
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo exigido.
@@ -131,8 +131,9 @@ def Total_duration_admin(date_1, date_2):
 			for total in all_duration:
 				total_hours += total.duration
 
-			users_data += u'{},{:.2f};'.format(user.username,
-											   total_hours/3600.0)
+			total_hours = total_hours/3600.0
+			users_data += u'{},{:.2f},{:.2f},{};'.format(user.username,
+											   total_hours,total_hours,user.carga_horaria)
 
 	return users_data
 
@@ -182,6 +183,7 @@ def index():
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
 		new_time.duration = Duration_calculation(
 			last_time_value, new_time.time_validated)
+		
 		db.session.add(data)
 		db.session.add(new_time)
 		db.session.commit()
@@ -281,7 +283,6 @@ def hours_worked():
 	user_data = User.query.filter(User.username == session['username'])
 	for user in user_data:
 		workload = user.carga_horaria if user.carga_horaria else 20
-	
 	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload})
 
 
