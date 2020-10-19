@@ -285,6 +285,10 @@ def hours_worked():
 	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload})
 
 
+def calculateTotalAudios():
+	total = Dataset.query.filter(Dataset.number_validated >= 3, Dataset.data_gold == 0).count()
+	return total
+
 @webui.route('/admin', methods=['GET', 'POST'])
 @require_admin
 def admin():
@@ -327,7 +331,9 @@ def admin():
 			return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
 
 	today = dtt.datetime.today()
-	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 1, 0, 0, 0), today), "today": today.strftime('%d-%m-%Y'), "start": datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y')})
+	total_audios = calculateTotalAudios()
+	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 1, 0, 0, 0), today), 'today': today.strftime('%d-%m-%Y'),\
+		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios})
 
 
 @webui.route('/login', methods=['GET', 'POST'])

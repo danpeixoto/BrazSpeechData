@@ -81,11 +81,25 @@
 		opacity: 1;
 		width: 600px;
 	}
+
+
+	/* Css para o link de voltar ao index */
+	.voltar {
+		text-decoration: none;
+		color: inherit;
+		font-size: inherit;
+		transition-property: color;
+		transition-duration: 1s;
+	}
+
+	.voltar:hover {
+		color: aliceblue;
+	}
 </style>
 
 
 <div class='contentContainer' style='text-align: center'>
-	<h1>Horas anotadas</h1>
+	<h1><a class="voltar" href="/">Horas anotadas</a></h1>
 
 	<span id='todasSemanas' hidden>{{hours.response_string}}</span>
 	<span id='cargaHoraria' hidden>{{hours.workload}}</span>
@@ -99,8 +113,8 @@
 				<th>Horas anotadas</th>
 				<th class="tooltip">
 					Horas anotadas + descanso
-					<span class="tooltiptext">Horas anotadas somadas com o tempo do descanso semanal 
-						(o descanso corresponde a 15 minutos a cada 4 horas trabalhadas).						
+					<span class="tooltiptext">Horas anotadas somadas com o tempo do descanso semanal
+						(o descanso corresponde a 15 minutos a cada 4 horas trabalhadas).
 					</span>
 				</th>
 
@@ -133,18 +147,18 @@
 
 	}
 
-	function styleTdSaldo(tr,saldo){
+	function styleTdSaldo(tr, saldo) {
 		let tamanhoCells = tr.cells.length
 		if (saldo <= 0) {
-			tr.cells[tamanhoCells-1].style.color = "#ff0000";
+			tr.cells[tamanhoCells - 1].style.color = "#ff0000";
 		} else if (saldo > 0) {
-			tr.cells[tamanhoCells-1].style.color = "#00ff37";
+			tr.cells[tamanhoCells - 1].style.color = "#00ff37";
 		}
 		return tr;
 	}
 
 	function processaElementoLista(elemento, cargaHoraria, table) {
-		
+
 		let listaDados = elemento.split(",");
 		let tr = document.createElement("tr");
 
@@ -152,7 +166,7 @@
 		let horaMaisDescanso = parseFloat(listaDados[2]) + descanso;
 
 		let saldo = (cargaHoraria - horaMaisDescanso) * -1;
-		
+
 
 
 		horaMaisDescanso = converteFloatParaHoras(horaMaisDescanso);
@@ -163,7 +177,7 @@
 		listaDados.push(saldo);
 
 		listaDados[2] = converteFloatParaHoras(listaDados[2])
-		
+
 
 		listaDados.forEach(dado => {
 			let td = document.createElement("td");
@@ -173,7 +187,7 @@
 
 		tr.cells[5].textContent = converteFloatParaHoras(Math.abs(saldo));
 
-		table.appendChild(styleTdSaldo(tr,saldo));
+		table.appendChild(styleTdSaldo(tr, saldo));
 		return saldo;
 	}
 
@@ -188,13 +202,13 @@
 		let cargaHorariaPrimeiraSemana = cargaHoraria == 20 ? 8 : 4;
 
 		listaDatasProcessada.forEach((elemento, index) => {
-			
-			if(index === 0){
+
+			if (index === 0) {
 				saldoTotal += processaElementoLista(elemento, cargaHorariaPrimeiraSemana, table);
-			}else{
+			} else {
 				saldoTotal += processaElementoLista(elemento, cargaHoraria, table);
 			}
-			
+
 		});
 
 		let lastRow = document.createElement("tr");
@@ -202,17 +216,17 @@
 		let tdSaldoTotal = document.createElement("td");
 
 
-					
+
 		total.innerHTML = "<strong>Saldo total</strong>";
 		total.colSpan = "5";
 		total.style.textAlign = "center";
-		
+
 		lastRow.appendChild(total);
 		lastRow.appendChild(tdSaldoTotal);
-		table.appendChild(styleTdSaldo(lastRow,saldoTotal));
-		
+		table.appendChild(styleTdSaldo(lastRow, saldoTotal));
+
 		tdSaldoTotal.textContent = converteFloatParaHoras(Math.abs(saldoTotal));
-		
+
 	}
 
 

@@ -26,11 +26,11 @@
 			padding: 5px;
 		}
 
-		.presteAtencao{
-			color:#db0000
+		.presteAtencao {
+			color: #db0000
 		}
 
-		.obs:hover{
+		.obs:hover {
 			color: #b5e853;
 		}
 
@@ -56,6 +56,20 @@
 			margin: 5px;
 			font-size: 0.9em;
 		}
+
+
+		/* Css para o link de voltar ao index */
+		.voltar {
+			text-decoration: none;
+			color: inherit;
+			font-size: inherit;
+			transition-property: color;
+			transition-duration: 1s;
+		}
+
+		.voltar:hover {
+			color: aliceblue;
+		}
 	</style>
 
 </head>
@@ -68,7 +82,8 @@
 
 		<h1 style="text-align: center;">
 
-			<strong>Tutorial - Tarefa de avaliação de alinhamentos áudio-texto</strong><br><br><br>
+			<a class="voltar" href="/"><strong>Tutorial - Tarefa de avaliação de alinhamentos áudio-texto</strong></a>
+			<br><br><br>
 
 		</h1>
 
@@ -198,10 +213,12 @@
 
 			</li>
 
-			<p class="obs"><strong>NOTA 1: NA SOBREPOSIÇÃO de VOZES no MESMO VOLUME, SÓ a FALA do LOCUTOR PRINCIPAL É TRANSCRITA. NÃO IREMOS EDITAR PARA INCLUIR a SEGUNDA VOZ. ESSE PAR SERÁ EXCLUÍDO. </strong></p>
-			<p class="obs"><strong>NOTA 2: INDICAMOS ERRO na TRANSCRIÇÃO quando houver apenas um LOCUTOR FALANDO. SE HOUVER PROBLEMA DE FALTA/EXCESSO ou TROCA de PALAVRAS, IREMOS EDITAR.</strong></p>	
+			<p class="obs"><strong>NOTA 1: NA SOBREPOSIÇÃO de VOZES no MESMO VOLUME, SÓ a FALA do LOCUTOR PRINCIPAL É
+					TRANSCRITA. NÃO IREMOS EDITAR PARA INCLUIR a SEGUNDA VOZ. ESSE PAR SERÁ EXCLUÍDO. </strong></p>
+			<p class="obs"><strong>NOTA 2: INDICAMOS ERRO na TRANSCRIÇÃO quando houver apenas um LOCUTOR FALANDO. SE
+					HOUVER PROBLEMA DE FALTA/EXCESSO ou TROCA de PALAVRAS, IREMOS EDITAR.</strong></p>
 		</ol>
-		
+
 
 
 
@@ -218,15 +235,18 @@
 
 
 		<p>
-			As normas de transcrição são diferentes para os diferentes córpus acima. As marcas de truncamento, prolongamentos de vogal/consoante, pausas, comentários e algumas outras foram removidas.
+			As normas de transcrição são diferentes para os diferentes córpus acima. As marcas de truncamento,
+			prolongamentos de vogal/consoante, pausas, comentários e algumas outras foram removidas.
 		</p>
 
 		<p>
-			Pausas preenchidas ficaram e aparecem de várias formas. Para a tarefa de alinhamento áudio-texto não julgamos essas formas utilizadas, por exemplo: ahn, hum, eh, hã. Elas vão aparecer naturalmente na transcrição. Encontramos também trechos de hesitação.
+			Pausas preenchidas ficaram e aparecem de várias formas. Para a tarefa de alinhamento áudio-texto não
+			julgamos essas formas utilizadas, por exemplo: ahn, hum, eh, hã. Elas vão aparecer naturalmente na
+			transcrição. Encontramos também trechos de hesitação.
 		</p>
 
 		<p class="presteAtencao">
-			DEVEMOS INDICAR SE um PAR VÁLIDO TRAZ uma PAUSA PREENCHIDA ou uma HESITAÇÃO !!!<br/>
+			DEVEMOS INDICAR SE um PAR VÁLIDO TRAZ uma PAUSA PREENCHIDA ou uma HESITAÇÃO !!!<br />
 			OUTRAS OPÇÕES para PARES VÁLIDOS SÃO:
 		</p>
 		<ol class="presteAtencao">
@@ -234,13 +254,18 @@
 			<li>Válidos com ruído de fundo/voz baixa</li>
 			<li>Válidos com sobreposição de voz baixa</li>
 		</ol>
-			
-		<p><strong>REGRA 1:</strong> <span class="presteAtencao">Não invalide</span>  uma sentença se FALTAR a transcrição da pausa preenchida, pois ela é muito curta.</p>
-		<p><strong>REGRA 2:</strong>  Quanto à hesitação, por exemplo: ...o mole o o o moleton …., <span class="presteAtencao">invalide se ela não for transcrita</span> , para que o trecho de hesitações seja inserido. Geralmente as hesitações são mais longas e se faltar a transcrição haverá desalinhamento do áudio-transcrição.</p>
-		<p>A anotação deve julgar a qualidade/validade do pareamento para a compilação de um dataset para o Reconhecimento de Fala e não para o propósito original para o qual os córpus foram criados.</p>
-		
-		
-		
+
+		<p><strong>REGRA 1:</strong> <span class="presteAtencao">Não invalide</span> uma sentença se FALTAR a
+			transcrição da pausa preenchida, pois ela é muito curta.</p>
+		<p><strong>REGRA 2:</strong> Quanto à hesitação, por exemplo: ...o mole o o o moleton …., <span
+				class="presteAtencao">invalide se ela não for transcrita</span> , para que o trecho de hesitações seja
+			inserido. Geralmente as hesitações são mais longas e se faltar a transcrição haverá desalinhamento do
+			áudio-transcrição.</p>
+		<p>A anotação deve julgar a qualidade/validade do pareamento para a compilação de um dataset para o
+			Reconhecimento de Fala e não para o propósito original para o qual os córpus foram criados.</p>
+
+
+
 
 		<div class="casosAnotacao">
 
