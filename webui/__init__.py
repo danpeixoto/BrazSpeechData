@@ -401,11 +401,15 @@ def change_password():
 @require_admin
 def add_user():
 	if request.method == 'POST':
-		if 'password' in request.form and 'username' in request.form:
+		password = request.form.get('password')
+		username = request.form.get('username')
+		workload = request.form.get('workload')
+		if password and username and workload:
 			print(request.form['password'])
 			password_hash, salt = hash_and_salt(request.form['password'])
 			new_user = User()
-			new_user.username = request.form['username']
+			new_user.username = username
+			new_user.carga_horaria = workload
 			new_user.password = password_hash
 			new_user.salt = salt
 			db.session.add(new_user)

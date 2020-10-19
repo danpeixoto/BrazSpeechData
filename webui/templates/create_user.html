@@ -2,29 +2,66 @@
 {% include "header.html" %}
 {% endwith %}
 
-    <div class="container">
-    	<section id="main_content">
+<div class="container">
+	<section id="main_content">
 
-        <h2>Please inform the user data to be registered on the Web Interface.</h2>
-        <form method="POST" id="passform">
-          Username<br><input type="text" name="username"><br><br>
-          Password<br><input type="password" name="password" id="password1"><br><br>
-          Confirm<br><input type="password" id="password2"><br><br>
-    		  <input type="submit" value="Register">
-        </form>
+		<h2>Informe os dados do usuário a serem cadastrados no Sistema.</h2>
+		<form method="POST" id="form">
+			<label>Usuário:</label><br>
+			<input type="text" name="username" id="username" autocomplete="username"><br><br>
+			
+			<label>Repita o usuário:</label><br>
+			<input type="text" name="username-check" id="username-check" autocomplete="username"><br><br>
 
-	    </section>
-    </div>
-  <script>
-  document.getElementById("passform").onsubmit = function() {
-    if (document.getElementById("password1").value == document.getElementById("password2").value) {
-      return true;
-    }
-    else {
-      alert("Passwords do not match");
-      return false;
-    }
-  }
-  </script>
+			<label>Senha:</label><br>
+			<input type="password" name="password" id="password" autocomplete="new-password"><br><br>
+
+			<label>Repita a senha:</label><br>
+			<input type="password" name="password-check" id="password-check" autocomplete="new-password"><br><br>
+
+			<label>Carga Horária:</label><br>
+			<input type="number" name="workload" id="workload" min="1"><br><br>
+			
+
+			
+			<input type="button" onclick="submitForm()" value="Register">
+
+		</form>
+
+	</section>
+</div>
+<script>
+
+	function submitForm(){
+
+		let password = document.getElementById("password").value;
+		let passwordCheck = document.getElementById("password-check").value;
+		let username = document.getElementById("username").value;
+		let usernameCheck = document.getElementById("username-check").value;
+		let workload = document.getElementById("workload").value;
+		let form = document.getElementById("form");
+
+		let equalsPassword = password == passwordCheck;
+		let equalsUsername = username == usernameCheck;
+
+		if(equalsPassword && equalsUsername && workload > 0){
+			form.submit();
+		}
+		
+		if(!equalsPassword){
+			alert("Senhas diferentes.");
+		}
+
+		if(!equalsUsername){
+			alert("Usuários diferentes.");
+		}
+
+		if(workload < 1){
+			alert("Carga horária inválida.");
+		}
+
+
+	}
+</script>
 
 {% include "footer.html" %}
