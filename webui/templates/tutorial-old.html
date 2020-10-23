@@ -1,0 +1,476 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html" %}
+{% endwith %}
+
+<head>
+
+	<style>
+		p,
+		li {
+			text-align: justify;
+		}
+
+		.listaNegrito {
+			font-weight: bold;
+		}
+
+
+		.casosAnotacao,
+		.exemplos {
+			text-align: justify;
+			font-size: 1.2em;
+		}
+
+		ul li {
+			margin-left: 20px;
+			padding: 5px;
+		}
+
+		span#obsValido:hover,
+		h3.valido {
+			color: #0387e6;
+			text-shadow: none;
+		}
+
+		span#obsInvalido:hover,
+		h3.invalido {
+			color: #ff0000;
+			text-shadow: none;
+		}
+
+		h3.valido,
+		h3.invalido {
+			margin: 60px 0;
+		}
+
+		dt,
+		dl {
+			margin: 5px;
+			font-size: 0.9em;
+		}
+	</style>
+
+</head>
+
+<div class="container" style="text-align: center">
+	<section id="main_content">
+
+		<h1 style="text-align: center;">
+			<strong>Tutorial - Tarefa de avaliação de alinhamentos áudio-texto</strong><br><br><br>
+		</h1>
+
+		<p>
+			Você foi convidado para avaliar <strong>alinhamentos áudio-texto</strong> de vários córpus. Os trechos de
+			texto &lpar;ou enunciados&rpar;
+			vem de 4 córpus públicos da literatura: ALIP, NURC-RECIFE, C-ORAL Brasil, SP2010. Outros 2 córpus estão em
+			fase de processamento e negociação: ted talks brasil e Museu da Pessoa.
+		</p>
+
+		<p>
+			As normas de transcrição são diferentes para os diferentes córpus acima. As marcas de truncamento,
+			prolongamentos de vogal/consoante, pausas, comentários e algumas outras foram removidas.
+			<strong>Pausas preenchidas ficaram e aparecem de várias formas. Para a tarefa de alinhamento áudio-texto não
+				julgamos essas formas utilizadas, por exemplo: ahn, hum, eh, hã.
+				Elas vão aparecer naturalmente na transcrição.</strong>
+		</p>
+
+		<p>
+			A tarefa de avaliação é composta da:
+		</p>
+
+
+		<ol type="a">
+
+			<li>
+				audição de um arquivo de áudio &lpar;que pode ser ouvido quantas vezes se desejar&rpar; e leitura de transcrição
+			</li>
+
+			<li>
+				anotação binária: <strong>VALID/INVALID</strong>.
+			</li>
+
+		</ol>
+
+		<p>
+			Sendo que para os pares anotados como <strong>INVALID</strong> ainda é necessário indicar a razão de serem
+			inválidos.
+		</p>
+
+		<p>
+			Há 3 causas para julgarmos um <strong>áudio inválido</strong>:
+		</p>
+
+		<ol class="listaNegrito">
+
+			<li>
+				Sobreposição de vozes
+			</li>
+
+			<li>
+				Volume baixo da voz do locutor principal, tornando o áudio incompreensível
+			</li>
+
+			<li>
+				Truncamento de palavra
+			</li>
+		</ol>
+
+
+		<p>
+			Há 3 causas para julgarmos uma transcrição inválida, i.e. aquela que não bate com o áudio:
+		</p>
+
+		<ol class="listaNegrito">
+
+			<li>
+				Palavras a mais na transcrição
+			</li>
+
+			<li>
+				Palavras a menos
+			</li>
+
+			<li>
+				Palavras trocadas
+			</li>
+		</ol>
+
+		<p>
+			Após anotação, um novo áudio é fornecido, e assim por diante até o usuário desejar parar a anotação e/ou se
+			desconectar.
+		</p>
+
+		<p>
+			A anotação deve julgar a <strong>qualidade/validade</strong> do pareamento para a compilação de um dataset
+			para o
+			Reconhecimento de Fala e não para o propósito original para o qual os córpus foram criados.
+		</p>
+
+
+		<div class="casosAnotacao">
+			<h3>
+				A lista abaixo resume os casos de anotação Valid e Invalid.
+			</h3>
+
+			<ul>
+				<li>
+					Validos:
+					<ol type="1">
+						<li>
+							Sobreposição de voz &lpar;ou risos&rpar;, se a segunda voz &lpar;ou risos&rpar; for baixa.
+						</li>
+						<li>
+							Locutor com voz baixa, mas compreensível.
+						</li>
+
+						<span id="obsValido">&ast;OBS: O que não foi anotado como Invalid será uma sentença/trecho
+							Valid.</span>
+
+
+					</ol>
+				</li>
+
+				<li>
+					Invalidos:
+					<ol type="1">
+						<li>
+							Sobreposição de voz &lpar;ou risos&rpar;, se a segunda voz &lpar;ou risos&rpar; for em um
+							volume próximo do volume do locutor principal.
+						</li>
+						<li>
+							Locutor com voz baixa, mas incompreensível.
+						</li>
+						<li>
+							Última palavra da sentença está truncada.
+						</li>
+						<li>
+							Sentença composta por uma única palavra e essa palavra está truncada.
+						</li>
+						<li>
+							Palavra&lpar;s&rpar; a mais, a menos ou trocadas na transcrição.
+						</li>
+						<li>
+							Junção de 2 ou mais problemas acima, por exemplo, a anonimização com YYY na transcrição e
+							zumbido no áudio.
+						</li>
+						<span id="obsInvalido">
+							&ast;Casos de Invalid não elencados acima devem ser anotados na janela de texto.
+						</span>
+					</ol>
+				</li>
+			</ul>
+		</div>
+
+		<div class="exemplos">
+
+			<h2>
+				Exemplos reais de pares de áudio-transcrição e sua anotação
+			</h2>
+			
+			<h3 class="valido" style = "margin-top: 100px;">
+				Validos e sem problema:
+			</h3>
+			<dt>cê não pode aprontar apontar pra mesa</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7726_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>cê quer começar adivinhando ou fazendo a mímica</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7928_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>não pode falar nada</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7713_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>mas cê nunca vai adivinhar nenhuma minha porque eu nũ tenho a mínima noção</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7706_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>esse aqui não</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7688_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>amarelo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7682_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>tá</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7653_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>se alguém se enrola assim</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7849_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>e quem for daltônico</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7662_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>teve um teve uma fase longuíssima da história da RAI até o começo dos anos setenta o Bruno vai poder
+					entender isso sem tradução em que não podia se falar hhh a conjunção "anche”</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8306_CO_bfamcv07.wav"></audio>
+				</dd>
+			<h3 class="valido" style="margin-top: 100px;">
+				Sobreposição de voz &lpar;ou risos&rpar;, se a segunda voz &lpar;ou risos&rpar; for baixa:
+			</h3>
+
+			<dl>
+				<dt>é porque assim quando tem asterisco é pra todo mundo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7667_CO_bfamcv04.wav"></dd>
+				<dt>tem que ser tudo a mesma coisa</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7698_CO_bfamcv04.wav"></dd>
+				<dt>a minha irmã é tão lerda Carla que até outro dia ela nũ sabia que o pen drive quando cê tira do
+					computador cê tem que desativar</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8018_CO_bfamcv20.wav"></dd>
+				<dt>e vocês devem visitar o YouTube porque tem um um vídeo produzido pelo Mishima pelo Mishima o poeta o
+					escritor japonês em homenagem</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8340_CO_bfamcv07.wav"></dd>
+			</dl>
+
+			<h3 class="valido">
+				Locutor com voz baixa, mas compreensível:
+			</h3>
+
+			<dl>
+				<dt>mas tipo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7768_CO_bfamcv04.wav"></dd>
+				<dt>um rato</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7782_CO_bfamcv04.wav"></dd>
+				<dt>o tempo dá briga</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7871_CO_bfamcv04.wav"></dd>
+				<dt>tava saindo pus</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8137_CO_bfamcv20.wav"></dd>
+				<dt>pra todo mundo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7956_CO_bfamcv04.wav"></dd>
+			</dl>
+
+			<h3 class="invalido" style="margin-top: 100px;">
+				Sobreposição de voz &lpar;ou risos&rpar;, se a segunda voz &lpar;ou risos&rpar; for em um
+							volume próximo do volume do locutor principal:
+			</h3>
+
+			<dl>
+				<dt>aí o no jogo do desenho por exemplo um cê nũ pode tirar o o o o lápis do papel o outro tem que
+					desenhar com
+					a mão esquerda</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7690_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>só tem uma entrada</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8035_CO_bfamcv20.wav"></audio>
+				</dd>
+				<dt>contei pra todo mundo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8085_CO_bfamcv20.wav"></audio>
+				</dd>
+				<dt>cê lembra aquele dia com a Ana eu tinha gravado</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8420_CO_bfamcv07.wav"></audio>
+				</dd>
+				<dt>acaba o tempo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7858_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>é lazer é onde tá filme e tudo né</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7954_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>eu eu conheço o velho Imagem e Ação</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7656_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>eu nũ vou jogar não hhh</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7666_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>sim todos jogam</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7668_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>esse asterisco é porque é pra todo mundo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7670_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>depois só pro meu grupo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7673_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>então se ocê tem uma cor predefinida cê nũ vai</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7676_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>mas esse é novo no que eu jogava nũ tinha isso não</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7703_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>pra nenhum objeto que tenha</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7729_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>que isso é similar</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7733_CO_bfamcv04.wav"></audio>
+				</dd>
+				<dt>tá então só amarelo</dt>
+				<dd><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7678_CO_bfamcv04.wav"></audio>
+				</dd>
+			</dl>
+
+
+			<h3 class="invalido">
+				Locutor com voz baixa, mas incompreensível:
+			</h3>
+
+			<dl>
+				<dd>gato faz isso nada</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7776_CO_bfamcv04.wav"></audio>
+				</dt>
+			</dl>
+
+			<h3 class="invalido">
+				Última palavra da sentença está truncada:
+			</h3>
+
+			<dl>
+				<dd>hhh que saco</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7664_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>e palavras compostas que não s</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7838_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>a nossa chance é pontuar assim</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7709_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>eu fiquei olhando pra cara dela</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8040_CO_bfamcv20.wav"></audio>
+				</dt>
+				<dd>vai explicando aí</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7722_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>não cê só nũ p</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7761_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>no di</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8113_CO_bfamcv20.wav"></audio>
+				</dt>
+				<dd>a primei</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7779_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>ah primeiro a letra depois cê identifica a palavra</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7806_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>e tem um dadinho diferente ali</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7687_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>que saco</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7912_CO_bfamcv04.wav"></audio>
+				</dt>
+			</dl>
+
+
+			<h3 class="invalido">
+				Sentença composta por uma única palavra e essa palavra está truncada:
+			</h3>
+
+			<dl>
+				<dd>é</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7680_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>mas</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7805_CO_bfamcv04.wav"></audio>
+				</dt>
+
+			</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			Palavra(s) a mais, a menos ou trocadas na transcrição
+
+
+			<h3 class="invalido">
+				Palavra&lpar;s&rpar; a mais, a menos ou trocadas na transcrição:
+			</h3>
+
+			<dl>
+				<dd>porque esse aqui é quando for desenhar</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7689_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>ah cê não pode falar nada tipo se for</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7711_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>hhh tampinha</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7975_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>não eu adivinho</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7944_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>por exemplo duas palavras cê faz assim</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7826_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>é porque quando é uma né</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8003_CO_bfamcv04.wav"></audio>
+				</dt>
+
+			</dl>
+
+
+			<h3 class="invalido">
+				Junção de 2 ou mais problemas acima, por exemplo, a anonimização de trechos com YYY na transcrição e
+				zumbido
+				no áudio:
+			</h3>
+
+			<dl>
+				<dd>eu s eu adivinho mímica muito fácil</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/7705_CO_bfamcv04.wav"></audio>
+				</dt>
+				<dd>a minha yyy ela he a gente botava a blusa nela</dd>
+				<dt><audio controls src="http://143.107.183.175:14880/static/Dataset/data/8199_CO_bfamcv20.wav"></audio>
+				</dt>
+			</dl>
+
+
+		</div>
+
+		<form method="post" action="/tutorial">
+			<input type="submit" value="Ir Para Anotação" name="Ir Para Anotação" />
+
+		</form>
+
+	</section>
+</div>
+
+
+{% include "footer.html" %}

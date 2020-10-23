@@ -94,6 +94,17 @@ def check_current_reason(data, invalid_reason):
 		data.invalid_reason3 = invalid_reason
 
 
+# Função para retornar o número de áudios anotados por cada usuário
+def count_anotations(anotador):
+
+	all_anotations = TimeValidated.query.filter(TimeValidated.user_validated  == anotador)
+	count = 0
+	for anotation in all_anotations:
+		count += 1
+
+	return (count)
+
+
 # Parte de contagem de tempo
 
 # Função que calcula e armazena o tempo gasto por cada usuário.
@@ -189,12 +200,12 @@ def index():
 		db.session.commit()
 		return redirect(url_for('webui.index'))
 
-	if session['username'] == 'sandra' or session['username'] == 'edresson':
+	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
 		data = Dataset.query.filter_by(
 			instance_validated=0, file_with_user=0, data_gold=1).first()
 	else:
 		#data = session.query(Dataset).filter(Dataset.number_validated < 3, Dataset.file_with_user == 0, Dataset.data_gold == 0)
-		data = Dataset.query.filter(Dataset.instance_validated < 3, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated !=
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated !=
 									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username']).first()
 
 	if data is None:
@@ -287,7 +298,7 @@ def hours_worked():
 
 
 def calculateTotalAudios():
-	total = Dataset.query.filter(Dataset.number_validated >= 3, Dataset.data_gold == 0).count()
+	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0).count()
 	return total
 
 @webui.route('/admin', methods=['GET', 'POST'])
