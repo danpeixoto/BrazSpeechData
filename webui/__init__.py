@@ -166,7 +166,10 @@ def check_valids(values_list):
 @require_login
 def index():
 	if request.method == 'POST':
-		data = Dataset.query.filter_by(file_path=session['file_path']).first()
+
+		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
+
+		data = Dataset.query.filter_by(file_path=session['file_path'],data_gold= data_gold_result).first()
 		last_time = TimeValidated.query.filter_by(
 			user_validated=session['username']).order_by(desc(TimeValidated.id)).first()
 		check_current_user(data)
@@ -204,14 +207,15 @@ def index():
 		data = Dataset.query.filter_by(
 			instance_validated=0, file_with_user=0, data_gold=1).first()
 	else:
-		#data = session.query(Dataset).filter(Dataset.number_validated < 3, Dataset.file_with_user == 0, Dataset.data_gold == 0)
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated !=
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.audio_lenght/22050 > 2, Dataset.user_validated !=
+									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username']).first()
+		if data is None:
+			data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated !=
 									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username']).first()
 
 	if data is None:
 		return render_template('index-finish.html')
 	else:
-
 		data.file_with_user = 0
 		session['text'] = data.text
 		session['audio_lenght'] = data.audio_lenght
