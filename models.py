@@ -20,6 +20,8 @@ class User(db.Model):
 	last_login_time = db.Column(db.DateTime())
 	last_login_ip = db.Column(db.String(100))
 	carga_horaria = db.Column(db.Integer)
+	data_inicio = db.Column(db.String(100))
+	data_fim = db.Column(db.String(100))
 
 class Dataset(db.Model):
 	__tablename__ = 'Dataset'
