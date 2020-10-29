@@ -52,8 +52,8 @@
 
 		<h1>Welcome to BrazSpeechData.</h1>
 		
-		<p>O total de áudios anotados é: {{hours.total_audios}}</p>
-
+		<p>O total de áudios anotados é: {{hours.total_audios}}.</p>
+		<p>O total de horas de áudios anotadas é: {{hours.total_hours}} horas.</p>
 
 		<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
 			value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
@@ -107,8 +107,6 @@
 			<input class="botaoForm" id="listarUsuarios" type="button" value="Listar total horas usuarios"
 				style="height: 35px; width: 170px; margin-top: 15px;" onclick="mostrarListaUsuarios()" />
 			<p id="todosUsuarios" hidden>{{hours.user_list}}</p>
-			<p id="diaAtual" hidden>{{hours.today}}</p>
-			<p id="diaComeco" hidden>{{hours.start}}</p>
 			<table hidden>
 				<tr>
 					<th>Usuário</th>
@@ -152,13 +150,13 @@
 	}
 
 
-	function calcularDescanso(cargaHoraria) {
-		return (1.25 / 20) * cargaHoraria
+	function calcularHoraComDescanso(horasAnotadas) {
+		return (1.25 / 20) * horasAnotadas + horasAnotadas;
 	}
 
 	function subtraiHoras(elemento1, elemento2) {
-		let hora1 = elemento1.split(",")[1];
-		let hora2 = elemento2.split(",")[1];
+		let hora1 = elemento1.split(",")[3];
+		let hora2 = elemento2.split(",")[3];
 
 		return hora2 - hora1;
 	}
@@ -172,21 +170,17 @@
 		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
 
 		let table = document.querySelector("div > table");
-		let diaAtual = document.getElementById("diaAtual").innerHTML;
-		let diaComeco = document.getElementById("diaComeco").innerHTML;
+
 
 		listaDatasOrdenada.forEach(elemento => {
 			
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
 
-			listaDados[5] = listaDados[3];
-			listaDados[2] = parseFloat(listaDados[2]);
-			listaDados[2] = (listaDados[2]+calcularDescanso(listaDados[2]));
-			listaDados[4] = listaDados[2].toFixed(2);
-			listaDados[3] = listaDados[1];
-			listaDados[1] = diaComeco;
-			listaDados[2] = diaAtual;
+			
+			listaDados[4] = parseFloat(listaDados[4]);
+			listaDados[4] = calcularHoraComDescanso(listaDados[4]).toFixed(2);
+
 
 			listaDados.forEach(dado => {
 				let td = document.createElement("td");
