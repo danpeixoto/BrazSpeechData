@@ -376,8 +376,12 @@ def admin():
 	today = dtt.datetime.today()
 	total_audios = calculate_total_audios()
 	total_hours_validated = calculate_total_hours_validated()
+
+	project_started = datetime(2020, 10, 5, 0, 0, 0)
+	num_weeks = abs(today-project_started).days//7 + 1
+
 	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 1, 0, 0, 0), today), 'today': today.strftime('%d-%m-%Y'),\
-		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios,'total_hours' :total_hours_validated})
+		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios,'total_hours' :total_hours_validated,'num_weeks':num_weeks})
 
 
 @webui.route('/login', methods=['GET', 'POST'])

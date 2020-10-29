@@ -107,6 +107,7 @@
 			<input class="botaoForm" id="listarUsuarios" type="button" value="Listar total horas usuarios"
 				style="height: 35px; width: 170px; margin-top: 15px;" onclick="mostrarListaUsuarios()" />
 			<p id="todosUsuarios" hidden>{{hours.user_list}}</p>
+			<p id="numeroSemanas" hidden>{{hours.num_weeks}}</p>
 			<table hidden>
 				<tr>
 					<th>Usuário</th>
@@ -115,6 +116,7 @@
 					<th>Horas anotadas</th>
 					<th>Horas anotadas + descanso</th>
 					<th>Carga horária</th>
+					<th>Saldo</th>
 				</tr>
 			</table>
 		</div>
@@ -161,6 +163,18 @@
 		return hora2 - hora1;
 	}
 
+
+	function styleTdSaldo(tr, saldo) {
+		let tamanhoCells = tr.cells.length
+		if (saldo <= 0) {
+			tr.cells[tamanhoCells - 1].style.color = "#ff0000";
+		} else if (saldo > 0) {
+			tr.cells[tamanhoCells - 1].style.color = "#00ff37";
+		}
+		return tr;
+	}
+
+
 	function mostrarListaUsuarios() {
 		document.getElementById("listarUsuarios").disabled = true;
 
@@ -168,7 +182,7 @@
 		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
 
 		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
-
+		let totalSemanas = document.getElementById('numeroSemanas').textContent;
 		let table = document.querySelector("div > table");
 
 
@@ -176,10 +190,14 @@
 			
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
+			let totalHorasDoProjeto = listaDados[5]*parseInt(totalSemanas);
+			let horasPrimeirosDoisDias = listaDados[5]==10? 4:8;
+			totalHorasDoProjeto+= horasPrimeirosDoisDias;
 
-			
 			listaDados[4] = parseFloat(listaDados[4]);
 			listaDados[4] = calcularHoraComDescanso(listaDados[4]).toFixed(2);
+
+			listaDados[6] = (listaDados[4] - totalHorasDoProjeto).toFixed(2);
 
 
 			listaDados.forEach(dado => {
@@ -188,7 +206,7 @@
 				tr.appendChild(td);
 			});
 
-			table.appendChild(tr);
+			table.appendChild(styleTdSaldo(tr,listaDados[6]));
 		});
 
 		table.hidden = false;
