@@ -148,6 +148,21 @@ def Total_duration_admin(date_1, date_2):
 
 	return users_data
 
+# Altera o file_with_user
+def change_file_with_user():
+	data = Dataset.query.all()
+
+	for anotations in data:
+		if anotations.number_validated == 0 and anotations.file_with_user == 1:
+			anotations.file_with_user = 0
+			db.session.add(anotations)
+	
+	db.session.commit()
+
+	
+	
+	
+
 
 def check_invalid_reason(invalid_reason):
 	return invalid_reason if invalid_reason != None else 'None'
@@ -178,7 +193,7 @@ def index():
 			request.form.get('InvalidReason')))
 		new_time = TimeValidated()
 		data.instance_validated += 1
-		data.file_with_user = 0
+		data.file_with_user = 1
 		data.number_validated += 1
 
 		if request.form.getlist('Valid'):
@@ -216,7 +231,7 @@ def index():
 	if data is None:
 		return render_template('index-finish.html')
 	else:
-		data.file_with_user = 0
+		data.file_with_user = 1 
 		session['text'] = data.text
 		session['audio_lenght'] = data.audio_lenght
 		session['file_path'] = data.file_path
