@@ -2,6 +2,10 @@
 
 import random
 import string
+import time
+from datetime import datetime
+from sqlalchemy import or_
+from threading import Timer
 from functools import wraps
 import hashlib
 from datetime import datetime
@@ -151,19 +155,14 @@ def Total_duration_admin(date_1, date_2):
 	return users_data
 
 # Altera o file_with_user
-def change_file_with_user():
-	data = Dataset.query.all()
-
-	for anotations in data:
-		if anotations.number_validated == 0 and anotations.file_with_user == 1:
-			anotations.file_with_user = 0
-			db.session.add(anotations)
-	
-	db.session.commit()
-
-	
-	
-	
+#def change_file_with_user():
+#	data = Dataset.query.all()
+#	for anotations in data:
+#		if anotations.number_validated == 0 and anotations.file_with_user == 1:
+#			anotations.file_with_user = 0
+#			db.session.add(anotations)
+#	
+#	db.session.commit()
 
 
 def check_invalid_reason(invalid_reason):
@@ -195,8 +194,9 @@ def index():
 			request.form.get('InvalidReason')))
 		new_time = TimeValidated()
 		data.instance_validated += 1
-		data.file_with_user = 1
+		data.file_with_user = 0
 		data.number_validated += 1
+		data.travado = datetime.now()
 
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
@@ -225,15 +225,18 @@ def index():
 			instance_validated=0, file_with_user=0, data_gold=1).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.audio_lenght/22050 > 2, Dataset.user_validated !=
-									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username']).first()
+									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+									or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).first()
 		if data is None:
-			data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated !=
-									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username']).first()
+			data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
+			Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
+			or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
 	else:
-		data.file_with_user = 1 
+		data.file_with_user = 0
+		data.travado = datetime.now()
 		session['text'] = data.text
 		session['audio_lenght'] = data.audio_lenght
 		session['file_path'] = data.file_path
@@ -243,8 +246,7 @@ def index():
 		data.file_path = os.path.join(
 			'Dataset', data.file_path).replace('\\', '/')
 
-
-
+		# MUDEI AQUI 
 
 		return render_template('index.html', dataset=data)
 

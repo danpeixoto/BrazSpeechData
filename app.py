@@ -81,6 +81,8 @@ def initdataset():
 		new_data.invalid_reason3 = ''
 		new_data.number_validated = 0 
 		new_data.data_gold = 0
+		new_data.duration = 0
+		new_data.travado = None
 		db.session.add(new_data)
 
 	lines = list(open(data_csv_gold,encoding='utf8').readlines())   
@@ -108,6 +110,8 @@ def initdataset():
 		new_data.invalid_reason3 = ''
 		new_data.number_validated = 0 
 		new_data.data_gold = 1
+		new_data.duration = 0
+		new_data.travado = None
 		db.session.add(new_data)
 	db.session.commit()
 
@@ -116,7 +120,7 @@ def initvalidateddataset():
 	lines = list(open(data_validated_csv).readlines())
 
 	for line in lines:
-		audio_path,lenght,text,invalid_reason,number_validated,type_validated_1, type_validated_2, type_validated_3, type_validated_4, type_validated_5, type_validated_6, data_gold = line.split(',')
+		audio_path, duration, travado, lenght,text,invalid_reason,number_validated,type_validated_1, type_validated_2, type_validated_3, type_validated_4, type_validated_5, type_validated_6, data_gold = line.split(',')
 		text = text.replace('\n','')
 		new_data= Dataset()
 		new_data.text = text
@@ -137,6 +141,8 @@ def initvalidateddataset():
 		new_data.type_validated_4 = type_validated_4
 		new_data.type_validated_5 = type_validated_5
 		new_data.type_validated_6 = type_validated_6
+		new_data.duration = duration
+		new_data.travado = travado
 		db.session.add(new_data)
 	db.session.commit()
 

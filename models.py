@@ -45,7 +45,8 @@ class Dataset(db.Model):
 	invalid_reason1 = db.Column(db.String(2000))# rasão invalida 
 	invalid_reason2 = db.Column(db.String(2000))# rasão invalida 
 	invalid_reason3 = db.Column(db.String(2000))# rasão invalida 
-	duration = db.Column(db.Integer())
+	duration = db.Column(db.Integer) # Time of the audio
+	travado = db.Column(db.DateTime()) # Control for that only one receive the path, SETAR COMO 0 POR PADRAO
 
 class TimeValidated(db.Model):
 	__tablename__ = 'TimeValidated'
