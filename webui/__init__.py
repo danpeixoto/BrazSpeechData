@@ -246,8 +246,6 @@ def index():
 		data.file_path = os.path.join(
 			'Dataset', data.file_path).replace('\\', '/')
 
-		# MUDEI AQUI 
-
 		return render_template('index.html', dataset=data)
 
 
@@ -329,7 +327,7 @@ def calculate_total_hours_validated():
 	total_hours = 0
 	i = 0 
 	for row in rows:
-		total_hours += row.audio_lenght/22050.0
+		total_hours += row.duration
 		i+=1
 
 	return '{:.2f}'.format(total_hours/3600.0)
