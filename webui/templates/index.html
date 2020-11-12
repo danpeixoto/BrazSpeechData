@@ -78,7 +78,7 @@
 
 		<p>Sentence: {{dataset.text}}</p>
 
-		<audio controls autoplay>
+		<audio controls autoplay loop>
 			<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
 				media="(min-width: 900px)" preload>
 

@@ -54,12 +54,12 @@
 		
 		<p>O total de áudios anotados é: {{hours.total_audios}}.</p>
 		<p>O total de horas de áudios anotadas é: {{hours.total_hours}} horas.</p>
-
+		<p>O total de horas de áudios validas anotadas é: {{hours.valid_hours}} horas.</p>
 		<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
 			value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
 
 		<input class="botaoForm" id="botaoValidados" type="button" onclick="mostrarFormSelecionado(this.id,'naoGold')"
-			value="Validados" style="height: 35px; width: 130px; margin-top: 15px;" />
+			value="Anotados" style="height: 35px; width: 130px; margin-top: 15px;" />
 
 
 		<form id="gold" method='post' hidden>

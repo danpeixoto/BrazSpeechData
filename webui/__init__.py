@@ -325,12 +325,27 @@ def calculate_total_audios():
 def calculate_total_hours_validated():
 	rows = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0)
 	total_hours = 0
-	i = 0 
+	valid_hours = 0
 	for row in rows:
 		total_hours += row.duration
-		i+=1
+		valid_hours += return_duration_for_valid(row)
 
-	return '{:.2f}'.format(total_hours/3600.0)
+	return '{:.2f}'.format(total_hours/3600.0), '{:.2f}'.format(valid_hours/3600.0)
+
+def return_duration_for_valid(row):
+	if(row.number_validated > 2):
+			if(row.invalid_user1 == 0 and row.invalid_user2 == 0):
+				return row.duration
+			elif (row.invalid_user2 == 0 and row.invalid_user3 == 0):
+				return row.duration
+			elif (row.invalid_user1 == 0 and row.invalid_user3 == 0):
+				return row.duration
+	elif(row.number_validated == 1):
+		if(row.invalid_user1 == 0):
+			return row.duration
+
+	return 0
+
 
 @webui.route('/admin', methods=['GET', 'POST'])
 @require_admin
@@ -375,13 +390,13 @@ def admin():
 
 	today = dtt.datetime.today()
 	total_audios = calculate_total_audios()
-	total_hours_validated = calculate_total_hours_validated()
+	total_hours_validated, valid_hours = calculate_total_hours_validated()
 
 	project_started = datetime(2020, 10, 5, 0, 0, 0)
 	num_weeks = abs(today-project_started).days//7 + 1
 
 	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 1, 0, 0, 0), today), 'today': today.strftime('%d-%m-%Y'),\
-		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios,'total_hours' :total_hours_validated,'num_weeks':num_weeks})
+		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios,'total_hours' :total_hours_validated,'valid_hours':valid_hours,'num_weeks':num_weeks})
 
 
 @webui.route('/login', methods=['GET', 'POST'])
