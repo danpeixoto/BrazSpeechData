@@ -96,7 +96,7 @@
 
 		<p>Sentence: {{dataset.text}}</p>
 
-		<!-- <audio controls autoplay loop>
+		<!-- <audio controls autoplay >
 			<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
 				media="(min-width: 900px)" preload>
 
@@ -105,10 +105,10 @@
 
 		<div class="flex-container">
 			<div>
-				<audio id="audioAtual" controls autoplay>
-					<source src="../../static/Gold/data/1_CO_bpubdl06.wav" type="audio/wav" media="(min-width: 900px)"
-						preload>
-
+				<audio controls autoplay >
+					<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
+						media="(min-width: 900px)" preload>
+		
 					Your browser does not support the audio element. Please contact the admin!
 				</audio>
 			</div>
@@ -159,9 +159,14 @@
 
 		function getCookieValue() {
 			let cookieRe = /loop=\w*/g;
-			let cookieString = document.cookie.match(cookieRe)[0];
-			let cookieValue = cookieString.split("=")[1] === 'true';
-			return cookieValue;
+			let cookieString = document.cookie.match(cookieRe);
+			// verifica se já foi estabelecido algum valor ao cookie e depois retorna o valor
+			if(cookieString){
+				let cookieValue = cookieString[0].split("=")[1] === 'true';
+				return cookieValue;
+			}
+			
+			return false;
 		}
 
 		function gerenciarLoop() {
