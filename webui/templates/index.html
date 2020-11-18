@@ -20,9 +20,26 @@
 			margin: 0 40px;
 		}
 
-		audio {
-			margin-bottom: 70px;
+		#botaoLoop{
+			width: 45px;
+			height: 45px;
+			cursor: pointer;
 		}
+
+		.flex-container {
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: center;
+		}
+
+		.flex-container>div {
+			margin: 10px;
+			text-align: center;
+			line-height: 75px;
+			font-size: 30px;
+		}
+
+
 
 		label {
 			text-align: center;
@@ -32,7 +49,8 @@
 			padding: 2px;
 		}
 
-		input[type="radio"]:checked+label,input[type="checkbox"]:checked+label {
+		input[type="radio"]:checked+label,
+		input[type="checkbox"]:checked+label {
 			background: #d1d1d1;
 			color: black;
 		}
@@ -78,12 +96,30 @@
 
 		<p>Sentence: {{dataset.text}}</p>
 
-		<audio controls autoplay loop>
+		<!-- <audio controls autoplay loop>
 			<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
 				media="(min-width: 900px)" preload>
 
 			Your browser does not support the audio element. Please contact the admin!
-		</audio>
+		</audio> -->
+
+		<div class="flex-container">
+			<div>
+				<audio id="audioAtual" controls autoplay>
+					<source src="../../static/Gold/data/1_CO_bpubdl06.wav" type="audio/wav" media="(min-width: 900px)"
+						preload>
+
+					Your browser does not support the audio element. Please contact the admin!
+				</audio>
+			</div>
+			<div>
+				<img id="botaoLoop" onclick="gerenciarCookie()" src="{{url_for('webui.static', filename='images/loop.png')}}">
+			</div>
+		</div>
+
+
+
+
 		<br>
 		<br>
 		<br>
@@ -96,7 +132,7 @@
 			value="Invalid" name="ShowInvalidList" style="height: 35px; width: 130px; margin-top: 15px;" />
 
 
-		
+
 		{% include "classes_invalido.html" %}
 		{% include "classes_valido.html" %}
 
@@ -106,6 +142,39 @@
 
 
 	<script>
+
+		gerenciarLoop();
+
+		function gerenciarCookie() {
+			let botaoLoop = document.getElementById("botaoLoop");
+
+			if (botaoLoop.loopAtivo) {
+				document.cookie = "loop=false";
+			} else {
+				document.cookie = "loop=true";
+			}
+
+			gerenciarLoop();
+		}
+
+		function getCookieValue() {
+			let cookieRe = /loop=\w*/g;
+			let cookieString = document.cookie.match(cookieRe)[0];
+			let cookieValue = cookieString.split("=")[1] === 'true';
+			return cookieValue;
+		}
+
+		function gerenciarLoop() {
+			let botaoLoop = document.getElementById("botaoLoop");
+			let audioTag = document.getElementById("audioAtual");
+			let cookieValue = getCookieValue();
+
+			botaoLoop.style.opacity =  cookieValue ? 1.0 : 0.5;
+			botaoLoop.loopAtivo = cookieValue;
+			audioTag.loop = cookieValue;
+
+		}
+
 
 		function esconderClassesNaoSelecionadas(classe) {
 
@@ -139,7 +208,7 @@
 
 		}
 
-		
+
 	</script>
 
 </div>
