@@ -229,13 +229,9 @@ def index():
 		data = Dataset.query.filter_by(
 			instance_validated=0, file_with_user=0, data_gold=1).first()
 	else:
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.audio_lenght/22050 > 2, Dataset.user_validated !=
-									session['username'], Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
-									or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).first()
-		if data is None:
-			data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
-			Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
-			or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).first()
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
+		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
