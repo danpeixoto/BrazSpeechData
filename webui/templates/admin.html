@@ -182,7 +182,6 @@
 		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
 
 		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
-		let totalSemanas = document.getElementById('numeroSemanas').textContent;
 		let table = document.querySelector("div > table");
 
 
@@ -190,9 +189,17 @@
 			
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
-			let totalHorasDoProjeto = listaDados[5]*parseInt(totalSemanas);
-			let horasPrimeirosDoisDias = listaDados[5]==10? 4:8;
-			totalHorasDoProjeto+= horasPrimeirosDoisDias;
+			//listaDados na posicao 6 é o total de semanas do anotador, esse valor vai ser substituido depois
+			let totalHorasDoProjeto = 0;
+			//por algum motivo tem um caractere a mais na string
+			if(listaDados[1].substring(0, listaDados[1].length - 1) == "01/10/2020"){
+				let horasPrimeirosDoisDias = listaDados[5]==10? 4:8;
+				totalHorasDoProjeto = listaDados[5]*parseInt(listaDados[6]-1);
+				totalHorasDoProjeto+= horasPrimeirosDoisDias;
+			}else{
+				totalHorasDoProjeto = listaDados[5]*parseInt(listaDados[6]);
+			}
+			
 
 			listaDados[4] = parseFloat(listaDados[4]);
 			listaDados[4] = calcularHoraComDescanso(listaDados[4]).toFixed(2);

@@ -103,6 +103,7 @@
 
 	<span id='todasSemanas' hidden>{{hours.response_string}}</span>
 	<span id='cargaHoraria' hidden>{{hours.workload}}</span>
+	<span id='desdeInicio' hidden>{{hours.since_start}}</span>
 	<div id='listaDatas'></div>
 
 	<div id='tabelaSemanas'>
@@ -206,12 +207,13 @@
 		let table = document.querySelector("div > table");
 
 		let cargaHoraria = document.getElementById('cargaHoraria').textContent;
+		let desdeInicio = document.getElementById('desdeInicio').textContent;
 		let saldoTotal = 0;
 		let cargaHorariaPrimeiraSemana = cargaHoraria == 20 ? 8 : 4;
 
 		listaDatasProcessada.forEach((elemento, index) => {
 
-			if (index === 0) {
+			if (index === 0 && desdeInicio == true) {
 				saldoTotal += processaElementoLista(elemento, cargaHorariaPrimeiraSemana, table);
 			} else {
 				saldoTotal += processaElementoLista(elemento, cargaHoraria, table);

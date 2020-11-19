@@ -136,21 +136,26 @@ def Total_duration_user(date_1, date_2, current_user):
 def Total_duration_admin(date_1, date_2):
 	all_users = User.query.all()
 	users_data = ""
+	today = dtt.datetime.today()
 	for user in all_users:
 		if(len(user.username) > 10 and " " not in user.username):
 			#all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
-			all_duration = TimeValidated.query.filter(
-				TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
+			# all_duration = TimeValidated.query.filter(
+			# 	TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
+			
+			start = datetime.strptime(user.data_inicio.strip(),'%d/%m/%Y')
+			end = datetime.strptime(user.data_fim.strip(),'%d/%m/%Y')
+			# total_hours = 0
+			# for total in all_duration:
+			# 	total_hours += total.duration
 
-			total_hours = 0
-			for total in all_duration:
-				total_hours += total.duration
-
-			total_hours = total_hours/3600.0
+			# total_hours = total_hours/3600.0
+			num_weeks = abs(today-start).days//7 + 1
+			total_hours = Total_duration_user(start,end,user.username)
 			user_start = user.data_inicio
 			user_finish = user.data_fim
-			users_data += u'{},{},{},{:.2f},{:.2f},{};'.format(user.username,user_start,user_finish,
-											   total_hours,total_hours,user.carga_horaria)
+			users_data += u'{},{},{},{:.2f},{:.2f},{},{};'.format(user.username,user_start,user_finish,
+											   total_hours,total_hours,user.carga_horaria,num_weeks)
 
 	return users_data
 
@@ -260,19 +265,32 @@ def tutorial():
 
 @webui.route('/hours_worked', methods=['GET', 'POST'])
 def hours_worked():
-
+	# response_string is a list of strings '{week_start},{week_end},total_hours;'
 	response_string = ''
+	current_user = User.query.filter_by(username = session['username']).first()
+	
 
-	first_week = Total_duration_user(datetime(2020, 10, 1, 0, 0, 0), datetime(
+	if(current_user.data_inicio is None):
+		current_user.data_inicio = '01/10/2020'
+
+	if(current_user.data_inicio.strip() == '01/10/2020'):
+		since_start = 1
+		project_first_week = Total_duration_user(datetime(2020, 10, 1, 0, 0, 0), datetime(
 		2020, 10, 4, 23, 59, 59), session['username'])
+		response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime(
+		'%d-%m-%Y'), datetime(2020, 10, 4, 23, 59, 59).strftime('%d-%m-%Y'), project_first_week)
+		start = datetime(2020, 10, 5, 0, 0, 0)
+	else:
+		since_start = 0
+		start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
+
+	#2020-10-05 00:00:00
 	today = dtt.datetime.today()
-	start = datetime(2020, 10, 5, 0, 0, 0)
-	response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime(
-		'%d-%m-%Y'), datetime(2020, 10, 4, 23, 59, 59).strftime('%d-%m-%Y'), first_week)
+	#start = datetime(2020, 10, 5, 0, 0, 0)
+	
 	num_weeks = abs(today-start).days//7 + 1
 
-	total_listened_since_start = 0
-	total_listened_since_start += first_week
+
 	for i in range(num_weeks-1):
 
 		monday = start + dtt.timedelta(days=i*7)
@@ -315,7 +333,7 @@ def hours_worked():
 	user_data = User.query.filter(User.username == session['username'])
 	for user in user_data:
 		workload = user.carga_horaria if user.carga_horaria else 20
-	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload})
+	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload,'since_start':since_start})
 
 
 def calculate_total_audios():
