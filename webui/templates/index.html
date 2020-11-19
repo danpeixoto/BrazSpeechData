@@ -105,7 +105,7 @@
 
 		<div class="flex-container">
 			<div>
-				<audio controls autoplay >
+				<audio id="audioAtual" controls autoplay >
 					<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
 						media="(min-width: 900px)" preload>
 		
@@ -113,7 +113,7 @@
 				</audio>
 			</div>
 			<div>
-				<img id="botaoLoop" onclick="gerenciarCookie()" src="{{url_for('webui.static', filename='images/loop.png')}}">
+				<img id="botaoLoop" onclick="gerenciarCookie()" src="{{url_for('webui.static', filename='images/loop.png')}}" ativo>
 			</div>
 		</div>
 
@@ -174,9 +174,16 @@
 			let audioTag = document.getElementById("audioAtual");
 			let cookieValue = getCookieValue();
 
-			botaoLoop.style.opacity =  cookieValue ? 1.0 : 0.5;
-			botaoLoop.loopAtivo = cookieValue;
-			audioTag.loop = cookieValue;
+			if(cookieValue !== null){
+				botaoLoop.style.opacity =  cookieValue ? 1.0 : 0.5;
+				botaoLoop.loopAtivo = cookieValue;
+				audioTag.loop = cookieValue;
+			}else{
+				botaoLoop.style.opacity = 0.5;
+				botaoLoop.loopAtivo = false;
+				audioTag.loop = false;
+			}
+			
 
 		}
 
@@ -217,4 +224,4 @@
 	</script>
 
 </div>
-{% include 'footer.html' %}
+
