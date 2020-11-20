@@ -47,6 +47,8 @@ class Dataset(db.Model):
 	invalid_reason3 = db.Column(db.String(2000))# rasão invalida 
 	duration = db.Column(db.Integer) # Time of the audio
 	travado = db.Column(db.DateTime()) # Control for that only one receive the path, SETAR COMO 0 POR PADRAO
+	task = db.Column(db.Integer) # 0 para anotar e 1 para transcrever, valor padrão é 0
+	text_asr = db.Column(db.String(2000)) # Text fornecido pelo ASR, o que será transcrito fica em TEXT
 
 class TimeValidated(db.Model):
 	__tablename__ = 'TimeValidated'
