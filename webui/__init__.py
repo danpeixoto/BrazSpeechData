@@ -260,6 +260,7 @@ def tutorial():
 
 
 @webui.route('/hours_worked', methods=['GET', 'POST'])
+@require_login
 def hours_worked():
 	# response_string is a list of strings '{week_start},{week_end},total_hours;'
 	response_string = ''
@@ -307,24 +308,7 @@ def hours_worked():
 	#total_listened_since_start += hours_listened
 
 	response_string += u'{},{},{:.2f};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened)
-	#response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), total_listened_since_start)
 
-	'''
-	if request.method == 'POST':
-		today= dtt.datetime.today()
-		if request.form.get('segunda'):
-			last_monday =  today - dtt.timedelta(days=today.weekday())
-			next_monday = today + dtt.timedelta(days=-today.weekday(), weeks=1)
-			hours_listened = Total_duration_user(last_monday,today,session['username'])
-			total_hours = 20
-			response_string = 'Você trabalhou {} essa semana. Semana atual: {} até {}'.format(hours_listened, str(last_monday)[:10],str(next_monday)[:10])
-		elif request.form.get('comeco'):
-			comeco = datetime(2020,10,1,0,0,0)
-			total_hours =  today - comeco
-			total_hours =  total_hours.days*24.0
-			hours_listened = Total_duration_user(comeco,today,session['username'])
-			response_string = 'Você trabalhou {} essa desde a data 01/10/2020. O total de horas desde o inicio do projeto foi de {} horas'.format(hours_listened,total_hours)
-	'''
 	#Aqui eu pesquiso a carga horaria do anotador, caso ele não seja anotador comum recebe 20
 	user_data = User.query.filter(User.username == session['username'])
 	for user in user_data:
@@ -506,11 +490,58 @@ def add_user():
 	return render_template('create_user.html')
 
 
+@webui.route('/transcribe_page', methods=['GET', 'POST'])
+@require_login
+def transcribe_page():
+
+	if request.method == 'POST':
+		#lucas, aqui é a parte onde vai salvar no banco
+		print("TERMINAR AQUI")
+		#é assim que pega o texto que a pessoa alterou
+		print(request.form.get('transcricao'))
+
+	#aqui tem que alterar para pegar audios daquele dataset
+	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
+		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+
+	if data is None:
+		return render_template('index-finish.html')
+	else:
+		data.file_with_user = 0
+		data.travado = datetime.now()
+		session['text'] = data.text
+		session['audio_lenght'] = data.audio_lenght
+		session['file_path'] = data.file_path
+		db.session.add(data)
+		db.session.commit()
+		
+		data.file_path = os.path.join(
+			'Dataset', data.file_path).replace('\\', '/')
+
+
+	return render_template('transcribe_page.html',dataset = data)
+
+
 @webui.route('/logout')
 def logout():
 	session.pop('username', None)
 	flash('Logged out successfully.')
 	return redirect(url_for('webui.login'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ESSA FUNÇÂO É PARA ARRUMAR A COLUNA DURATION DO TIMEVALIDATED

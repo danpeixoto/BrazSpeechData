@@ -34,8 +34,10 @@
     {% if session.username %}
     <h3 style="text-align: right">Logged in as {{ session.username }}</h3>
 	<h2 style="text-align: right">
+		<a href="{{ url_for('webui.index') }}">Anotação</a>  
 		<a href="{{ url_for('webui.hours_worked') }}">Horas</a>  
-		<a href="{{ url_for('webui.tutorial') }}">Tutorial</a>  
+		<a href="{{ url_for('webui.tutorial') }}">Tutorial</a>
+		<a href="{{ url_for('webui.transcribe_page') }}">Transcrição</a>  
 		<a href="{{ url_for('webui.change_password') }}">Trocar a senha</a>
 		<a href="{{ url_for('webui.logout') }}">Logout</a>
 

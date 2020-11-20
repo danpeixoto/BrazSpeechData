@@ -1,0 +1,151 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html" %}
+{% endwith %}
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta charset="utf-8">
+	<style>
+		textarea {
+			resize: none;
+		}
+
+		.conteiner {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			min-height: 100%;
+			min-width: 600px;
+		}
+
+		#botaoLoop {
+			width: 45px;
+			height: 45px;
+			cursor: pointer;
+		}
+
+		.flex-container {
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: center;
+		}
+
+		.flex-container>div {
+			margin: 10px;
+			text-align: center;
+			line-height: 75px;
+			font-size: 30px;
+		}
+	</style>
+</head>
+
+<div class="container" style="text-align: center">
+	<section id="main_content">
+
+		<p>Texto atual: {{dataset.text}}</p>
+
+		<div class="flex-container">
+			<div>
+				<audio id="audioAtual" controls autoplay>
+					<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
+						media="(min-width: 900px)" preload>
+
+					Your browser does not support the audio element. Please contact the admin!
+				</audio>
+			</div>
+			<div>
+				<img id="botaoLoop" onclick="gerenciarCookie()"
+					src="{{url_for('webui.static', filename='images/loop.png')}}" ativo>
+			</div>
+		</div>
+
+
+
+
+		<br>
+		<br>
+		<br>
+		<div>
+			<form id="form" method="post" action="/transcribe_page">
+				<div>
+					<textarea id="transcricao" name="transcricao" rows="4" cols="50">{{dataset.text}}</textarea>
+				</div>
+				<div><input id="submitButton" type="button" value="Submit"
+						style="height: 35px; width: 130px; margin-top: 100px;" onclick="formSubmit()" disabled>
+				</div>
+
+			</form>
+		</div>
+
+
+
+
+	</section>
+
+
+	<script>
+		setTimeout(() => {
+			//disabilita o botão de submit por 3 segundos
+
+			let submit = document.getElementById("submitButton");
+			submit.disabled = false;
+
+		}, 3000)
+
+		gerenciarLoop();
+
+		function gerenciarCookie() {
+			let botaoLoop = document.getElementById("botaoLoop");
+
+			if (botaoLoop.loopAtivo) {
+				document.cookie = "loop=false";
+			} else {
+				document.cookie = "loop=true";
+			}
+
+			gerenciarLoop();
+		}
+
+		function getCookieValue() {
+			let cookieRe = /loop=\w*/g;
+			let cookieString = document.cookie.match(cookieRe);
+			// verifica se já foi estabelecido algum valor ao cookie e depois retorna o valor
+			if (cookieString) {
+				let cookieValue = cookieString[0].split("=")[1] === 'true';
+				return cookieValue;
+			}
+
+			return false;
+		}
+
+		function gerenciarLoop() {
+			let botaoLoop = document.getElementById("botaoLoop");
+			let audioTag = document.getElementById("audioAtual");
+			let cookieValue = getCookieValue();
+
+			if (cookieValue !== null) {
+				botaoLoop.style.opacity = cookieValue ? 1.0 : 0.5;
+				botaoLoop.loopAtivo = cookieValue;
+				audioTag.loop = cookieValue;
+			} else {
+				botaoLoop.style.opacity = 0.5;
+				botaoLoop.loopAtivo = false;
+				audioTag.loop = false;
+			}
+
+
+		}
+
+		function formSubmit() {
+			let button = document.getElementById("submitButton");
+			if (!button.disabled) {
+				button.disabled = true;
+				document.getElementById("form").submit();
+			}
+		}
+
+	</script>
+
+</div>
