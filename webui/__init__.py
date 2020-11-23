@@ -511,7 +511,7 @@ def transcribe_page():
 		data.number_validated += 1
 		data.travado = datetime.now()
 		data.task = 1
-		data.text = print(request.form.get('transcricao')) 	#é assim que pega o texto que a pessoa alterou
+		data.text = request.form.get('transcricao')  #é assim que pega o texto que a pessoa alterou
 
 		new_time.user_validated = session['username']
 		new_time.id_data = data.id
