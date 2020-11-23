@@ -229,7 +229,7 @@ def index():
 		data = Dataset.query.filter_by(
 			instance_validated=0, file_with_user=0, data_gold=1).first()
 	else:
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
 		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
@@ -495,13 +495,38 @@ def add_user():
 def transcribe_page():
 
 	if request.method == 'POST':
-		#lucas, aqui é a parte onde vai salvar no banco
-		print("TERMINAR AQUI")
-		#é assim que pega o texto que a pessoa alterou
-		print(request.form.get('transcricao'))
 
-	#aqui tem que alterar para pegar audios daquele dataset
-	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
+		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
+
+		data = Dataset.query.filter_by(file_path=session['file_path'],data_gold= data_gold_result).first()
+		last_time = TimeValidated.query.filter_by(
+			user_validated=session['username']).order_by(desc(TimeValidated.id)).first()
+		check_current_user(data)
+
+		check_current_reason(data, check_invalid_reason(
+			request.form.get('InvalidReason')))
+		new_time = TimeValidated()
+		data.instance_validated += 1
+		data.file_with_user = 0
+		data.number_validated += 1
+		data.travado = datetime.now()
+		data.task = 1
+		data.text = print(request.form.get('transcricao')) 	#é assim que pega o texto que a pessoa alterou
+
+		new_time.user_validated = session['username']
+		new_time.id_data = data.id
+		new_time.time_validated = datetime.now()
+		last_time_value = last_time.time_validated if last_time != None else datetime.now()
+		new_time.duration = Duration_calculation(
+			last_time_value, new_time.time_validated)
+		
+		db.session.add(data)
+		db.session.add(new_time)
+		db.session.commit()
+		return redirect(url_for('webui.transcribe_page'))
+
+
+	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
 		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
