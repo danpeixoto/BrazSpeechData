@@ -480,6 +480,8 @@ def add_user():
 			new_user = User()
 			new_user.username = username
 			new_user.carga_horaria = workload
+			new_user.data_inicio = '22/11/2020'
+			new_user.data_fim = '02/12/2020'
 			new_user.password = password_hash
 			new_user.salt = salt
 			db.session.add(new_user)
@@ -535,7 +537,7 @@ def transcribe_page():
 	else:
 		data.file_with_user = 0
 		data.travado = datetime.now()
-		session['text'] = data.text
+		session['text'] = data.text_asr
 		session['audio_lenght'] = data.audio_lenght
 		session['file_path'] = data.file_path
 		db.session.add(data)

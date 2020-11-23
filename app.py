@@ -57,43 +57,12 @@ def initdb():
 @manager.command
 def initdataset():
 
-	lines = list(open(data_csv,encoding='utf8').readlines())   
-	
-	for line in lines:
-		audio_path,lenght,text = line.split(',')
-		text = text.replace('\n','')
-		new_data= Dataset()
-		new_data.text = text
-		new_data.audio_lenght = lenght
-		new_data.file_path= audio_path
-		new_data.instance_validated = 0 #1 if human validated this instance
-		new_data.file_with_user = 0 # 1 if user validating this instance
-		new_data.invalid_user1 = 0
-		new_data.invalid_user2 = 0
-		new_data.invalid_user3= 0
-		new_data.valids_user1 = ''
-		new_data.valids_user2 = ''
-		new_data.valids_user3 = ''
-		new_data.user_validated = ''
-		new_data.user_validated2 = ''
-		new_data.user_validated3 = ''
-		new_data.invalid_reason1 = ''
-		new_data.invalid_reason2 = ''
-		new_data.invalid_reason3 = ''
-		new_data.number_validated = 0 
-		new_data.data_gold = 0
-		new_data.duration = 0
-		new_data.travado = None
-		new_data.task = 0
-		new_data.text_asr = ''
-		db.session.add(new_data)
-
-
 	lines = list(open(data_csv_transcribe,encoding='utf8').readlines())   
 	
 	for line in lines:
-		audio_path,lenght,text = line.split(',')
-		text_asr = text.replace('\n','')
+		audio_path,lenght,text, text_asr = line.split(',')
+		duration = text.replace('\n','')
+		text_asr = text_asr.replace('\n','')
 		new_data= Dataset()
 		new_data.text_asr = text_asr
 		new_data.text = ''
@@ -115,41 +84,9 @@ def initdataset():
 		new_data.invalid_reason3 = ''
 		new_data.number_validated = 0 
 		new_data.data_gold = 0
-		new_data.duration = 0
+		new_data.duration = duration
 		new_data.task = 1
 		new_data.travado = None
-		db.session.add(new_data)
-
-
-	lines = list(open(data_csv_gold,encoding='utf8').readlines())   
-	
-	for line in lines:
-		audio_path,lenght,text = line.split(',')
-		text = text.replace('\n','')
-		new_data= Dataset()
-		new_data.text = text
-		new_data.audio_lenght = lenght
-		new_data.file_path= audio_path
-		new_data.instance_validated = 0 #1 if human validated this instance
-		new_data.file_with_user = 0 # 1 if user validating this instance
-		new_data.invalid_user1 = 0
-		new_data.invalid_user2 = 0
-		new_data.invalid_user3= 0
-		new_data.valids_user1 = ''
-		new_data.valids_user2 = ''
-		new_data.valids_user3 = ''
-		new_data.user_validated = ''
-		new_data.user_validated2 = ''
-		new_data.user_validated3 = ''
-		new_data.invalid_reason1 = ''
-		new_data.invalid_reason2 = ''
-		new_data.invalid_reason3 = ''
-		new_data.number_validated = 0 
-		new_data.data_gold = 1
-		new_data.duration = 0
-		new_data.travado = None
-		new_data.task = 0
-		new_data.text_asr = ''
 		db.session.add(new_data)
 	db.session.commit()
 
