@@ -492,6 +492,11 @@ def add_user():
 	return render_template('create_user.html')
 
 
+@webui.route('/tutorial_transcribe', methods=['GET', 'POST'])
+@require_login
+def tutorial_transcribe():
+	return render_template('tutorial_transcribe.html')
+
 @webui.route('/transcribe_page', methods=['GET', 'POST'])
 @require_login
 def transcribe_page():

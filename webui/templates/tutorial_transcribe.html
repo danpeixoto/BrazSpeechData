@@ -1,0 +1,250 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html" %}
+{% endwith %}
+
+<head>
+
+	<style>
+		.container{
+			font-size: 1.2em;
+		}
+		p,
+		li {
+			text-align: justify;
+		}
+
+		.listaNegrito {
+			font-weight: bold;
+		}
+
+
+		
+
+		li {
+			margin-left: 40px;
+			margin-top: 15px;
+			padding: 5px;
+		}
+
+		.presteAtencao {
+			color: #db0000
+		}
+
+		.obs:hover {
+			color: #b5e853;
+		}
+
+		span#obsValido:hover,
+		h3.valido {
+			color: #0387e6;
+			text-shadow: none;
+		}
+
+		span#obsInvalido:hover,
+		h3.invalido {
+			color: #ff0000;
+			text-shadow: none;
+		}
+
+		h3.valido,
+		h3.invalido {
+			margin: 60px 0;
+		}
+
+		dt,
+		dl {
+			margin: 5px;
+			font-size: 0.9em;
+		}
+
+
+		/* Css para o link de voltar ao index */
+		.voltar {
+			text-decoration: none;
+			color: inherit;
+			font-size: inherit;
+			transition-property: color;
+			transition-duration: 0.5s;
+		}
+
+		.voltar:hover {
+			color: aliceblue;
+		}
+	</style>
+
+</head>
+
+<div class="container" style="text-align: center">
+
+	<section id="main_content">
+
+
+
+		<h1 style="text-align: center;">
+
+			<a class="voltar" href="/"><strong>Tutorial - Tarefa de avaliação de alinhamentos áudio-texto</strong></a>
+			<br><br><br>
+
+		</h1>
+
+
+
+		<p>
+
+			Você foi convidado para <strong> transcrever manualmente </strong> os áudios de um pequeno córpus (~ 10
+			horas) durante a semana de 24 a 30 de novembro de 2020. Durante esta semana, a validação dos áudios, que era
+			a tarefa anterior, será interrompida.
+		</p>
+
+		<p>A tarefa de Transcrição é ativada pelo link <strong> Transcrição </strong> na tela do site BrazSpeechData.
+		</p>
+
+		<p>
+
+			<strong>A tarefa de transcrição é composta de:</strong>
+
+		</p>
+
+
+
+
+
+		<ol type="1" class="listaNegrito">
+
+
+
+			<li>
+
+				Audição de um áudio (que pode ser ouvido quantas vezes desejar) e leitura de uma transcrição automática,
+				realizada por um ASR de português.
+			</li>
+
+
+
+			<li>
+
+				transcrição manual, a ser digitada em uma caixa de texto, abaixo do player do áudio, como mostra a tela
+				abaixo.
+			</li>
+
+
+			<li>
+				Assim que terminar, clique no botão Submit.
+			</li>
+
+
+		</ol>
+
+		<img src="{{url_for('webui.static', filename='images/tela_transcricao.png')}}" style="width: 100%; margin: 10px;">
+
+		<p>
+			Será adotada a transcrição ortográfica, mas vamos preservar a fala coloquial.<br>
+
+			Para que fique clara a diferença entre a transcrição ortográfica e a literal, mostramos abaixo duas orações
+			que foram transcritas do mesmo áudio:
+
+		</p>
+
+
+
+		<p style="text-align: center;">
+
+			literal: u mininu estudô, mais foi mau na prova<br>
+			<strong>ortográfica: o menino estudou, mas foi mal na prova</strong>
+
+		</p>
+
+		<p>Seguem as <strong> 9 regras </strong> a serem adotadas para a transcrição:</p>
+
+		<ol class="listaNegrito">
+
+
+
+			<li>
+
+				Se no áudio for ouvido tá, transcreva como tá, não mude para está. O mesmo vale para né, não mude para
+				não é.
+
+			</li>
+
+
+
+			<li>
+
+				Transcreva a pausa preenchida. Tente aproximar a transcrição do que foi ouvido:<br>
+
+				<strong> ah, ãh, eh, hum, uhum, aham, uh</strong>
+
+
+			</li>
+
+
+
+			<li>
+
+				Hesitações repetitivas:
+
+				depois <strong>da da da </strong> janta teve doce <br>
+
+				fui <strong> no no </strong> mer mercado<br>
+				<strong> parece que parece que </strong>não é porque eles não vêm me ver eu não vou também né?
+
+			</li>
+
+			<li>
+				Escreva números por extenso. Seja para pesos, medidas, dia, ano, hora, datas completas.<br>
+
+				Hoje é dia vinte e quatro de novembro de dois mil e vinte.<br>
+				Comprei dois kilos de salmão para fazer sashimi.
+			</li>
+
+
+
+			<li>
+				Siglas devem ser transcritas por extenso.<br>
+
+				Qual site do <strong> ibegeé </strong>?
+			</li>
+
+
+			<li>
+				Letras que aparecem sozinhas devem ser escritas por extenso.<br>
+
+				Meu nome começa com <strong> esse</strong>. Me chamo Sandra.
+			</li>
+
+
+
+			<li>
+				Interrupções de uma fala, iniciando outra ideia. Transcreva.<br>
+
+				Eu gostaria de ir para a praia … eu vou comprar queijo hoje.
+
+			</li>
+
+
+			<li>
+				Interrupções de palavras geram transcrições inválidas.<br>
+
+				<strong> Descartem o áudio colocando ### na caixa de edição.</strong>
+
+			</li>
+
+			<li>
+				O corpus é de fala de estudantes. É possível que encontrem palavrões. <br>
+
+
+				Neste caso, coloquem na caixa de edição o trecho ###.
+				Não há necessidade de transcrever este áudio.
+				Ele será descartado.
+
+			</li>
+
+		</ol>
+
+
+
+
+
+	</section>
+</div>
