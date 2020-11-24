@@ -547,7 +547,7 @@ def transcribe_page():
 		session['file_path'] = data.file_path
 		db.session.add(data)
 		db.session.commit()
-		
+		data.file_path = data.file_path.replace('./','data/')
 		data.file_path = os.path.join(
 			'Dataset', data.file_path).replace('\\', '/')
 
