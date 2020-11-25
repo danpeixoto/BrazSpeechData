@@ -5,9 +5,10 @@
 <head>
 
 	<style>
-		.container{
+		.container {
 			font-size: 1.2em;
 		}
+
 		p,
 		li {
 			text-align: justify;
@@ -18,7 +19,9 @@
 		}
 
 
-		
+		.exemploCentrado {
+			text-align: center;
+		}
 
 		li {
 			margin-left: 40px;
@@ -135,7 +138,11 @@
 
 		</ol>
 
-		<img src="{{url_for('webui.static', filename='images/tela_transcricao.png')}}" style="width: 100%; margin: 10px;">
+		<img src="{{url_for('webui.static', filename='images/tela_transcricao.png')}}"
+			style="width: 100%; margin: 10px;">
+
+		<p>Será adotada a transcrição ortográfica, mas vamos preservar a fala coloquial para 2 casos recorrentes: tá e
+			né.</p>
 
 		<p>
 			Será adotada a transcrição ortográfica, mas vamos preservar a fala coloquial.<br>
@@ -147,14 +154,14 @@
 
 
 
-		<p style="text-align: center;">
+		<p class="exemploCentrado">
 
 			literal: u mininu estudô, mais foi mau na prova<br>
 			<strong>ortográfica: o menino estudou, mas foi mal na prova</strong>
 
 		</p>
 
-		<p>Seguem as <strong> 9 regras </strong> a serem adotadas para a transcrição:</p>
+		<p>Seguem as <strong> 10 regras </strong> a serem adotadas para a transcrição:</p>
 
 		<ol class="listaNegrito">
 
@@ -162,8 +169,12 @@
 
 			<li>
 
-				Se no áudio for ouvido tá, transcreva como tá, não mude para está. O mesmo vale para né, não mude para
-				não é.
+				<strong> Fala coloquial:</strong> Se no áudio for ouvido tá, transcreva como tá, não mude para está. O
+				mesmo vale para né, não mude para
+				não é.<br>
+
+				<p class="presteAtencao">Para facilitar a transcrição, vamos usar somente estas duas palavras da fala
+					coloquial. O resto será colocado na norma culta.</p>
 
 			</li>
 
@@ -173,7 +184,7 @@
 
 				Transcreva a pausa preenchida. Tente aproximar a transcrição do que foi ouvido:<br>
 
-				<strong> ah, ãh, eh, hum, uhum, aham, uh</strong>
+				<p class="exemploCentrado"><strong> ah, ãh, eh, hum, uhum, aham, uh</strong></p>
 
 
 			</li>
@@ -182,20 +193,20 @@
 
 			<li>
 
-				Hesitações repetitivas:
+				Transcreva as hesitações repetitivas:
+				<p class="exemploCentrado">
+					depois <strong>da da da </strong> janta teve doce <br>
 
-				depois <strong>da da da </strong> janta teve doce <br>
-
-				fui <strong> no no </strong> mer mercado<br>
-				<strong> parece que parece que </strong>não é porque eles não vêm me ver eu não vou também né?
-
+					fui <strong> no no </strong> mer mercado<br>
+					<strong> parece que parece que </strong>não é porque eles não vêm me ver eu não vou também né?
+				</p>
 			</li>
 
 			<li>
 				Escreva números por extenso. Seja para pesos, medidas, dia, ano, hora, datas completas.<br>
+				<p class="exemploCentrado">Hoje é dia vinte e quatro de novembro de dois mil e vinte.<br>
+					Comprei dois kilos de salmão para fazer sashimi. </p>
 
-				Hoje é dia vinte e quatro de novembro de dois mil e vinte.<br>
-				Comprei dois kilos de salmão para fazer sashimi.
 			</li>
 
 
@@ -203,22 +214,35 @@
 			<li>
 				Siglas devem ser transcritas por extenso.<br>
 
-				Qual site do <strong> ibegeé </strong>?
+				<p class="exemploCentrado">Qual site do <strong> ibegeé </strong>?</p>
 			</li>
 
 
 			<li>
 				Letras que aparecem sozinhas devem ser escritas por extenso.<br>
 
-				Meu nome começa com <strong> esse</strong>. Me chamo Sandra.
+				<p class="exemploCentrado"> Meu nome começa com <strong> esse</strong>. Me chamo Sandra.</p>
 			</li>
 
 
+			<li>
+				Transcreva os estrangeirismos. Muitos vem do jargão tecnológico.
+				Alguns já foram dicionarizados, MAS neste momento podem <span class="presteAtencao">ESCOLHER: MANTER NO
+					INGLÊS ou ESCREVER a FORMA DICIONARIZADA (podemos uniformizar depois)</span>.
+
+				<p class="exemploCentrado">laptops, netbook, notebook
+					coach, e-reader, skinhead, smartphone, tablet
+					air bag, bike, blitz, blockbuster, bluetooth, boeing, book, bullying,
+					business, chip, closet, cult, diet, experts, fashion, fast-food, glamour, hacker, high-tech,
+					laptops, light, nerd, netbook, outdoor, piercing, pizza, resort, round, royalties, shopping,
+					single, skate, slogan, smoking, socialites, stand-up, talk-show, test drive, workshops
+					boom, round, top
+				</p>
+			</li>
+
 
 			<li>
-				Interrupções de uma fala, iniciando outra ideia. Transcreva.<br>
-
-				Eu gostaria de ir para a praia … eu vou comprar queijo hoje.
+				PODEM usar pontuação (vírgulas, ponto, exclamações e interrogações) e PODEM usar maiúsculas para início de frase ou nomes. Será fácil uniformizar após a anotação.
 
 			</li>
 
@@ -226,11 +250,18 @@
 			<li>
 				Interrupções de palavras geram transcrições inválidas.<br>
 
-				<strong> Descartem o áudio colocando ### na caixa de edição.</strong>
+				<strong class="presteAtencao"> Descartem o áudio colocando ### na caixa de edição.</strong>
+
+				<p class="exemploCentrado">Eu gostaria de ir ao merca.  (PALAVRA MERCADO CORTADA)
+
+					<br>Fico pensando em comprar uma abóbo. (PALAVRA ABÓBORA CORTADA)
+					
+					<br>pete é difícil de limpar. Prefiro piso frio. (PALAVRA CARPETE CORTADA)</p>
+				
 
 			</li>
 
-			<li>
+			<li class="presteAtencao">
 				O corpus é de fala de estudantes. É possível que encontrem palavrões. <br>
 
 
