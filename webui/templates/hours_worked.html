@@ -101,9 +101,12 @@
 <div class='contentContainer' style='text-align: center'>
 	<h1><a class="voltar" href="/">Horas anotadas</a></h1>
 
-	<span id='todasSemanas' hidden>{{hours.response_string}}</span>
-	<span id='cargaHoraria' hidden>{{hours.workload}}</span>
-	<span id='desdeInicio' hidden>{{hours.since_start}}</span>
+	<!-- <span id='todasSemana' hidden>{{hours.response_string}}</span> -->
+	<span id="todasSemanas" hidden="">01-10-2020,04-10-2020,7.84;05-10-2020,11-10-2020,18.78;12-10-2020,18-10-2020,17.17;19-10-2020,25-10-2020,24.04;26-10-2020,01-11-2020,20.01;02-11-2020,08-11-2020,18.78;09-11-2020,15-11-2020,19.75;16-11-2020,22-11-2020,20.01;23-11-2020,29-11-2020,26.04;30-11-2020,02-12-2020,12.01;</span>
+	<!-- <span id='cargaHoraria' hidden>{{hours.workload}}</span> -->
+	<span id='desdeInicio' hidden>1</span>
+	 <span id='cargaHoraria' hidden>20</span>
+	<!-- <span id='desdeInicio' hidden>{{hours.since_start}}</span>-->
 	<div id='listaDatas'></div>
 
 	<div id='tabelaSemanas'>
@@ -140,14 +143,14 @@
 <script>
 
 	function calcularDescanso(cargaHoraria) {
-		return (1.25 / 20) * cargaHoraria
+		return (1.25 / 20.0) * cargaHoraria
 	}
 
 
 	function converteFloatParaHoras(horaEmFLoat) {
 
 		let horas = Math.floor(horaEmFLoat);
-		let minutos = Math.trunc((horaEmFLoat - horas) * 60);
+		let minutos =((horaEmFLoat - horas) * 60.0).toFixed(0);
 
 		horas = `${horas}`.length > 1 ? horas : `0${horas}`;
 		minutos = `${minutos}`.length > 1 ? minutos : `0${minutos}`;
@@ -218,7 +221,7 @@
 			} else {
 				saldoTotal += processaElementoLista(elemento, cargaHoraria, table);
 			}
-
+			
 		});
 
 		let lastRow = document.createElement("tr");
@@ -236,7 +239,7 @@
 		table.appendChild(styleTdSaldo(lastRow, saldoTotal));
 
 		tdSaldoTotal.textContent = converteFloatParaHoras(Math.abs(saldoTotal));
-
+		
 	}
 
 

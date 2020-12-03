@@ -51,7 +51,7 @@
 	<section id='main_content'>
 
 		<h1>Welcome to BrazSpeechData.</h1>
-		
+
 		<p>O total de áudios anotados é: {{hours.total_audios}}.</p>
 		<p>O total de horas de áudios anotadas é: {{hours.total_hours}} horas.</p>
 		<p>O total de horas de áudios validas anotadas é: {{hours.valid_hours}} horas.</p>
@@ -152,8 +152,8 @@
 	}
 
 
-	function calcularHoraComDescanso(horasAnotadas) {
-		return (1.25 / 20) * horasAnotadas + horasAnotadas;
+	function calcularHoraComDescanso(horasAnotadas, cargahoraria, totalSemanas, descansoInicio) {
+		return ((1.25 / 20.0) * cargahoraria) * totalSemanas + horasAnotadas + descansoInicio;
 	}
 
 	function subtraiHoras(elemento1, elemento2) {
@@ -186,26 +186,24 @@
 
 
 		listaDatasOrdenada.forEach(elemento => {
-			
+
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
 			//listaDados na posicao 6 é o total de semanas do anotador, esse valor vai ser substituido depois
-			let totalHorasDoProjeto = 0;
+			let totalHorasDoProjeto = listaDados[5] * parseInt(listaDados[6]);
+			let descansoInicio = 0;
 			//por algum motivo tem um caractere a mais na string
-			if(listaDados[1].substring(0, listaDados[1].length - 1) == "01/10/2020"){
-				let horasPrimeirosDoisDias = listaDados[5]==10? 4:8;
-				totalHorasDoProjeto = listaDados[5]*parseInt(listaDados[6]-1);
-				totalHorasDoProjeto+= horasPrimeirosDoisDias;
-			}else{
-				totalHorasDoProjeto = listaDados[5]*parseInt(listaDados[6]);
+
+			if (listaDados[1].trim() === "01/10/2020") {
+				let horasPrimeirosDoisDias = listaDados[5] == 20 ? 8 : 4;
+				totalHorasDoProjeto += horasPrimeirosDoisDias;
+				descansoInicio = listaDados[5] == 20 ? 0.5 : 0.25;
 			}
-			
+
 
 			listaDados[4] = parseFloat(listaDados[4]);
-			listaDados[4] = calcularHoraComDescanso(listaDados[4]).toFixed(2);
-
+			listaDados[4] = calcularHoraComDescanso(listaDados[4], listaDados[5], listaDados[6], descansoInicio);
 			listaDados[6] = (listaDados[4] - totalHorasDoProjeto).toFixed(2);
-
 
 			listaDados.forEach(dado => {
 				let td = document.createElement("td");
@@ -213,7 +211,7 @@
 				tr.appendChild(td);
 			});
 
-			table.appendChild(styleTdSaldo(tr,listaDados[6]));
+			table.appendChild(styleTdSaldo(tr, listaDados[6]));
 		});
 
 		table.hidden = false;
