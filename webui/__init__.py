@@ -143,14 +143,17 @@ def Total_duration_admin(date_1, date_2):
 			# all_duration = TimeValidated.query.filter(
 			# 	TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
 			
-			start = datetime.strptime(user.data_inicio.strip(),'%d/%m/%Y')
+			if(user.data_inicio.strip() == '01/10/2020'):
+				start = datetime.strptime('05/10/2020','%d/%m/%Y')
+			else:
+				start = datetime.strptime(user.data_inicio.strip(),'%d/%m/%Y')
 			end = datetime.strptime(user.data_fim.strip(),'%d/%m/%Y')
 			# total_hours = 0
 			# for total in all_duration:
 			# 	total_hours += total.duration
 
 			# total_hours = total_hours/3600.0
-			num_weeks = abs(today-start).days//7 + 1
+			num_weeks = abs(today-start).days//7+1
 			total_hours = Total_duration_user(start,end,user.username)
 			user_start = user.data_inicio
 			user_finish = user.data_fim
@@ -393,7 +396,7 @@ def admin():
 	project_started = datetime(2020, 10, 5, 0, 0, 0)
 	num_weeks = abs(today-project_started).days//7 + 1
 
-	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 1, 0, 0, 0), today), 'today': today.strftime('%d-%m-%Y'),\
+	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 5, 0, 0, 0), today), 'today': today.strftime('%d-%m-%Y'),\
 		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios,'total_hours' :total_hours_validated,'valid_hours':valid_hours,'num_weeks':num_weeks})
 
 
