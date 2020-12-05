@@ -25,7 +25,8 @@ from models import db, Dataset, User, TimeValidated
 from webui import webui
 from config import config 
 
-
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # csv data from make dataset
 data_csv = 'static/Dataset/metadata.csv'
