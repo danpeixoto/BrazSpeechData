@@ -5,6 +5,16 @@
 <head>
 
 	<style>
+		.bem-vindo {
+			height: 10vh;
+		}
+
+		.links {
+			margin: 30px 0;
+		}
+
+		
+
 		ol {
 			list-style-type: none;
 		}
@@ -13,35 +23,16 @@
 			margin: 10px;
 		}
 
+		input {
+			font-size: 1.3em;
+			border-radius: 5px;
+			transition: all 650ms;
+			transition-property: background-color, color;
+		}
 
-		input:hover {
+		input:hover:enabled {
 			background-color: #4a4a4a;
 			color: #e3e3e3;
-			border-radius: 5px;
-		}
-
-		table {
-			font-family: arial, sans-serif;
-			border-collapse: collapse;
-			width: 70%;
-			margin-left: 15%;
-			margin-top: 30px;
-		}
-
-		th {
-			color: #b5e853;
-		}
-
-		td,
-		th {
-			border: 1px solid #dddddd;
-			text-align: center;
-			padding: 8px;
-			font-size: 1.1em;
-		}
-
-		tr:nth-child(even) {
-			background-color: #474747;
 		}
 	</style>
 
@@ -49,80 +40,79 @@
 
 <div class='container' style='text-align: center'>
 	<section id='main_content'>
-
-		<h1>Welcome to BrazSpeechData.</h1>
-
-		<p>O total de áudios anotados é: {{hours.total_audios}}.</p>
-		<p>O total de horas de áudios anotadas é: {{hours.total_hours}} horas.</p>
-		<p>O total de horas de áudios validas anotadas é: {{hours.valid_hours}} horas.</p>
-		<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
-			value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
-
-		<input class="botaoForm" id="botaoValidados" type="button" onclick="mostrarFormSelecionado(this.id,'naoGold')"
-			value="Anotados" style="height: 35px; width: 130px; margin-top: 15px;" />
-
-
-		<form id="gold" method='post' hidden>
-			<ol>
-				<li><input type='submit' value='Gold Valid' name='Download Valid instances' /></li>
-				<li><input type='submit' value='Gold Invalid 1' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Gold Invalid 2' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Gold Invalid 3' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Gold Invalid 4' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Gold Invalid 5' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Gold Invalid 6' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Gold Invalid 7' name='Download Invalid instances' />
-				</li>
-			</ol>
-		</form>
-
-		<form id="naoGold" method='post' hidden>
-			<ol>
-				<li><input type='submit' value='Valid' name='Download Valid instances' /></li>
-				<li><input type='submit' value='Invalid 1' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Invalid 2' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Invalid 3' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Invalid 4' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Invalid 5' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Invalid 6' name='Download Invalid instances' />
-				</li>
-				<li><input type='submit' value='Invalid 7' name='Download Invalid instances' />
-				</li>
-			</ol>
-		</form>
-
-
-		<div id='divListaDeUsuarios'>
-			<input class="botaoForm" id="listarUsuarios" type="button" value="Listar total horas usuarios"
-				style="height: 35px; width: 170px; margin-top: 15px;" onclick="mostrarListaUsuarios()" />
-			<p id="todosUsuarios" hidden>{{hours.user_list}}</p>
-			<p id="numeroSemanas" hidden>{{hours.num_weeks}}</p>
-			<table hidden>
-				<tr>
-					<th>Usuário</th>
-					<th>Data de inicio</th>
-					<th>Data de fim</th>
-					<th>Horas anotadas</th>
-					<th>Horas anotadas + descanso</th>
-					<th>Carga horária</th>
-					<th>Saldo</th>
-				</tr>
-			</table>
+		<div class="bem-vindo">
+			<h1 style="font-size: 2.5em;">Olá administrador(a), bem-vindo ao BrazSpeechData.</h1>
 		</div>
 
-		</form>
+		<div class="links">
+			<h3 style="font-size: 1.5em;">Informações:</h3>
+			<a class="link" href="/admin-audios-info" target="_blank">Áudios</a> |
+			<a class="link" href="/admin-users-info" target="_blank">Usuarios</a>
+		</div>
+
+
+		<div class="download-csv">
+			<h3 style="font-size: 1.5em;">Download da base como csv:</h3>
+			<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
+				value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
+
+			<input class="botaoForm" id="botaoValidados" type="button"
+				onclick="mostrarFormSelecionado(this.id,'naoGold')" value="Anotados"
+				style="height: 35px; width: 130px; margin-top: 15px;" />
+
+
+			<form id="gold" method='post' hidden>
+				<ol>
+					<li><input class='list-input' type='submit' value='Gold Valid' name='Download Valid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 1'
+							name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 2'
+							name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 3'
+							name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 4'
+							name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 5'
+							name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 6'
+							name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Gold Invalid 7'
+							name='Download Invalid instances' />
+					</li>
+				</ol>
+			</form>
+
+			<form id="naoGold" method='post' hidden>
+				<ol>
+					<li><input class='list-input' type='submit' value='Valid' name='Download Valid instances' /></li>
+					<li><input class='list-input' type='submit' value='Invalid 1' name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Invalid 2' name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Invalid 3' name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Invalid 4' name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Invalid 5' name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Invalid 6' name='Download Invalid instances' />
+					</li>
+					<li><input class='list-input' type='submit' value='Invalid 7' name='Download Invalid instances' />
+					</li>
+				</ol>
+			</form>
+		</div>
+
 	</section>
+
+
 </div>
 
 <script>
@@ -149,72 +139,6 @@
 		formInverso.hidden = true;
 
 		controlarBotoes(inputId);
-	}
-
-
-	function calcularHoraComDescanso(horasAnotadas, cargahoraria, totalSemanas, descansoInicio) {
-		return ((1.25 / 20.0) * cargahoraria) * totalSemanas + horasAnotadas + descansoInicio;
-	}
-
-	function subtraiHoras(elemento1, elemento2) {
-		let hora1 = elemento1.split(",")[3];
-		let hora2 = elemento2.split(",")[3];
-
-		return hora2 - hora1;
-	}
-
-
-	function styleTdSaldo(tr, saldo) {
-		let tamanhoCells = tr.cells.length
-		if (saldo <= 0) {
-			tr.cells[tamanhoCells - 1].style.color = "#ff0000";
-		} else if (saldo > 0) {
-			tr.cells[tamanhoCells - 1].style.color = "#00ff37";
-		}
-		return tr;
-	}
-
-
-	function mostrarListaUsuarios() {
-		document.getElementById("listarUsuarios").disabled = true;
-
-		let listaDatasNaoProcessada = document.getElementById('todosUsuarios').innerHTML;
-		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
-
-		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
-		let table = document.querySelector("div > table");
-
-
-		listaDatasOrdenada.forEach(elemento => {
-
-			let listaDados = elemento.split(",");
-			let tr = document.createElement("tr");
-			//listaDados na posicao 6 é o total de semanas do anotador, esse valor vai ser substituido depois
-			let totalHorasDoProjeto = listaDados[5] * parseInt(listaDados[6]);
-			let descansoInicio = 0;
-			//por algum motivo tem um caractere a mais na string
-
-			if (listaDados[1].trim() === "01/10/2020") {
-				let horasPrimeirosDoisDias = listaDados[5] == 20 ? 8 : 4;
-				totalHorasDoProjeto += horasPrimeirosDoisDias;
-				descansoInicio = listaDados[5] == 20 ? 0.5 : 0.25;
-			}
-
-
-			listaDados[4] = parseFloat(listaDados[4]);
-			listaDados[4] = calcularHoraComDescanso(listaDados[4], listaDados[5], listaDados[6], descansoInicio);
-			listaDados[6] = (listaDados[4] - totalHorasDoProjeto).toFixed(2);
-
-			listaDados.forEach(dado => {
-				let td = document.createElement("td");
-				td.textContent = dado;
-				tr.appendChild(td);
-			});
-
-			table.appendChild(styleTdSaldo(tr, listaDados[6]));
-		});
-
-		table.hidden = false;
 	}
 
 </script>

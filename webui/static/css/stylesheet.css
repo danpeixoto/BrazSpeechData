@@ -292,9 +292,34 @@ a {
 .projectName {
 	font-size: 2.5em;
 }
-
+/* logo copel */
 .logoCopel {
 	width: 150px;
 	height: 70px;
 }
 
+/* links */
+.link {
+	position: relative;
+	font-size: 1.2em;
+	text-decoration: none;
+	color: #fafafa;
+}
+
+
+.link::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: -2px;
+	background-color: #b5e853;
+	height: 2px;
+	width: 100%;
+	transform: scaleX(0);
+	transform-origin: center;
+	transition: transform 650ms;
+}
+
+.link:hover::before{
+transform: scaleX(1);
+}

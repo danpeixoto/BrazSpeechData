@@ -4,7 +4,7 @@ import random
 import string
 import time
 from datetime import datetime
-from sqlalchemy import or_
+from sqlalchemy import or_, not_, and_
 from threading import Timer
 from functools import wraps
 import hashlib
@@ -21,6 +21,7 @@ from flask import flash
 from flask import send_from_directory
 from flask import current_app, Response
 from sqlalchemy import asc, desc
+from sqlalchemy import func
 import math
 from models import db
 from models import User, Dataset, TimeValidated
@@ -319,34 +320,6 @@ def hours_worked():
 	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload,'since_start':since_start})
 
 
-def calculate_total_audios():
-	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0).count()
-	return total
-
-def calculate_total_hours_validated():
-	rows = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0)
-	total_hours = 0
-	valid_hours = 0
-	for row in rows:
-		total_hours += row.duration
-		valid_hours += return_duration_for_valid(row)
-
-	return '{:.2f}'.format(total_hours/3600.0), '{:.2f}'.format(valid_hours/3600.0)
-
-def return_duration_for_valid(row):
-	if(row.number_validated > 2):
-			if(row.invalid_user1 == 0 and row.invalid_user2 == 0):
-				return row.duration
-			elif (row.invalid_user2 == 0 and row.invalid_user3 == 0):
-				return row.duration
-			elif (row.invalid_user1 == 0 and row.invalid_user3 == 0):
-				return row.duration
-	elif(row.number_validated == 1):
-		if(row.invalid_user1 == 0):
-			return row.duration
-
-	return 0
-
 
 @webui.route('/admin', methods=['GET', 'POST'])
 @require_admin
@@ -389,15 +362,77 @@ def admin():
 				csv += string
 			return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
 
-	today = dtt.datetime.today()
+
+	return render_template('admin.html')
+
+
+
+def calculate_total_audios():
+	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0).count()
+	return total
+
+def calculate_total_hours_validated():
+	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 0).scalar()
+
+	total_duration_valid_two_users = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
+		Dataset.number_validated >=2, or_(and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user2 == 0) 
+		,and_(Dataset.invalid_user2 == 0 , Dataset.invalid_user3 == 0)
+		,and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user3 == 0))).scalar()
+
+	total_duration_valid_one_user = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
+		Dataset.number_validated == 1 , Dataset.invalid_user1 == 0).scalar()
+
+	total_duration = float(total_duration)
+	total_duration_valid = float(total_duration_valid_one_user )+float( total_duration_valid_two_users)
+	return '{:.2f}'.format(total_duration/3600.0), '{:.2f}'.format(total_duration_valid/3600.0)
+
+
+
+
+def calculate_total_audios_transcribed():
+	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0, Dataset.text_asr != None).count()
+	return total
+
+
+def calculate_total_hours_trancribed_validated():
+	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 1).scalar()
+	total_duration_valid = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.task == 1,not_(Dataset.text.ilike('%###%'))).scalar()
+
+
+	return '{:.2f}'.format(float(total_duration)/3600.0), '{:.2f}'.format(float(total_duration_valid)/3600.0)
+
+
+@webui.route('/admin-audios-info', methods=['GET'])
+@require_admin
+def admin_audios_info():
+	audios_info={}
 	total_audios = calculate_total_audios()
 	total_hours_validated, valid_hours = calculate_total_hours_validated()
+	total_audios_transcribe = calculate_total_audios_transcribed()
+	total_hours_transcribe, valid_hours_transcribed = calculate_total_hours_trancribed_validated()
 
+	audios_info['total_audios'] = total_audios
+	audios_info['total_hours']	= total_hours_validated
+	audios_info['valid_hours'] = valid_hours
+	audios_info['audios_transcribed'] = total_audios_transcribe
+	audios_info['total_hours_transcribed'] = total_hours_transcribe
+	audios_info['valid_hours_transcribed'] = valid_hours_transcribed
+
+	return render_template('admin-audios-info.html',data=audios_info)
+
+
+@webui.route('/admin-users-info', methods=['GET'])
+@require_admin
+def admin_users_info():
+	users_info = {}
+	today = dtt.datetime.today()
 	project_started = datetime(2020, 10, 5, 0, 0, 0)
 	num_weeks = abs(today-project_started).days//7 + 1
 
-	return render_template('admin.html', hours={'user_list': Total_duration_admin(datetime(2020, 10, 5, 0, 0, 0), today), 'today': today.strftime('%d-%m-%Y'),\
-		'start': datetime(2020, 10, 1, 0, 0, 0).strftime('%d-%m-%Y'),'total_audios' :total_audios,'total_hours' :total_hours_validated,'valid_hours':valid_hours,'num_weeks':num_weeks})
+	users_info['user_list'] = Total_duration_admin(project_started, today)
+	users_info['num_weeks'] = num_weeks
+
+	return render_template('admin-users-info.html',data=users_info)
 
 
 @webui.route('/login', methods=['GET', 'POST'])

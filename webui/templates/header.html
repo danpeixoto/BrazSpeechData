@@ -29,18 +29,18 @@
   <div class="container">
 	<h1 class="projectName">{{ title }}</h1>
     {% if previous_page %}
-    <a href="{{ previous_page }}">&lt;&lt; Back</a>
+    <a class="link" href="{{ previous_page }}">&lt;&lt; Back</a>
     {% endif %}
     {% if session.username %}
     <h3 style="text-align: right">Logged in as {{ session.username }}</h3>
 	<h2 style="text-align: right">
-		<a href="{{ url_for('webui.index') }}">Anotação</a>  
-		<a href="{{ url_for('webui.hours_worked') }}">Horas</a>  
-		<a href="{{ url_for('webui.tutorial') }}">Tutorial</a>
-		<a href="{{ url_for('webui.transcribe_page') }}">Transcrição</a> 
-		<a href="{{ url_for('webui.tutorial_transcribe') }}">Tutorial transcrição</a>  
-		<a href="{{ url_for('webui.change_password') }}">Trocar a senha</a>
-		<a href="{{ url_for('webui.logout') }}">Logout</a>
+		<a class="link" href="{{ url_for('webui.index') }}">Anotação</a>  |
+		<a class="link" href="{{ url_for('webui.tutorial') }}">Tutorial Anotação</a> |
+		<a class="link" href="{{ url_for('webui.hours_worked') }}">Horas</a>  |
+		<a class="link" href="{{ url_for('webui.transcribe_page') }}">Transcrição</a> |
+		<a class="link" href="{{ url_for('webui.tutorial_transcribe') }}">Tutorial transcrição</a>  |
+		<a class="link" href="{{ url_for('webui.change_password') }}">Trocar a senha</a> |
+		<a class="link" href="{{ url_for('webui.logout') }}">Logout</a>
 
 	</h2>
 	{% endif %}
