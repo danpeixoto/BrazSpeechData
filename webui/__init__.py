@@ -135,31 +135,32 @@ def Total_duration_user(date_1, date_2, current_user):
 
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
 def Total_duration_admin(date_1, date_2):
-	all_users = User.query.all()
+	#all_users = User.query.all()
 	users_data = ""
 	today = dtt.datetime.today()
-	for user in all_users:
-		if(len(user.username) > 10 and " " not in user.username):
+
+	users_info = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
+		.with_entities(TimeValidated.user_validated,User.data_inicio,User.data_fim,User.carga_horaria,func.sum(TimeValidated.duration).label("sum_duration"))\
+		.group_by(TimeValidated.user_validated).all()
+
+	for user_info in users_info:
+		if(len(user_info[0]) > 10 and " " not in user_info[0]):
 			#all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
 			# all_duration = TimeValidated.query.filter(
 			# 	TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
-			
-			if(user.data_inicio.strip() == '01/10/2020'):
+
+			if(user_info[1].strip() == '01/10/2020'):
 				start = datetime.strptime('05/10/2020','%d/%m/%Y')
 			else:
-				start = datetime.strptime(user.data_inicio.strip(),'%d/%m/%Y')
-			end = datetime.strptime(user.data_fim.strip(),'%d/%m/%Y')
-			# total_hours = 0
-			# for total in all_duration:
-			# 	total_hours += total.duration
-
-			# total_hours = total_hours/3600.0
+				start = datetime.strptime(user_info[1].strip(),'%d/%m/%Y')
+			end = datetime.strptime(user_info[2].strip(),'%d/%m/%Y')
+			
 			num_weeks = abs(today-start).days//7+1
-			total_hours = Total_duration_user(start,end,user.username)
-			user_start = user.data_inicio
-			user_finish = user.data_fim
-			users_data += u'{},{},{},{:.2f},{:.2f},{},{};'.format(user.username,user_start,user_finish,
-											   total_hours,total_hours,user.carga_horaria,num_weeks)
+			total_hours = float(user_info[-1])/3600
+			start = datetime.strftime(start,'%d/%m/%Y')
+			end = datetime.strftime(end,'%d/%m/%Y')
+			users_data += u'{},{},{},{:.2f},{:.2f},{},{};'.format(user_info[0],start,end,
+											   total_hours,total_hours,user_info[3],num_weeks)
 
 	return users_data
 
@@ -170,7 +171,7 @@ def Total_duration_admin(date_1, date_2):
 #		if anotations.number_validated == 0 and anotations.file_with_user == 1:
 #			anotations.file_with_user = 0
 #			db.session.add(anotations)
-#	
+#
 #	db.session.commit()
 
 
@@ -223,7 +224,7 @@ def index():
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
 		new_time.duration = Duration_calculation(
 			last_time_value, new_time.time_validated)
-		
+
 		db.session.add(data)
 		db.session.add(new_time)
 		db.session.commit()
@@ -233,8 +234,8 @@ def index():
 		data = Dataset.query.filter_by(
 			instance_validated=0, file_with_user=0, data_gold=1).first()
 	else:
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
@@ -247,7 +248,7 @@ def index():
 		session['file_path'] = data.file_path
 		db.session.add(data)
 		db.session.commit()
-		
+
 		data.file_path = os.path.join(
 			'Dataset', data.file_path).replace('\\', '/')
 
@@ -269,7 +270,7 @@ def hours_worked():
 	# response_string is a list of strings '{week_start},{week_end},total_hours;'
 	response_string = ''
 	current_user = User.query.filter_by(username = session['username']).first()
-	
+
 
 	if(current_user.data_inicio is None):
 		current_user.data_inicio = '01/10/2020'
@@ -288,9 +289,9 @@ def hours_worked():
 	#2020-10-05 00:00:00
 	today = dtt.datetime.today()
 	#start = datetime(2020, 10, 5, 0, 0, 0)
-	
-	num_weeks = abs(today-start).days//7 + 1
 
+	num_weeks = abs(today-start).days//7 + 1
+	print(num_weeks)
 
 	for i in range(num_weeks-1):
 
@@ -375,7 +376,7 @@ def calculate_total_hours_validated():
 	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 0).scalar()
 
 	total_duration_valid_two_users = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
-		Dataset.number_validated >=2, or_(and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user2 == 0) 
+		Dataset.number_validated >=2, or_(and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user2 == 0)
 		,and_(Dataset.invalid_user2 == 0 , Dataset.invalid_user3 == 0)
 		,and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user3 == 0))).scalar()
 
@@ -387,7 +388,7 @@ def calculate_total_hours_validated():
 	return '{:.2f}'.format(total_duration/3600.0), '{:.2f}'.format(total_duration_valid/3600.0)
 
 
-
+# admin_audios_info
 
 def calculate_total_audios_transcribed():
 	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0, Dataset.text_asr != None).count()
@@ -564,15 +565,15 @@ def transcribe_page():
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
 		new_time.duration = Duration_calculation(
 			last_time_value, new_time.time_validated)
-		
+
 		db.session.add(data)
 		db.session.add(new_time)
 		db.session.commit()
 		return redirect(url_for('webui.transcribe_page'))
 
 
-	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'], 
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], 
+	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:

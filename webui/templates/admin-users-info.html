@@ -10,6 +10,18 @@
 		.lista-usuarios{
 			width: 100%;
 		}
+
+		.header{
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.header h1{
+			font-size: 2.5em;
+		}
+
 		table {
 			font-family: arial, sans-serif;
 			border-collapse: collapse;
@@ -41,6 +53,9 @@
 	<main>
 		<section class="lista-usuarios">
 			<div class="container">
+				<div class="header">
+					<h1>Horas trabalhadas por cada anotador:</h1>
+				</div>
 				<div id='divListaDeUsuarios'>
 					<p id="todosUsuarios" hidden>{{data.user_list}}</p>
 					<p id="numeroSemanas" hidden>{{data.num_weeks}}</p>
