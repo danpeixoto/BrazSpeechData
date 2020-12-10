@@ -26,7 +26,7 @@ class User(db.Model):
 class Dataset(db.Model):
 	__tablename__ = 'Dataset'
 	id = db.Column(db.Integer, primary_key=True)
-	text = db.Column(db.String(2000))
+	text = db.Column(db.Text())
 	audio_lenght = db.Column(db.Integer())
 	file_path= db.Column(db.String(250), unique=False)# Alterar aqui depois de resolver o problema do sp
 	file_with_user = db.Column(db.Integer()) # true if 
@@ -48,7 +48,7 @@ class Dataset(db.Model):
 	duration = db.Column(db.Integer()) # Time of the audio
 	travado = db.Column(db.DateTime()) # Control for that only one receive the path, SETAR COMO 0 POR PADRAO
 	task = db.Column(db.Integer()) # 0 para anotar e 1 para transcrever, valor padrão é 0
-	text_asr = db.Column(db.String(5000)) # Text fornecido pelo ASR, o que será transcrito fica em TEXT
+	text_asr = db.Column(db.Text()) # Text fornecido pelo ASR, o que será transcrito fica em TEXT
 
 class TimeValidated(db.Model):
 	__tablename__ = 'TimeValidated'
