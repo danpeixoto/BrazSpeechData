@@ -1,0 +1,13 @@
+[Unit]
+Description= Sistema de anotação e transcrição BrazSpeechData.
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /home/utf/BrazSpeechData/lanca-app.sh
+User=utf
+Group=utf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

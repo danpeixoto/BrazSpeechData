@@ -236,7 +236,7 @@ def index():
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
-		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
@@ -291,7 +291,6 @@ def hours_worked():
 	#start = datetime(2020, 10, 5, 0, 0, 0)
 
 	num_weeks = abs(today-start).days//7 + 1
-	print(num_weeks)
 
 	for i in range(num_weeks-1):
 
@@ -571,10 +570,10 @@ def transcribe_page():
 		db.session.commit()
 		return redirect(url_for('webui.transcribe_page'))
 
-
+	
 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
-		or_((datetime.now() - Dataset.travado) > 86400, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
