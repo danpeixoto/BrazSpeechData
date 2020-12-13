@@ -148,7 +148,6 @@
 
 		let horas = Math.floor(horaEmFLoat);
 		let minutos =((horaEmFLoat - horas) * 60.0).toFixed(0);
-
 		horas = `${horas}`.length > 1 ? horas : `0${horas}`;
 		minutos = `${minutos}`.length > 1 ? minutos : `0${minutos}`;
 
@@ -158,20 +157,22 @@
 
 	function styleTdSaldo(tr, saldo) {
 		let tamanhoCells = tr.cells.length
-		if (saldo <= 0) {
+		if (saldo < 0) {
 			tr.cells[tamanhoCells - 1].style.color = "#ff0000";
-		} else if (saldo > 0) {
+		} else if (saldo >= 0) {
 			tr.cells[tamanhoCells - 1].style.color = "#00ff37";
 		}
 		return tr;
 	}
 
-	function processaElementoLista(elemento, cargaHoraria, table) {
+	function processaElementoLista(elemento, table) {
 
 		let listaDados = elemento.split(",");
 		let tr = document.createElement("tr");
-
+		let cargaHoraria = parseFloat(listaDados[3]);
+		console.log(cargaHoraria)
 		let descanso = calcularDescanso(cargaHoraria)
+		console.log(descanso)
 		let horaMaisDescanso = parseFloat(listaDados[2]) + descanso;
 
 		let saldo = (cargaHoraria - horaMaisDescanso) * -1;
@@ -179,9 +180,9 @@
 
 
 		horaMaisDescanso = converteFloatParaHoras(horaMaisDescanso);
-		cargaHoraria = converteFloatParaHoras(cargaHoraria);
+		
 
-		listaDados.push(horaMaisDescanso);
+		listaDados[3] = horaMaisDescanso;
 		listaDados.push(cargaHoraria);
 		listaDados.push(saldo);
 
@@ -204,6 +205,7 @@
 
 		let listaDatasNaoProcessada = document.getElementById('todasSemanas').innerHTML;
 		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
+		console.log(listaDatasProcessada)
 		let table = document.querySelector("div > table");
 
 		let cargaHoraria = document.getElementById('cargaHoraria').textContent;
@@ -212,13 +214,7 @@
 		let cargaHorariaPrimeiraSemana = cargaHoraria == 20 ? 8 : 4;
 
 		listaDatasProcessada.forEach((elemento, index) => {
-
-			if (index === 0 && desdeInicio == true) {
-				saldoTotal += processaElementoLista(elemento, cargaHorariaPrimeiraSemana, table);
-			} else {
-				saldoTotal += processaElementoLista(elemento, cargaHoraria, table);
-			}
-			
+			saldoTotal += processaElementoLista(elemento, table);	
 		});
 
 		let lastRow = document.createElement("tr");

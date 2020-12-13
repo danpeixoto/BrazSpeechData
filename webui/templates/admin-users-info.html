@@ -7,18 +7,18 @@
 <head>
 
 	<style>
-		.lista-usuarios{
+		.lista-usuarios {
 			width: 100%;
 		}
 
-		.header{
+		.header {
 			width: 100%;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 		}
 
-		.header h1{
+		.header h1 {
 			font-size: 2.5em;
 		}
 
@@ -50,100 +50,101 @@
 </head>
 
 
-	<main>
-		<section class="lista-usuarios">
-			<div class="container">
-				<div class="header">
-					<h1>Horas trabalhadas por cada anotador:</h1>
-				</div>
-				<div id='divListaDeUsuarios'>
-					<p id="todosUsuarios" hidden>{{data.user_list}}</p>
-					<p id="numeroSemanas" hidden>{{data.num_weeks}}</p>
-					<table hidden>
-						<tr>
-							<th>Usuário</th>
-							<th>Data de inicio</th>
-							<th>Data de fim</th>
-							<th>Horas anotadas</th>
-							<th>Horas anotadas + descanso</th>
-							<th>Carga horária</th>
-							<th>Saldo</th>
-						</tr>
-					</table>
-				</div>
+<main>
+	<section class="lista-usuarios">
+		<div class="container">
+			<div class="header">
+				<h1>Horas trabalhadas por cada anotador:</h1>
 			</div>
-		</section>
-	</main>
+			<div id='divListaDeUsuarios'>
+				<p id="todosUsuarios" hidden>{{data.user_list}}</p>
+				<p id="numeroSemanas" hidden>{{data.num_weeks}}</p>
+				<table hidden>
+					<tr>
+						<th>Usuário</th>
+						<th>Data de inicio</th>
+						<th>Data de fim</th>
+						<th>Horas anotadas</th>
+						<th>Horas anotadas + descanso</th>
+						<th>Carga horária</th>
+						<th>Saldo</th>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</section>
+</main>
 
 
-	<script>
+<script>
 
 
-		function calcularHoraComDescanso(horasAnotadas, cargahoraria, totalSemanas, descansoInicio) {
-			return ((1.25 / 20.0) * cargahoraria) * totalSemanas + horasAnotadas + descansoInicio;
+	function calcularHoraComDescanso(horasAnotadas, cargahoraria, totalSemanas, descansoInicio) {
+		//console.log(horasAnotadas, cargahoraria, totalSemanas, descansoInicio)
+		return ((1.25 / 20.0) * cargahoraria) * totalSemanas + horasAnotadas + descansoInicio;
+	}
+
+	function subtraiHoras(elemento1, elemento2) {
+		let hora1 = elemento1.split(",")[3];
+		let hora2 = elemento2.split(",")[3];
+
+		return hora2 - hora1;
+	}
+
+
+	function styleTdSaldo(tr, saldo) {
+		let tamanhoCells = tr.cells.length
+		if (saldo < 0) {
+			tr.cells[tamanhoCells - 1].style.color = "#ff0000";
+		} else if (saldo >= 0) {
+			tr.cells[tamanhoCells - 1].style.color = "#00ff37";
 		}
-
-		function subtraiHoras(elemento1, elemento2) {
-			let hora1 = elemento1.split(",")[3];
-			let hora2 = elemento2.split(",")[3];
-
-			return hora2 - hora1;
-		}
+		return tr;
+	}
 
 
-		function styleTdSaldo(tr, saldo) {
-			let tamanhoCells = tr.cells.length
-			if (saldo <= 0) {
-				tr.cells[tamanhoCells - 1].style.color = "#ff0000";
-			} else if (saldo > 0) {
-				tr.cells[tamanhoCells - 1].style.color = "#00ff37";
-			}
-			return tr;
-		}
+	function mostrarListaUsuarios() {
+		//document.getElementById("listarUsuarios").disabled = true;
+
+		let listaDatasNaoProcessada = document.getElementById('todosUsuarios').innerHTML;
+		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
+
+		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
+		let table = document.querySelector("div > table");
 
 
-		function mostrarListaUsuarios() {
-			//document.getElementById("listarUsuarios").disabled = true;
+		listaDatasOrdenada.forEach(elemento => {
 
-			let listaDatasNaoProcessada = document.getElementById('todosUsuarios').innerHTML;
-			let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
+			let listaDados = elemento.split(",");
+			let tr = document.createElement("tr");
+			//listaDados na posicao 6 é o total de semanas do anotador, esse valor vai ser substituido depois
+			let totalHorasDeProjeto = parseInt(listaDados[5]) * (parseInt(listaDados[6])) + parseInt(listaDados[7]);
+			let descansoInicio = 0;
+			//por algum motivo tem um caractere a mais na string
+			//console.log(listaDados[0],listaDados[7], totalHorasDeProjeto)
 
-			let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
-			let table = document.querySelector("div > table");
+			descansoInicio = parseInt(listaDados[7]) * (1.25 / 20.0);
 
+			
 
-			listaDatasOrdenada.forEach(elemento => {
+			listaDados[4] = parseFloat(listaDados[4]);
+			listaDados[4] = calcularHoraComDescanso(listaDados[4], parseInt(listaDados[5]), parseInt(listaDados[6]) - 1, descansoInicio);
+			listaDados[6] = (listaDados[4] - totalHorasDeProjeto).toFixed(2);
+			listaDados[4] = listaDados[4].toFixed(2);
 
-				let listaDados = elemento.split(",");
-				let tr = document.createElement("tr");
-				//listaDados na posicao 6 é o total de semanas do anotador, esse valor vai ser substituido depois
-				let totalHorasDoProjeto = listaDados[5] * parseInt(listaDados[6]);
-				let descansoInicio = 0;
-				//por algum motivo tem um caractere a mais na string
+			listaDados.pop()//remove o 7 dado da lista que é o total de horas da primeira descansa
 
-				if (listaDados[1].trim() === "01/10/2020") {
-					let horasPrimeirosDoisDias = listaDados[5] == 20 ? 8 : 4;
-					totalHorasDoProjeto += horasPrimeirosDoisDias;
-					descansoInicio = listaDados[5] == 20 ? 0.5 : 0.25;
-				}
-
-
-				listaDados[4] = parseFloat(listaDados[4]);
-				listaDados[4] = calcularHoraComDescanso(listaDados[4], listaDados[5], listaDados[6], descansoInicio);
-				listaDados[6] = (listaDados[4] - totalHorasDoProjeto).toFixed(2);
-				listaDados[4] = listaDados[4].toFixed(2);
-				listaDados.forEach(dado => {
-					let td = document.createElement("td");
-					td.textContent = dado;
-					tr.appendChild(td);
-				});
-
-				table.appendChild(styleTdSaldo(tr, listaDados[6]));
+			listaDados.forEach(dado => {
+				let td = document.createElement("td");
+				td.textContent = dado;
+				tr.appendChild(td);
 			});
 
-			table.hidden = false;
-		}
+			table.appendChild(styleTdSaldo(tr, listaDados[6]));
+		});
 
-		mostrarListaUsuarios();
-	</script>
+		table.hidden = false;
+	}
 
+	mostrarListaUsuarios();
+</script>

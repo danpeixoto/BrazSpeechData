@@ -8,7 +8,6 @@ from sqlalchemy import or_, not_, and_
 from threading import Timer
 from functools import wraps
 import hashlib
-from datetime import datetime
 import datetime as dtt
 from flask import Blueprint
 from flask import abort
@@ -123,14 +122,10 @@ def Duration_calculation(last_time, present_time):
 
 
 def Total_duration_user(date_1, date_2, current_user):
-	all_duration = TimeValidated.query.filter_by(
-		user_validated=current_user).all()
-	total_hours = 0
-	for total in all_duration:
-		if (total.time_validated >= date_1 and total.time_validated <= date_2):
-			total_hours += total.duration
-
-	return total_hours/3600.0
+	total_hours = TimeValidated.query.with_entities(func.sum(TimeValidated.duration).label("sum_duration"))\
+		.filter(TimeValidated.time_validated.between(date_1,date_2), TimeValidated.user_validated == current_user).scalar()
+	total_hours = total_hours if total_hours is not None else 0
+	return float(total_hours)/3600.0
 
 
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
@@ -149,18 +144,20 @@ def Total_duration_admin(date_1, date_2):
 			# all_duration = TimeValidated.query.filter(
 			# 	TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
 
-			if(user_info[1].strip() == '01/10/2020'):
-				start = datetime.strptime('05/10/2020','%d/%m/%Y')
-			else:
-				start = datetime.strptime(user_info[1].strip(),'%d/%m/%Y')
+			start = datetime.strptime(user_info[1].strip(),'%d/%m/%Y')
+			start_monday = start - dtt.timedelta(days=start.weekday())
+			
 			end = datetime.strptime(user_info[2].strip(),'%d/%m/%Y')
 			
-			num_weeks = abs(today-start).days//7+1
+			first_week_workload = user_info[3] - (start.weekday()*user_info[3]/5)
+			first_week_workload = first_week_workload if first_week_workload > 0 else 0
+
+			num_weeks = abs(today-start_monday).days//7
 			total_hours = float(user_info[-1])/3600
 			start = datetime.strftime(start,'%d/%m/%Y')
 			end = datetime.strftime(end,'%d/%m/%Y')
-			users_data += u'{},{},{},{:.2f},{:.2f},{},{};'.format(user_info[0],start,end,
-											   total_hours,total_hours,user_info[3],num_weeks)
+			users_data += u'{},{},{},{:.2f},{:.2f},{},{},{};'.format(user_info[0],start,end,
+											   total_hours,total_hours,user_info[3],num_weeks,first_week_workload)
 
 	return users_data
 
@@ -274,36 +271,45 @@ def hours_worked():
 
 	if(current_user.data_inicio is None):
 		current_user.data_inicio = '01/10/2020'
+	if(current_user.carga_horaria is None):
+		current_user.carga_horaria = 20
+	since_start = 1
+	# if(current_user.data_inicio.strip() == '01/10/2020'):
+	# 	since_start = 1
+	# 	project_first_week = Total_duration_user(datetime(2020, 10, 1, 0, 0, 0), datetime(
+	# 	2020, 10, 4, 23, 59, 59), session['username'])
+	# 	response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime(
+	# 	'%d-%m-%Y'), datetime(2020, 10, 4, 23, 59, 59).strftime('%d-%m-%Y'), project_first_week)
+	# 	start = datetime(2020, 10, 5, 0, 0, 0)
+	# else:
+	# 	since_start = 0
+	# 	start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
 
-	if(current_user.data_inicio.strip() == '01/10/2020'):
-		since_start = 1
-		project_first_week = Total_duration_user(datetime(2020, 10, 1, 0, 0, 0), datetime(
-		2020, 10, 4, 23, 59, 59), session['username'])
-		response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime(
-		'%d-%m-%Y'), datetime(2020, 10, 4, 23, 59, 59).strftime('%d-%m-%Y'), project_first_week)
-		start = datetime(2020, 10, 5, 0, 0, 0)
-	else:
-		since_start = 0
-		start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
-
+	start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
 	#2020-10-05 00:00:00
 	today = dtt.datetime.today()
 	#start = datetime(2020, 10, 5, 0, 0, 0)
 
-	num_weeks = abs(today-start).days//7 + 1
+	num_weeks = abs(today-start).days//7 
+	start_monday = start - dtt.timedelta(days=start.weekday())
 
-	for i in range(num_weeks-1):
-
-		monday = start + dtt.timedelta(days=i*7)
+	for i in range(num_weeks):
+		if(i == 0):
+			week_workload = current_user.carga_horaria - (start.weekday()*current_user.carga_horaria/5)
+			week_workload = week_workload if week_workload > 0 else 0
+		else:
+			week_workload = current_user.carga_horaria
+		
+		monday = start_monday + dtt.timedelta(days=i*7)
 		sunday = monday + dtt.timedelta(days=6)
 		next_monday = monday + dtt.timedelta(days=7)
 		hours_listened = Total_duration_user(
 			monday, next_monday, session['username'])
 		#total_listened_since_start += hours_listened
-		response_string += u'{},{},{:.2f};'.format(monday.strftime(
-			'%d-%m-%Y'), sunday.strftime('%d-%m-%Y'), hours_listened)
+		response_string += u'{},{},{:.2f},{};'.format(monday.strftime(
+			'%d-%m-%Y'), sunday.strftime('%d-%m-%Y'), hours_listened,week_workload)
 
-	today = dtt.datetime.today()
+	#today = dtt.datetime.today()
 	last_monday = today - dtt.timedelta(days=today.weekday(), hours=today.hour,
 										minutes=today.minute, seconds=today.second, microseconds=today.microsecond)
 	hours_listened = Total_duration_user(
@@ -311,7 +317,7 @@ def hours_worked():
 
 	#total_listened_since_start += hours_listened
 
-	response_string += u'{},{},{:.2f};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened)
+	response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,current_user.carga_horaria)
 
 	#Aqui eu pesquiso a carga horaria do anotador, caso ele não seja anotador comum recebe 20
 	user_data = User.query.filter(User.username == session['username'])
@@ -426,10 +432,9 @@ def admin_audios_info():
 def admin_users_info():
 	users_info = {}
 	today = dtt.datetime.today()
-	project_started = datetime(2020, 10, 5, 0, 0, 0)
-	num_weeks = abs(today-project_started).days//7 + 1
-
-	users_info['user_list'] = Total_duration_admin(project_started, today)
+	project_first_day_week_started = datetime(2020, 9, 28, 0, 0, 0)
+	num_weeks = abs(today-project_first_day_week_started).days//7 + 1
+	users_info['user_list'] = Total_duration_admin(project_first_day_week_started, today)
 	users_info['num_weeks'] = num_weeks
 
 	return render_template('admin-users-info.html',data=users_info)
