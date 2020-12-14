@@ -290,9 +290,9 @@ def hours_worked():
 	today = dtt.datetime.today()
 	#start = datetime(2020, 10, 5, 0, 0, 0)
 
-	num_weeks = abs(today-start).days//7 
+	
 	start_monday = start - dtt.timedelta(days=start.weekday())
-
+	num_weeks = abs(today-start_monday).days//7 
 	for i in range(num_weeks):
 		if(i == 0):
 			week_workload = current_user.carga_horaria - (start.weekday()*current_user.carga_horaria/5)
