@@ -590,9 +590,15 @@ def transcribe_page():
 		session['file_path'] = data.file_path
 		db.session.add(data)
 		db.session.commit()
-		data.file_path = data.file_path.replace('./','data/')
-		data.file_path = os.path.join(
-			'Dataset', data.file_path).replace('\\', '/')
+
+		if './wavs_TED1/' in data.file_path:
+			data.file_path = data.file_path.replace('./','Ted_part1/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		else:
+			data.file_path = data.file_path.replace('./','data/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
 
 
 	return render_template('transcribe_page.html',dataset = data)
