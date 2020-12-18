@@ -592,7 +592,7 @@ def transcribe_page():
 		db.session.commit()
 
 		if './wavs_TED1/' in data.file_path:
-			data.file_path = data.file_path.replace('./','Ted_part1/')		
+			data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
 			data.file_path = os.path.join(
 				'Dataset', data.file_path).replace('\\', '/')
 		else:
