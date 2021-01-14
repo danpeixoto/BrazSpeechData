@@ -33,6 +33,7 @@ data_csv = 'static/Dataset/metadata.csv'
 data_csv_transcribe = 'static/Dataset/metadata_transcribe.csv'
 data_validated_csv = 'static/Dataset/metadata_validated.csv'
 data_csv_gold = 'static/Gold/metadata_gold.csv' 
+data_ted = 'static/Dataset/metadata_ted.csv'
 
 app = Flask(__name__)
 app.config.from_object(config['dev'])
@@ -58,7 +59,7 @@ def initdb():
 @manager.command
 def initdataset():
 
-	lines = list(open(data_csv_transcribe,encoding='utf8').readlines())   
+	lines = list(open(data_ted,encoding='utf8').readlines())   
 	
 	for line in lines:
 		audio_path,lenght,text, text_asr = line.split(',')

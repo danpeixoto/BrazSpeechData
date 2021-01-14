@@ -548,7 +548,7 @@ def transcribe_page():
 
 		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
 
-		data = Dataset.query.filter_by(file_path=session['file_path'],data_gold= data_gold_result).first()
+		data = Dataset.query.filter_by(id=session['id'],data_gold= data_gold_result).first()
 		last_time = TimeValidated.query.filter_by(
 			user_validated=session['username']).order_by(desc(TimeValidated.id)).first()
 		check_current_user(data)
@@ -576,8 +576,8 @@ def transcribe_page():
 		return redirect(url_for('webui.transcribe_page'))
 
 	
-	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs_TED1/%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
@@ -588,6 +588,7 @@ def transcribe_page():
 		session['text'] = data.text_asr
 		session['audio_lenght'] = data.audio_lenght
 		session['file_path'] = data.file_path
+		session['id'] = data.id
 		db.session.add(data)
 		db.session.commit()
 
