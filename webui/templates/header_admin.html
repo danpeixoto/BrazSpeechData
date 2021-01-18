@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/stylesheet.css') }}" media="screen">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/github-dark.css') }}" media="screen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/styles.css') }}" media="screen">
     <title>BrazSpeechData</title>
     {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -27,14 +27,33 @@
 {% if not custom_header %}
 <header>
   <div class="container">
-    <h1>{{ title }}</h1>
-    {% if previous_page %}
-    <a class="link" href="{{ previous_page }}">&lt;&lt; Back</a>
-    {% endif %}
-    {% if session.username %}
-    <h3 style="text-align: right">Logged in as {{ session.username }}</h3>
-    <h2 style="text-align: right"><a class="link" href="{{ url_for('webui.change_password') }}">Change Password</a>  |  <a class="link" href="{{ url_for('webui.add_user') }}">Add User</a> | <a class="link" href="{{ url_for('webui.logout') }}">Disconnect</a></h2>
-    {% endif %}
+	<div class="project-info">
+		<h1 class="project-name">{{ title }}</h1>
+		<img class="logo-copel" src='{{url_for("webui.static", filename="images/Copel.svg")}}' alt="Logo da Copel"/>
+	</div>
+	
+	<nav>
+		<div class="nav-info">
+			{% if session.username %}
+			<h3>Logged in as {{ session.username }}</h3>
+		</div>
+		
+		<ul class="nav-list">
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.add_user') }}">Adicionar usuário</a> 
+			</li>
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.change_password') }}">Trocar a senha</a>
+			</li>
+			</li>
+			<li class="nav-item last">
+				<a class="link" href="{{ url_for('webui.logout') }}">Logout</a>
+			</li>
+		</ul>
+	</nav>
+
+	{% endif %}
    </div>
+   
 </header>
 {% endif %}

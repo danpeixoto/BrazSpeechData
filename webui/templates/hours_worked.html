@@ -2,140 +2,56 @@
 {% include "header.html" %}
 {% endwith %}
 
-<style>
-	li {
-		font-size: 1.2em;
-		margin: 10px;
-	}
 
-	li:hover {
-		transition: 0.5s;
-		color: aliceblue;
-		font-size: 1.8em;
-		background-color: #363636;
-	}
+<section class="hours-worked">
+	<div class="container">
+		<div class="return">
+			<a href="/">Horas anotadas</a>
+		</div>
+		
 
-	h1 {
-		font-size: 3em;
-	}
+		<span id='todasSemanas' hidden>{{hours.response_string}}</span>
+		<span id='cargaHoraria' hidden>{{hours.workload}}</span>
+		<span id='desdeInicio' hidden>{{hours.since_start}}</span>
 
-	form {
-		margin-bottom: 50px;
-	}
+		<div class="hours-table" id='tabelaSemanas'>
+			<table>
+				<tr>
+					<th>Data de inicio</th>
+					<th>Data de fim</th>
+					<th>Horas anotadas</th>
+					<th class="tooltip">
+						Horas anotadas + descanso (*)
+						<span class="tooltiptext">Horas anotadas somadas com o tempo do descanso semanal
+							(o descanso corresponde a 15 minutos a cada 4 horas trabalhadas).
+						</span>
+					</th>
 
-	input {
-		font-size: 1.1em;
-	}
+					<th>Carga horária</th>
+					<th class="tooltip">
+						Saldo
+						<span class='tooltiptext'> Vermelho = Negativo; Verde = Positivo. </span>
+					</th>
+				</tr>
+			</table>
+		</div>
 
-	input:hover {
-		transition: 0.5s;
-		color: aliceblue;
-		background-color: #363636;
-	}
+		<div class="observations">
+			<p>
+				<strong>*OBS:</strong> o descanso da semana corrente inteira é creditado antecipadamente na integra todas as
+				segundas-feiras ás 0h00.
+			</p>
+	
+			<p>
+				<strong>**OBS:</strong> clicar no campo "Horas anotadas", que está fora da tabela, retorna para anotação.
+			</p>
+		</div>
+		
 
-
-	table {
-		font-family: arial, sans-serif;
-		border-collapse: collapse;
-		width: 50%;
-		margin-left: 25%;
-		overflow: scroll;
-	}
-
-	th {
-		color: #b5e853;
-	}
-
-	td,
-	th {
-		border: 1px solid #dddddd;
-		text-align: center;
-		padding: 8px;
-		font-size: 1.2em;
-	}
-
-	tr:nth-child(even) {
-		background-color: #474747;
-	}
-
-
-	.tooltip .tooltiptext {
-		visibility: hidden;
-		width: 0px;
-		background-color: #474747;
-		color: #fff;
-		text-align: center;
-		border: 0.5px solid #dddddd;
-		border-radius: 6px;
-		padding: 5px 0;
-		position: absolute;
-		z-index: 10;
-		margin-left: -30%;
-		top: 30%;
-		opacity: 0;
-		transition: opacity 0.6s;
-	}
-
-	.tooltip:hover .tooltiptext {
-		visibility: visible;
-		opacity: 1;
-		width: 600px;
-	}
-
-
-	/* Css para o link de voltar ao index */
-	.voltar {
-		text-decoration: none;
-		color: inherit;
-		font-size: inherit;
-		transition-property: color;
-		transition-duration: 0.5s;
-	}
-
-	.voltar:hover {
-		color: aliceblue;
-	}
-</style>
-
-
-<div class='contentContainer' style='text-align: center'>
-	<h1><a class="voltar" href="/">Horas anotadas</a></h1>
-
-	 <span id='todasSemanas' hidden>{{hours.response_string}}</span> 
-	 <span id='cargaHoraria' hidden>{{hours.workload}}</span> 
-	 <span id='desdeInicio' hidden>{{hours.since_start}}</span>
-	<div id='listaDatas'></div>
-
-	<div id='tabelaSemanas'>
-		<table>
-			<tr>
-				<th>Data de inicio</th>
-				<th>Data de fim</th>
-				<th>Horas anotadas</th>
-				<th class="tooltip">
-					Horas anotadas + descanso (*)
-					<span class="tooltiptext">Horas anotadas somadas com o tempo do descanso semanal
-						(o descanso corresponde a 15 minutos a cada 4 horas trabalhadas).
-					</span>
-				</th>
-
-				<th>Carga horária</th>
-				<th class="tooltip">
-					Saldo
-					<span class='tooltiptext'> Vermelho = Negativo; Verde = Positivo. </span>
-				</th>
-			</tr>
-		</table>
 	</div>
+</section>
 
-	<p>
-		<strong>*OBS:</strong> o descanso da semana corrente inteira é creditado antecipadamente na integra todas as segundas-feiras ás 0h00.
-	</p>
 
-	<p>
-		<strong>**OBS:</strong> clicar no campo "Horas anotadas", que está fora da tabela, retorna para anotação.
-	</p>
-</div>
 
 <script>
 
@@ -147,7 +63,7 @@
 	function converteFloatParaHoras(horaEmFLoat) {
 
 		let horas = Math.floor(horaEmFLoat);
-		let minutos =((horaEmFLoat - horas) * 60.0).toFixed(0);
+		let minutos = ((horaEmFLoat - horas) * 60.0).toFixed(0);
 		horas = `${horas}`.length > 1 ? horas : `0${horas}`;
 		minutos = `${minutos}`.length > 1 ? minutos : `0${minutos}`;
 
@@ -180,7 +96,7 @@
 
 
 		horaMaisDescanso = converteFloatParaHoras(horaMaisDescanso);
-		
+
 
 		listaDados[3] = horaMaisDescanso;
 		listaDados.push(cargaHoraria);
@@ -214,7 +130,7 @@
 		let cargaHorariaPrimeiraSemana = cargaHoraria == 20 ? 8 : 4;
 
 		listaDatasProcessada.forEach((elemento, index) => {
-			saldoTotal += processaElementoLista(elemento, table);	
+			saldoTotal += processaElementoLista(elemento, table);
 		});
 
 		let lastRow = document.createElement("tr");
@@ -232,7 +148,7 @@
 		table.appendChild(styleTdSaldo(lastRow, saldoTotal));
 
 		tdSaldoTotal.textContent = converteFloatParaHoras(Math.abs(saldoTotal));
-		
+
 	}
 
 

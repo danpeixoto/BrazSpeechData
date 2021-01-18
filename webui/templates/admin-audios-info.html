@@ -1,73 +1,36 @@
 {% with title='BrazSpeechData' %}
 {% include 'header_admin.html' %}
 {% endwith %}
-
-<head>
-	<style>
-		.text{
-			width: 100%;
-			text-align: center;
-			color: #b5e853;
-			font-size: 2em;
-			text-transform: uppercase;
-			margin: 20px auto;
-		}
-		.audios-info {
-			width: 100%;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			text-align: left;
-		}
-
-		.audio-grid {
-			display: grid;
-			grid-template-rows: repeat(autofit, minmax(250, 1fr));
-			gap: 25px;
-			margin-bottom: 20px;
-			transform: translateX(25%);
-		}
-		.audio-grid-item{
-			font-size: 1.4em;
-			color: #fafafa;
-		}
-	</style>
-
-
-</head>
-
-<main>
-	<section class="audios-info">
-		<div class="container">
-			<div class="text">
-				<p>Informações sobre os áudios da base de dados:</p>
+<section class="audios-info">
+	<div class="container">
+		<div class="heading">
+			<h1>Informações sobre os áudios da base de dados:</h1>
+		</div>
+		<div class="audio-grid">
+			<!-- Grid item 1 -->
+			<div class="audio-grid-item">
+				<p>O total de áudios anotados é: {{data.total_audios}}.</p>
 			</div>
-			<div class="audio-grid">
-				<!-- Grid item 1 -->
-				<div class="audio-grid-item">
-					<p>O total de áudios anotados é: {{data.total_audios}}.</p>
-				</div>
-				<!-- Grid item 2 -->
-				<div class="audio-grid-item">
-					<p>O total de horas de áudios anotadas é: {{data.total_hours}} horas.</p>
-				</div>
-				<!-- Grid item 3 -->
-				<div class="audio-grid-item">
-					<p>O total de horas de áudios válidas anotadas é: {{data.valid_hours}} horas.</p>
-				</div>
-				<!-- Grid item 4 -->
-				<div class="audio-grid-item">
-					<p>O total de áudios transcritos é: {{data.audios_transcribed}}.</p>
-				</div>
-				<!-- Grid item 5 -->
-				<div class="audio-grid-item">
-					<p>O total de horas de áudios transcritos é: {{data.total_hours_transcribed}} horas.</p>
-				</div>
-				<!-- Grid item 6 -->
-				<div class="audio-grid-item">
-					<p>O total de horas de áudios transcritos válidos é: {{data.valid_hours_transcribed}} horas.</p>
-				</div>
+			<!-- Grid item 2 -->
+			<div class="audio-grid-item">
+				<p>O total de horas de áudios anotadas é: {{data.total_hours}} horas.</p>
+			</div>
+			<!-- Grid item 3 -->
+			<div class="audio-grid-item">
+				<p>O total de horas de áudios válidas anotadas é: {{data.valid_hours}} horas.</p>
+			</div>
+			<!-- Grid item 4 -->
+			<div class="audio-grid-item">
+				<p>O total de áudios transcritos é: {{data.audios_transcribed}}.</p>
+			</div>
+			<!-- Grid item 5 -->
+			<div class="audio-grid-item">
+				<p>O total de horas de áudios transcritos é: {{data.total_hours_transcribed}} horas.</p>
+			</div>
+			<!-- Grid item 6 -->
+			<div class="audio-grid-item">
+				<p>O total de horas de áudios transcritos válidos é: {{data.valid_hours_transcribed}} horas.</p>
 			</div>
 		</div>
-	</section>
-</main>
+	</div>
+</section>

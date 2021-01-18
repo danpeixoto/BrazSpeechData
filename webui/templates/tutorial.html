@@ -2,91 +2,15 @@
 {% include "header.html" %}
 {% endwith %}
 
-<head>
-
-	<style>
-		p,
-		li {
-			text-align: justify;
-		}
-
-		.listaNegrito {
-			font-weight: bold;
-		}
 
 
-		.casosAnotacao,
-		.exemplos {
-			text-align: justify;
-			font-size: 1.2em;
-		}
+<section class="annotation-tutorial">
 
-		ul li {
-			margin-left: 20px;
-			padding: 5px;
-		}
+	<div class="container tutorial">
 
-		.presteAtencao {
-			color: #db0000
-		}
-
-		.obs:hover {
-			color: #b5e853;
-		}
-
-		span#obsValido:hover,
-		h3.valido {
-			color: #0387e6;
-			text-shadow: none;
-		}
-
-		span#obsInvalido:hover,
-		h3.invalido {
-			color: #ff0000;
-			text-shadow: none;
-		}
-
-		h3.valido,
-		h3.invalido {
-			margin: 60px 0;
-		}
-
-		dt,
-		dl {
-			margin: 5px;
-			font-size: 0.9em;
-		}
-
-
-		/* Css para o link de voltar ao index */
-		.voltar {
-			text-decoration: none;
-			color: inherit;
-			font-size: inherit;
-			transition-property: color;
-			transition-duration: 0.5s;
-		}
-
-		.voltar:hover {
-			color: aliceblue;
-		}
-	</style>
-
-</head>
-
-<div class="container" style="text-align: center">
-
-	<section id="main_content">
-
-
-
-		<h1 style="text-align: center;">
-
-			<a class="voltar" href="/"><strong>Tutorial - Tarefa de avaliação de alinhamentos áudio-texto</strong></a>
-			<br><br><br>
-
-		</h1>
-
+		<div class="return">
+			<a href="/"><strong>Tutorial - Tarefa de avaliação de alinhamentos áudio-texto</strong></a>
+		</div>
 
 
 		<p>
@@ -899,14 +823,16 @@
 
 			</dl>
 
-
 		</div>
-
 		<form method="post" action="/tutorial">
 			<input type="submit" value="Ir Para Anotação" name="Ir Para Anotação" />
 
 		</form>
+</section>
 
-	</section>
-</div>
+
+
+
+
+
 {% include 'footer.html' %}

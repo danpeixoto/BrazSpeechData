@@ -5,62 +5,40 @@
 <head>
 
 	<style>
-		.bem-vindo {
-			height: 10vh;
-			margin: 60px 0;
-		}
-
-		.links {
-			margin: 30px 0;
-		}
-
-		
-
-		ol {
-			list-style-type: none;
-		}
-
-		li {
-			margin: 10px;
-		}
-
-		input {
-			font-size: 1.3em;
-			border-radius: 5px;
-			transition: all 650ms;
-			transition-property: background-color, color;
-		}
-
-		input:hover:enabled {
-			background-color: #4a4a4a;
-			color: #e3e3e3;
-		}
 	</style>
 
 </head>
 
-<div class='container' style='text-align: center'>
-	<section id='main_content'>
+<section class="admin">
+	<div class="container">
 		<div class="bem-vindo">
-			<h1 style="font-size: 2.5em;">Olá administrador(a), bem-vindo ao BrazSpeechData.</h1>
+			<h1>Olá administrador(a), bem-vindo ao BrazSpeechData.</h1>
 		</div>
 
 		<div class="links">
-			<h3 style="font-size: 1.5em;">Informações:</h3>
-			<a class="link" href="/admin-audios-info" target="_blank">Áudios</a> |
-			<a class="link" href="/admin-users-info" target="_blank">Usuarios</a>
+			<div>
+				<h3 style="font-size: 1.5em;">Informações:</h3>
+			</div>
+			<div>
+				<a class="link" href="/admin-audios-info" target="_blank">Áudios</a>
+				<span>|</span>
+				<a class="link" href="/admin-users-info" target="_blank">Usuarios</a>
+			</div>
 		</div>
 
 
 		<div class="download-csv">
-			<h3 style="font-size: 1.5em;">Download da base como csv:</h3>
-			<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
-				value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
+			<h3>Download da base como csv:</h3>
+			<div class="download-csv-inputs">
+				<input class="botaoForm" id="botaoGold" type="button" onclick="mostrarFormSelecionado(this.id,'gold')"
+					value="Gold" style="height: 35px; width: 130px; margin-top: 15px;" />
 
-			<input class="botaoForm" id="botaoValidados" type="button"
-				onclick="mostrarFormSelecionado(this.id,'naoGold')" value="Anotados"
-				style="height: 35px; width: 130px; margin-top: 15px;" />
+				<input class="botaoForm" id="botaoValidados" type="button"
+					onclick="mostrarFormSelecionado(this.id,'naoGold')" value="Anotados"
+					style="height: 35px; width: 130px; margin-top: 15px;" />
 
+
+			</div>
 
 			<form id="gold" method='post' hidden>
 				<ol>
@@ -110,11 +88,7 @@
 				</ol>
 			</form>
 		</div>
-
-	</section>
-
-
-</div>
+</section>
 
 <script>
 

@@ -151,13 +151,19 @@ def Total_duration_admin(date_1, date_2):
 			
 			first_week_workload = user_info[3] - (start.weekday()*user_info[3]/5)
 			first_week_workload = first_week_workload if first_week_workload > 0 else 0
-
-			num_weeks = abs(today-start_monday).days//7
+			last_week_workload = (end.weekday()+1)*(user_info[3]/5)
+			last_week_workload = last_week_workload if last_week_workload < user_info[3] else user_info[3]
+	
+			if(today > end):
+				num_weeks = abs(end-start_monday).days//7
+			else:
+				num_weeks = abs(today-start_monday).days//7
+				
 			total_hours = float(user_info[-1])/3600
 			start = datetime.strftime(start,'%d/%m/%Y')
 			end = datetime.strftime(end,'%d/%m/%Y')
-			users_data += u'{},{},{},{:.2f},{:.2f},{},{},{};'.format(user_info[0],start,end,
-											   total_hours,total_hours,user_info[3],num_weeks,first_week_workload)
+			users_data += u'{},{},{},{:.2f},{:.2f},{},{},{},{};'.format(user_info[0],start,end,
+											   total_hours,total_hours,user_info[3],num_weeks,first_week_workload,last_week_workload)
 
 	return users_data
 
@@ -204,7 +210,7 @@ def index():
 		data.file_with_user = 0
 		data.number_validated += 1
 		data.travado = datetime.now()
-
+		print(request.form)
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
 			valid_list = check_valids(values_list)
@@ -271,32 +277,35 @@ def hours_worked():
 
 	if(current_user.data_inicio is None):
 		current_user.data_inicio = '01/10/2020'
+	if(current_user.data_fim is None):
+		current_user.data_fim = '31/12/2021'
 	if(current_user.carga_horaria is None):
 		current_user.carga_horaria = 20
 	since_start = 1
-	# if(current_user.data_inicio.strip() == '01/10/2020'):
-	# 	since_start = 1
-	# 	project_first_week = Total_duration_user(datetime(2020, 10, 1, 0, 0, 0), datetime(
-	# 	2020, 10, 4, 23, 59, 59), session['username'])
-	# 	response_string += u'{},{},{:.2f};'.format(datetime(2020, 10, 1, 0, 0, 0).strftime(
-	# 	'%d-%m-%Y'), datetime(2020, 10, 4, 23, 59, 59).strftime('%d-%m-%Y'), project_first_week)
-	# 	start = datetime(2020, 10, 5, 0, 0, 0)
-	# else:
-	# 	since_start = 0
-	# 	start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
 
 	start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
+	end = datetime.strptime(current_user.data_fim.strip(),'%d/%m/%Y')
 	#2020-10-05 00:00:00
 	today = dtt.datetime.today()
 	#start = datetime(2020, 10, 5, 0, 0, 0)
 
-	
 	start_monday = start - dtt.timedelta(days=start.weekday())
+	num_weeks_until_end = float("inf")
+	
+	if(today > end):
+		num_weeks_until_end = abs(end-start_monday).days//7 
+
 	num_weeks = abs(today-start_monday).days//7 
+	
 	for i in range(num_weeks):
 		if(i == 0):
 			week_workload = current_user.carga_horaria - (start.weekday()*current_user.carga_horaria/5)
 			week_workload = week_workload if week_workload > 0 else 0
+		elif(i == num_weeks_until_end):
+			week_workload = (end.weekday()+1)*(current_user.carga_horaria/5)
+			week_workload = week_workload if week_workload < current_user.carga_horaria else current_user.carga_horaria
+		elif(i > num_weeks_until_end):
+			week_workload = 0
 		else:
 			week_workload = current_user.carga_horaria
 		
@@ -316,8 +325,10 @@ def hours_worked():
 		last_monday, today, session['username'])
 
 	#total_listened_since_start += hours_listened
-
-	response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,current_user.carga_horaria)
+	if(num_weeks_until_end< float("inf")):
+		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,0)
+	else:
+		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,current_user.carga_horaria)
 
 	#Aqui eu pesquiso a carga horaria do anotador, caso ele não seja anotador comum recebe 20
 	user_data = User.query.filter(User.username == session['username'])
@@ -381,12 +392,12 @@ def calculate_total_hours_validated():
 	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 0).scalar()
 
 	total_duration_valid_two_users = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
-		Dataset.number_validated >=2, or_(and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user2 == 0)
+		Dataset.number_validated >=2, Dataset.task==0, or_(and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user2 == 0)
 		,and_(Dataset.invalid_user2 == 0 , Dataset.invalid_user3 == 0)
 		,and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user3 == 0))).scalar()
 
 	total_duration_valid_one_user = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
-		Dataset.number_validated == 1 , Dataset.invalid_user1 == 0).scalar()
+		Dataset.number_validated == 1 , Dataset.task==0, Dataset.invalid_user1 == 0).scalar()
 
 	total_duration = float(total_duration)
 	total_duration_valid = float(total_duration_valid_one_user )+float( total_duration_valid_two_users)
@@ -430,6 +441,7 @@ def admin_audios_info():
 @webui.route('/admin-users-info', methods=['GET'])
 @require_admin
 def admin_users_info():
+	# TODO: Corrigir código para que deixe de contar a partir da saida do usuario
 	users_info = {}
 	today = dtt.datetime.today()
 	project_first_day_week_started = datetime(2020, 9, 28, 0, 0, 0)

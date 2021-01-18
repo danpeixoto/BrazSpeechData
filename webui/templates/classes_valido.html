@@ -1,54 +1,54 @@
-<form id="formValid" method="post" action="/">
+<div class="valid-options">
+	<form id="formValid" method="post" action="/">
 
-	<p id="pEscondidoValido" hidden>Selecione o motivo da validação:</p>
-	<div id="divEscondidoValido" hidden>
+		<p class="p-reason" id="pEscondidoValido" hidden>Selecione o motivo da validação:</p>
+		<div id="divEscondidoValido" hidden>
+			<table class="options-table">
+				<tbody>
+					<tr>
+						<td>
+							<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid1">
+							<label for="Valid1">Valid (áudio limpo).</label>
+						</td>
 
-		<table>
-			<tbody>
-				<tr>
-					<td>
-						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid1">
-						<label for="Valid1">Valid (áudio limpo).</label>
-					</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid2">
+							<label for="Valid2">Valid com pausa preenchida.</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid3">
+							<label for="Valid3">Valid com hesitação.</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid4">
+							<label for="Valid4">Valid com ruído/voz baixa, mas compreensível.</label>
+						</td>
 
-				</tr>
-				<tr>
-					<td>
-						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid2">
-						<label for="Valid2">Valid com pausa preenchida.</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid3">
-						<label for="Valid3">Valid com hesitação.</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid4">
-						<label for="Valid4">Valid com ruído/voz baixa, mas compreensível.</label>
-					</td>
+					</tr>
 
-				</tr>
-
-				<tr>
-					<td>
-						<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid5">
-						<label for="Valid5">Valid com segunda voz baixa.</label>
-					</td>
-				</tr>
-
-
-			</tbody>
-		</table>
-
-	</div>
+					<tr>
+						<td>
+							<input type="checkbox" name="Valid" onclick="lidaClickCheck()" value="Valid5">
+							<label for="Valid5">Valid com segunda voz baixa.</label>
+						</td>
+					</tr>
 
 
-	<input id="inputEscondidoValido" type="button" value="Submit" style="height: 35px; width: 130px; margin-top: 100px;"
-		disabled="true" onclick="formSubmitValido()" hidden>
-</form>
+				</tbody>
+			</table>
+		</div>
+
+
+		<input class="submit-button" id="inputEscondidoValido" type="button" value="Submit" disabled="true" onclick="formSubmitValido()" hidden>
+	</form>
+</div>
+
 
 
 
@@ -64,9 +64,9 @@
 		}
 	}
 
-	function formSubmitValido(){
+	function formSubmitValido() {
 		let button = document.getElementById("inputEscondidoValido")
-		if(!button.disabled){
+		if (!button.disabled) {
 			button.disabled = true;
 			document.getElementById("formValid").submit();
 		}

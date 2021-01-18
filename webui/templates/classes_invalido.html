@@ -1,71 +1,74 @@
-<form id="formInvalid" method="post" action="/">
+<div class="invalid-options">
+	<form id="formInvalid" method="post" action="/">
 
-	<p id="pEscondidoInvalido" hidden>Selecione o motivo da invalidação:</p>
-	<div id="divEscondidoInvalido" hidden>
+		<p class="p-reason" id="pEscondidoInvalido" hidden>Selecione o motivo da invalidação:</p>
+		<div id="divEscondidoInvalido" hidden>
 
-		<table>
-			<tbody>
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid1" checked>
-						<label for="Invalid1">Sobreposição de voz: a segunda voz está em um volume próximo, ou
-							superior, ao do locutor principal.</label>
-					</td>
+			<table class="options-table">
+				<tbody>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid1" checked>
+							<label for="Invalid1">Sobreposição de voz: a segunda voz está em um volume próximo, ou
+								superior, ao do locutor principal.</label>
+						</td>
 
-				</tr>
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid2">
-						<label for="Invalid2">Locutor com voz incompreensível: com ruído de fundo alto ou voz
-							muito baixa.</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid3">
-						<label for="Invalid3">A sentença com uma única palavra e essa palavra está
-							truncada.</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid4">
-						<label for="Invalid4">Sentença com a última palavra truncada.</label>
-					</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid2">
+							<label for="Invalid2">Locutor com voz incompreensível: com ruído de fundo alto ou voz
+								muito baixa.</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid3">
+							<label for="Invalid3">A sentença com uma única palavra e essa palavra está
+								truncada.</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid4">
+							<label for="Invalid4">Sentença com a última palavra truncada.</label>
+						</td>
 
-				</tr>
+					</tr>
 
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid5">
-						<label for="Invalid5">Junção de mais de um problema no áudio.</label>
-					</td>
-				</tr>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid5">
+							<label for="Invalid5">Junção de mais de um problema no áudio.</label>
+						</td>
+					</tr>
 
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid6">
-						<input type="text" name="InvalidReason" id="razaoInvalido"
-							placeholder="Outro problema no áudio." style="width: 830px;" disabled>
-					</td>
-				</tr>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid6">
+							<input type="text" name="InvalidReason" id="razaoInvalido"
+								placeholder="Outro problema no áudio." disabled>
+						</td>
+					</tr>
 
-				<tr>
-					<td>
-						<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid7">
-						<label for="Invalid7">Erro na transcrição: palavras a mais, a menos ou trocadas.</label>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+					<tr>
+						<td>
+							<input type="radio" name="Invalid" onclick="lidaClickRadio(this)" value="Invalid7">
+							<label for="Invalid7">Erro na transcrição: palavras a mais, a menos ou trocadas.</label>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 
-	</div>
-	<input id="inputEscondidoInvalido" type="button" value="Submit" style="height: 35px; width: 130px; margin-top: 100px;"
-	 onclick="formSubmitInvalido()" hidden>
-</form>
+		</div>
+		<input class="submit-button" id="inputEscondidoInvalido" type="button" value="Submit" onclick="formSubmitInvalido()" hidden>
+	</form>
+</div>
+
 
 
 <script>
+	const mudaValorTextIput = (valor)=> valor===""? " ": valor;
 	function lidaClickRadio(radioButton) {
 
 		// Desabilita o input text caso o radioButton seja o 5 
@@ -74,16 +77,18 @@
 			document.getElementById("razaoInvalido").disabled = false;
 		} else {
 			let textInput = document.querySelector("#razaoInvalido");
-			textInput.value = " ";
+			textInput.value = "";
 			textInput.disabled = true;
 		}
 
 	}
 
-	function formSubmitInvalido(){
+	function formSubmitInvalido() {
 		let button = document.getElementById("inputEscondidoInvalido");
-		if(!button.disabled){
+		if (!button.disabled) {
 			button.disabled = true;
+			let textInput = document.getElementById("razaoInvalido")
+			textInput.value = mudaValorTextIput(textInput.value);
 			document.getElementById("formInvalid").submit();
 		}
 	}

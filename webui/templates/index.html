@@ -1,227 +1,122 @@
 {% with title="BrazSpeechData" %}
 {% include "header.html" %}
 {% endwith %}
+<section class="annotation">
+	<div class="container">
+		<p class="sentence">Sentença: {{dataset.text}}</p>
 
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<meta charset="utf-8">
-	<style>
-		.conteiner {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			min-height: 100%;
-			min-width: 600px;
-		}
-
-		.botaoForm {
-			margin: 0 40px;
-		}
-
-		#botaoLoop{
-			width: 45px;
-			height: 45px;
-			cursor: pointer;
-		}
-
-		.flex-container {
-			display: flex;
-			flex-wrap: nowrap;
-			justify-content: center;
-		}
-
-		.flex-container>div {
-			margin: 10px;
-			text-align: center;
-			line-height: 75px;
-			font-size: 30px;
-		}
-
-
-
-		label {
-			text-align: center;
-			font-size: 0.9em;
-			outline: 3px solid #efefef;
-			outline-offset: 0px;
-			padding: 2px;
-		}
-
-		input[type="radio"]:checked+label,
-		input[type="checkbox"]:checked+label {
-			background: #d1d1d1;
-			color: black;
-		}
-
-		input[type="text"] {
-			height: 20px;
-		}
-
-		.listado {
-			display: block;
-			align-items: center;
-			justify-content: center;
-			margin-left: 30%;
-			height: 250px;
-		}
-
-		table {
-			width: 100%;
-		}
-
-		tbody {
-			width: 940px;
-		}
-
-		tr {
-			float: left;
-			width: 100%;
-		}
-
-
-		@media screen and (max-width: 800px) {
-
-			.container,
-			label {
-				font-size: 0.8em;
-			}
-		}
-	</style>
-</head>
-
-<div class="container" style="text-align: center">
-	<section id="main_content">
-
-		<p>Sentence: {{dataset.text}}</p>
-
-		<!-- <audio controls autoplay >
-			<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
-				media="(min-width: 900px)" preload>
-
-			Your browser does not support the audio element. Please contact the admin!
-		</audio> -->
-
-		<div class="flex-container">
-			<div>
-				<audio id="audioAtual" controls autoplay >
+		<div class="audio-controls">
+			<div class="current-audio">
+				<audio id="current-audio" controls autoplay>
 					<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
 						media="(min-width: 900px)" preload>
-		
+
 					Your browser does not support the audio element. Please contact the admin!
 				</audio>
 			</div>
-			<div>
-				<img id="botaoLoop" onclick="gerenciarCookie()" src="{{url_for('webui.static', filename='images/loop.png')}}" ativo>
+			<div class="loop-button">
+				<i id="loop-button" class="fas fa-redo" onclick="gerenciarCookie()" ativo></i>
+			</div>
+
+		</div>
+		<div class="annotation-options">
+			<div class="container">
+				<div class="options-inputs">
+					<input id="valido" type="button" onclick="mostrarClassesSelecionada('Valido')" value="Valid"
+						name="ShowValidList" />
+
+					<input id="invalido" type="button" onclick="mostrarClassesSelecionada('Invalido')" value="Invalid"
+						name="ShowInvalidList" />
+				</div>
+
+				{% include "classes_invalido.html" %}
+				{% include "classes_valido.html" %}
 			</div>
 		</div>
+	</div>
+</section>
 
 
+<script>
 
+	gerenciarLoop();
 
-		<br>
-		<br>
-		<br>
+	function gerenciarCookie() {
+		let botaoLoop = document.getElementById("loop-button");
 
-
-		<input class="botaoForm" id="valido" type="button" onclick="mostrarClassesSelecionada('Valido')" value="Valid"
-			name="ShowValidList" style="height: 35px; width: 130px; margin-top: 15px;" />
-
-		<input class="botaoForm" id="invalido" type="button" onclick="mostrarClassesSelecionada('Invalido')"
-			value="Invalid" name="ShowInvalidList" style="height: 35px; width: 130px; margin-top: 15px;" />
-
-
-
-		{% include "classes_invalido.html" %}
-		{% include "classes_valido.html" %}
-
-
-
-	</section>
-
-
-	<script>
+		if (botaoLoop.loopAtivo) {
+			document.cookie = "loop=false";
+		} else {
+			document.cookie = "loop=true";
+		}
 
 		gerenciarLoop();
+	}
 
-		function gerenciarCookie() {
-			let botaoLoop = document.getElementById("botaoLoop");
-
-			if (botaoLoop.loopAtivo) {
-				document.cookie = "loop=false";
-			} else {
-				document.cookie = "loop=true";
-			}
-
-			gerenciarLoop();
+	function getCookieValue() {
+		let cookieRe = /loop=\w*/g;
+		let cookieString = document.cookie.match(cookieRe);
+		// verifica se já foi estabelecido algum valor ao cookie e depois retorna o valor
+		if (cookieString) {
+			let cookieValue = cookieString[0].split("=")[1] === 'true';
+			return cookieValue;
 		}
 
-		function getCookieValue() {
-			let cookieRe = /loop=\w*/g;
-			let cookieString = document.cookie.match(cookieRe);
-			// verifica se já foi estabelecido algum valor ao cookie e depois retorna o valor
-			if(cookieString){
-				let cookieValue = cookieString[0].split("=")[1] === 'true';
-				return cookieValue;
-			}
-			
-			return false;
-		}
+		return false;
+	}
 
-		function gerenciarLoop() {
-			let botaoLoop = document.getElementById("botaoLoop");
-			let audioTag = document.getElementById("audioAtual");
-			let cookieValue = getCookieValue();
+	function gerenciarLoop() {
+		let botaoLoop = document.getElementById("loop-button");
+		let audioTag = document.getElementById("current-audio");
+		let cookieValue = getCookieValue();
 
-			if(cookieValue !== null){
-				botaoLoop.style.opacity =  cookieValue ? 1.0 : 0.5;
-				botaoLoop.loopAtivo = cookieValue;
-				audioTag.loop = cookieValue;
-			}else{
-				botaoLoop.style.opacity = 0.5;
-				botaoLoop.loopAtivo = false;
-				audioTag.loop = false;
-			}
-			
-
+		if (cookieValue !== null) {
+			botaoLoop.style.opacity = cookieValue ? 1.0 : 0.5;
+			botaoLoop.loopAtivo = cookieValue;
+			audioTag.loop = cookieValue;
+		} else {
+			botaoLoop.style.opacity = 0.5;
+			botaoLoop.loopAtivo = false;
+			audioTag.loop = false;
 		}
 
 
-		function esconderClassesNaoSelecionadas(classe) {
-
-			document.getElementById(`pEscondido${classe}`).hidden = true;
-
-			document.getElementById(`inputEscondido${classe}`).hidden = true;
-
-			let div = document.getElementById(`divEscondido${classe}`);
-			div.hidden = true;
-			div.className = null;
-
-		}
-
-		function mostrarClassesSelecionada(classe) {
-
-			// Desabilita o input da classe selecionada e habilita o outro
-			document.getElementById(classe.toLowerCase()).disabled = true;
-			let classeInversa = classe === "Valido" ? "Invalido" : "Valido";
-			document.getElementById(classeInversa.toLowerCase()).disabled = false;
-
-			// Mostra o conteudo da classe selecionada e esconde da outra
-			document.getElementById(`pEscondido${classe}`).removeAttribute("hidden");
-			let div = document.getElementById(`divEscondido${classe}`);
-			div.removeAttribute("hidden");
-			div.className = "listado";
-			console.log(div)
-			esconderClassesNaoSelecionadas(classeInversa);
-
-			// Mostra o input de submit escondido
-			document.getElementById(`inputEscondido${classe}`).removeAttribute("hidden");
-
-		}
+	}
 
 
-	</script>
+	function esconderClassesNaoSelecionadas(classe) {
+
+		document.getElementById(`pEscondido${classe}`).hidden = true;
+
+		document.getElementById(`inputEscondido${classe}`).hidden = true;
+
+		let div = document.getElementById(`divEscondido${classe}`);
+		div.hidden = true;
+		div.className = null;
+
+	}
+
+	function mostrarClassesSelecionada(classe) {
+
+		// Desabilita o input da classe selecionada e habilita o outro
+		document.getElementById(classe.toLowerCase()).disabled = true;
+		let classeInversa = classe === "Valido" ? "Invalido" : "Valido";
+		document.getElementById(classeInversa.toLowerCase()).disabled = false;
+
+		// Mostra o conteudo da classe selecionada e esconde da outra
+		document.getElementById(`pEscondido${classe}`).removeAttribute("hidden");
+		let div = document.getElementById(`divEscondido${classe}`);
+		div.removeAttribute("hidden");
+		div.className = "listado";
+		console.log(div)
+		esconderClassesNaoSelecionadas(classeInversa);
+
+		// Mostra o input de submit escondido
+		document.getElementById(`inputEscondido${classe}`).removeAttribute("hidden");
+
+	}
+
+
+</script>
 
 </div>
-

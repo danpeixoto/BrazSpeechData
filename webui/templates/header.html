@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/stylesheet.css') }}" media="screen">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/github-dark.css') }}" media="screen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/styles.css') }}" media="screen">
     <title>BrazSpeechData</title>
     {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -27,34 +27,43 @@
 {% if not custom_header %}
 <header>
   <div class="container">
-	<h1 class="projectName">{{ title }}</h1>
-    {% if previous_page %}
-    <a class="link" href="{{ previous_page }}">&lt;&lt; Back</a>
-    {% endif %}
-    {% if session.username %}
-    <h3 style="text-align: right">Logged in as {{ session.username }}</h3>
-	<h2 style="text-align: right">
-		<a class="link" href="{{ url_for('webui.index') }}">Anotação</a>  |
-		<a class="link" href="{{ url_for('webui.tutorial') }}">Tutorial Anotação</a> |
-		<a class="link" href="{{ url_for('webui.hours_worked') }}">Horas</a>  |
-		<a class="link" href="{{ url_for('webui.transcribe_page') }}">Transcrição</a> |
-		<a class="link" href="{{ url_for('webui.tutorial_transcribe') }}">Tutorial transcrição</a>  |
-		<a class="link" href="{{ url_for('webui.change_password') }}">Trocar a senha</a> |
-		<a class="link" href="{{ url_for('webui.logout') }}">Logout</a>
+	<div class="project-info">
+		<h1 class="project-name">{{ title }}</h1>
+		<img class="logo-copel" src='{{url_for("webui.static", filename="images/Copel.svg")}}' alt="Logo da Copel"/>
+	</div>
+	
+	<nav>
+		<div class="nav-info">
+			{% if session.username %}
+			<h3 style="text-align: right">Logged in as {{ session.username }}</h3>
+		</div>
+		
+		<ul class="nav-list">
+			<li class="nav-item first">
+				<a class="link" href="{{ url_for('webui.index') }}">Anotação</a> 
+			</li>
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.tutorial') }}">Tutorial Anotação</a>
+			</li>
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.hours_worked') }}">Horas</a> 
+			</li>
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.transcribe_page') }}">Transcrição</a>
+			</li>
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.tutorial_transcribe') }}">Tutorial transcrição</a> 
+			</li>
+			<li class="nav-item">
+				<a class="link" href="{{ url_for('webui.change_password') }}">Trocar a senha</a>
+			</li>
+			<li class="nav-item last">
+				<a class="link" href="{{ url_for('webui.logout') }}">Logout</a>
+			</li>
+		</ul>
+	</nav>
 
-	</h2>
 	{% endif %}
-
-	<!-- COMENTARIO PARA O LUCAS:
-			Lucas, embaixo desse comentario está como se adiciona imagens pelo flask.
-			Primeiro você utiliza a tag do html "img" junto com os atributos alt (Serve para adicionar um rótulo para imagem, caso de um erro de carregamento ou para assistente de voz),
-			segundo é o src (esse é quem vai dar o caminho para o navegador carregar a imagem).
-			No flask, detro do src, usa o comando url_for para criar um link dinâmico para algo, nesse caso a imagem. É assim que se carrega imagens que estão no servidor, fora do servidor é 
-			só colar a url normal
-			EX:
-			 <img src="https://avatars3.githubusercontent.com/u/52468707?s=400&u=077103b7fa84c56ecfc20674c5ddc4cc351db5a1&v=4" />
-	-->
-	<img class="logoCopel" src='{{url_for("webui.static", filename="images/Copel.svg")}}' alt="Logo da Copel"/>
    </div>
    
 </header>
