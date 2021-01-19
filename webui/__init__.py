@@ -579,8 +579,8 @@ def transcribe_page():
 		new_time.id_data = data.id
 		new_time.time_validated = datetime.now()
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
-		new_time.duration = Duration_calculation(
-			last_time_value, new_time.time_validated)
+		new_time.duration = Duration_calculation_transcribe(
+			last_time_value, new_time.time_validated, data.duration)
 
 		db.session.add(data)
 		db.session.add(new_time)
@@ -633,7 +633,12 @@ def logout():
 
 
 
-
+def Duration_calculation_transcribe(last_time, present_time, duration_data):
+	time_difference = present_time - last_time
+	time_difference_on_seconds = time_difference.seconds
+	right_time = duration_data * 6
+	duration = min(time_difference_on_seconds, right_time)
+	return int(duration)
 
 
 
