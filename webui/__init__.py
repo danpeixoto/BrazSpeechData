@@ -278,7 +278,7 @@ def hours_worked():
 	if(current_user.data_inicio is None):
 		current_user.data_inicio = '01/10/2020'
 	if(current_user.data_fim is None):
-		current_user.data_fim = '31/12/2021'
+		current_user.data_fim = '31/12/2020'
 	if(current_user.carga_horaria is None):
 		current_user.carga_horaria = 20
 	since_start = 1
@@ -296,7 +296,6 @@ def hours_worked():
 		num_weeks_until_end = abs(end-start_monday).days//7 
 
 	num_weeks = abs(today-start_monday).days//7 
-	
 	for i in range(num_weeks):
 		if(i == 0):
 			week_workload = current_user.carga_horaria - (start.weekday()*current_user.carga_horaria/5)
@@ -315,9 +314,10 @@ def hours_worked():
 		hours_listened = Total_duration_user(
 			monday, next_monday, session['username'])
 		#total_listened_since_start += hours_listened
-		response_string += u'{},{},{:.2f},{};'.format(monday.strftime(
-			'%d-%m-%Y'), sunday.strftime('%d-%m-%Y'), hours_listened,week_workload)
-
+		if((week_workload > 0) or (hours_listened > 0)):
+			response_string += u'{},{},{:.2f},{};'.format(monday.strftime('%d-%m-%Y'), sunday.strftime('%d-%m-%Y'), hours_listened,week_workload)
+		
+	print(kct)
 	#today = dtt.datetime.today()
 	last_monday = today - dtt.timedelta(days=today.weekday(), hours=today.hour,
 										minutes=today.minute, seconds=today.second, microseconds=today.microsecond)
