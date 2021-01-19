@@ -317,7 +317,7 @@ def hours_worked():
 		if((week_workload > 0) or (hours_listened > 0)):
 			response_string += u'{},{},{:.2f},{};'.format(monday.strftime('%d-%m-%Y'), sunday.strftime('%d-%m-%Y'), hours_listened,week_workload)
 		
-	print(kct)
+
 	#today = dtt.datetime.today()
 	last_monday = today - dtt.timedelta(days=today.weekday(), hours=today.hour,
 										minutes=today.minute, seconds=today.second, microseconds=today.microsecond)
