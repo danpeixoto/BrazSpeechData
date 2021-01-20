@@ -311,6 +311,7 @@ def hours_worked():
 		monday = start_monday + dtt.timedelta(days=i*7)
 		sunday = monday + dtt.timedelta(days=6)
 		next_monday = monday + dtt.timedelta(days=7)
+
 		hours_listened = Total_duration_user(
 			monday, next_monday, session['username'])
 		#total_listened_since_start += hours_listened
@@ -323,7 +324,6 @@ def hours_worked():
 										minutes=today.minute, seconds=today.second, microseconds=today.microsecond)
 	hours_listened = Total_duration_user(
 		last_monday, today, session['username'])
-
 	#total_listened_since_start += hours_listened
 	if(num_weeks_until_end< float("inf")):
 		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,0)
