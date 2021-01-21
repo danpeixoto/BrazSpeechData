@@ -26,7 +26,8 @@
 					<textarea id="transcricao" name="transcricao" rows="5" cols="50">{{dataset.text_asr}}</textarea>
 				</div>
 				<div>
-					<input class="submit-button" id="submitButton" type="button" value="Submit" onclick="formSubmit()" disabled>
+					<input class="submit-button" id="submitButton" type="button" value="Submit" onclick="formSubmit()"
+						disabled>
 				</div>
 			</form>
 		</div>
@@ -52,7 +53,7 @@
 	gerenciarLoop();
 
 	function gerenciarCookie() {
-		let botaoLoop = document.getElementById("botaoLoop");
+		let botaoLoop = document.getElementById("loop-button");
 
 		if (botaoLoop.loopAtivo) {
 			document.cookie = "loop=false";
@@ -76,8 +77,8 @@
 	}
 
 	function gerenciarLoop() {
-		let botaoLoop = document.getElementById("botaoLoop");
-		let audioTag = document.getElementById("audioAtual");
+		let botaoLoop = document.getElementById("loop-button");
+		let audioTag = document.getElementById("current-audio");
 		let cookieValue = getCookieValue();
 
 		if (cookieValue !== null) {
@@ -92,6 +93,7 @@
 
 
 	}
+
 
 	function formSubmit() {
 		let button = document.getElementById("submitButton");
