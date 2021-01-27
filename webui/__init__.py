@@ -384,8 +384,8 @@ def admin():
 
 
 
-def calculate_total_audios():
-	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0).count()
+def calculate_total_audios_annotation():
+	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.task == 0 ,Dataset.data_gold == 0).count()
 	return total
 
 def calculate_total_hours_validated():
@@ -423,12 +423,12 @@ def calculate_total_hours_trancribed_validated():
 @require_admin
 def admin_audios_info():
 	audios_info={}
-	total_audios = calculate_total_audios()
+	total_audios_annotation = calculate_total_audios_annotation()
 	total_hours_validated, valid_hours = calculate_total_hours_validated()
 	total_audios_transcribe = calculate_total_audios_transcribed()
 	total_hours_transcribe, valid_hours_transcribed = calculate_total_hours_trancribed_validated()
 
-	audios_info['total_audios'] = total_audios
+	audios_info['audios_annotated'] = total_audios_annotation
 	audios_info['total_hours']	= total_hours_validated
 	audios_info['valid_hours'] = valid_hours
 	audios_info['audios_transcribed'] = total_audios_transcribe
@@ -441,7 +441,6 @@ def admin_audios_info():
 @webui.route('/admin-users-info', methods=['GET'])
 @require_admin
 def admin_users_info():
-	# TODO: Corrigir código para que deixe de contar a partir da saida do usuario
 	users_info = {}
 	today = dtt.datetime.today()
 	project_first_day_week_started = datetime(2020, 9, 28, 0, 0, 0)
