@@ -551,6 +551,20 @@ def add_user():
 def tutorial_transcribe():
 	return render_template('tutorial_transcribe.html')
 
+
+
+def Duration_calculation_transcribe(last_time, present_time, duration_data):
+	time_difference = present_time - last_time
+
+	time_difference_on_seconds = time_difference.seconds
+
+	right_time = duration_data * 6
+
+	duration = min(time_difference_on_seconds, max(right_time, 180))
+
+	return int(duration)
+
+
 @webui.route('/transcribe_page', methods=['GET', 'POST'])
 @require_login
 def transcribe_page():
@@ -586,10 +600,10 @@ def transcribe_page():
 		db.session.commit()
 		return redirect(url_for('webui.transcribe_page'))
 
-	
 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs_TED1/%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+
 
 	if data is None:
 		return render_template('index-finish.html')
@@ -632,12 +646,6 @@ def logout():
 
 
 
-def Duration_calculation_transcribe(last_time, present_time, duration_data):
-	time_difference = present_time - last_time
-	time_difference_on_seconds = time_difference.seconds
-	right_time = duration_data * 6
-	duration = min(time_difference_on_seconds, right_time)
-	return int(duration)
 
 
 
