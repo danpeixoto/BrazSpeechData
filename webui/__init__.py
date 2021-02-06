@@ -601,7 +601,7 @@ def transcribe_page():
 		return redirect(url_for('webui.transcribe_page'))
 
 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs_TED1/%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%_alip_%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 
@@ -617,8 +617,17 @@ def transcribe_page():
 		db.session.add(data)
 		db.session.commit()
 
-		if './wavs_TED1/' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
+		#if './wavs_TED1/' in data.file_path:
+		#	data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
+		#	data.file_path = os.path.join(
+		#		'Dataset', data.file_path).replace('\\', '/')
+		#else:
+		#	data.file_path = data.file_path.replace('./','data/')		
+		#	data.file_path = os.path.join(
+		#		'Dataset', data.file_path).replace('\\', '/')
+		
+		if '_alip_' in data.file_path:
+			data.file_path = data.file_path.replace('./data/','alip/data/')		
 			data.file_path = os.path.join(
 				'Dataset', data.file_path).replace('\\', '/')
 		else:

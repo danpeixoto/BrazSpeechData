@@ -8,10 +8,25 @@
 		<div class="heading">
 			<h1>Horas trabalhadas por cada anotador:</h1>
 		</div>
-		<div class="lista-usuarios-table-div" id='divListaDeUsuarios'>
+		<div class="lista-usuarios-table-div">
 			<p id="todosUsuarios" hidden>{{data.user_list}}</p>
 			<p id="numeroSemanas" hidden>{{data.num_weeks}}</p>
-			<table hidden>
+			<table id="table__usuarios--ativos" hidden>
+				<tr>
+					<th>Usuário</th>
+					<th>Data de inicio</th>
+					<th>Data de fim</th>
+					<th>Horas anotadas</th>
+					<th>Horas anotadas + descanso</th>
+					<th>Carga horária</th>
+					<th>Saldo</th>
+				</tr>
+			</table>
+		</div>
+
+		<div class="lista-usuarios-table-div">
+			<h2>Usuários Inativos</h2>
+			<table id="table__usuarios--inativos" hidden>
 				<tr>
 					<th>Usuário</th>
 					<th>Data de inicio</th>
@@ -30,6 +45,7 @@
 
 <script>
 
+	const DATAHOJE = new Date();
 
 	function calcularHoraComDescanso(horasAnotadas, cargahoraria, totalSemanas, descansoInicio, descansoFim) {
 		//console.log(horasAnotadas, cargahoraria, totalSemanas, descansoInicio)
@@ -55,17 +71,17 @@
 	}
 
 
-	function mostrarListaUsuarios() {
-		//document.getElementById("listarUsuarios").disabled = true;
+	function checarUsuarioAtivo(dataFim) {
+		dataFim = dataFim.split("/");
+		dataFim = new Date(`${dataFim[1]}/${dataFim[0]}/${dataFim[2]}`)
 
-		let listaDatasNaoProcessada = document.getElementById('todosUsuarios').innerHTML;
-		let listaDatasProcessada = listaDatasNaoProcessada.split(';').slice(0, -1);
-
-		let listaDatasOrdenada = listaDatasProcessada.sort(subtraiHoras);
-		let table = document.querySelector("div > table");
+		return dataFim > DATAHOJE;
+	}
 
 
-		listaDatasOrdenada.forEach(elemento => {
+	function adicionarUsuariosNaTabela(lista, tabela) {
+
+		lista.forEach(elemento => {
 
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
@@ -91,11 +107,30 @@
 				tr.appendChild(td);
 			});
 
-			table.appendChild(styleTdSaldo(tr, listaDados[6]));
+			tabela.appendChild(styleTdSaldo(tr, listaDados[6]));
 		});
 
-		table.hidden = false;
 	}
 
-	mostrarListaUsuarios();
+
+	function gerenciarTabelasUsuarios() {
+
+		let listaNaoProcessada = document.getElementById('todosUsuarios').innerHTML;
+		let listaProcessada = listaNaoProcessada.split(';').slice(0, -1);
+
+
+		let listaUsuariosAtivos = listaProcessada.filter((e) => checarUsuarioAtivo(e.split(",")[2])).sort(subtraiHoras);
+		let listaUsuariosInativos = listaProcessada.filter((e) => !checarUsuarioAtivo(e.split(",")[2])).sort(subtraiHoras);
+
+		let tabelaAtivos = document.getElementById("table__usuarios--ativos");
+		let tabelaInativos = document.getElementById("table__usuarios--inativos");
+
+		adicionarUsuariosNaTabela(listaUsuariosAtivos, tabelaAtivos);
+		adicionarUsuariosNaTabela(listaUsuariosInativos, tabelaInativos);
+
+		tabelaAtivos.hidden = false;
+		tabelaInativos.hidden = false;
+	}
+
+	gerenciarTabelasUsuarios();
 </script>
