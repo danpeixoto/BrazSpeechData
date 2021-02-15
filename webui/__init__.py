@@ -122,7 +122,7 @@ def Duration_calculation(last_time, present_time):
 
 
 def Total_duration_user(date_1, date_2, current_user):
-	total_hours = TimeValidated.query.with_entities(func.sum(TimeValidated.duration).label("sum_duration"))\
+	total_hours = TimeValidated.query.with_entities(func.sum(TimeValidated.duration).label('sum_duration'))\
 		.filter(TimeValidated.time_validated.between(date_1,date_2), TimeValidated.user_validated == current_user).scalar()
 	total_hours = total_hours if total_hours is not None else 0
 	return float(total_hours)/3600.0
@@ -131,15 +131,15 @@ def Total_duration_user(date_1, date_2, current_user):
 # Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
 def Total_duration_admin(date_1, date_2):
 	#all_users = User.query.all()
-	users_data = ""
+	users_data = ''
 	today = dtt.datetime.today()
 
 	users_info = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
-		.with_entities(TimeValidated.user_validated,User.data_inicio,User.data_fim,User.carga_horaria,func.sum(TimeValidated.duration).label("sum_duration"))\
+		.with_entities(TimeValidated.user_validated,User.data_inicio,User.data_fim,User.carga_horaria,func.sum(TimeValidated.duration).label('sum_duration'))\
 		.group_by(TimeValidated.user_validated).all()
 
 	for user_info in users_info:
-		if(len(user_info[0]) > 10 and " " not in user_info[0]):
+		if(len(user_info[0]) > 10 and ' ' not in user_info[0]):
 			#all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
 			# all_duration = TimeValidated.query.filter(
 			# 	TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
@@ -290,7 +290,7 @@ def hours_worked():
 	#start = datetime(2020, 10, 5, 0, 0, 0)
 
 	start_monday = start - dtt.timedelta(days=start.weekday())
-	num_weeks_until_end = float("inf")
+	num_weeks_until_end = float('inf')
 	
 	if(today > end):
 		num_weeks_until_end = abs(end-start_monday).days//7 
@@ -325,7 +325,7 @@ def hours_worked():
 	hours_listened = Total_duration_user(
 		last_monday, today, session['username'])
 	#total_listened_since_start += hours_listened
-	if(num_weeks_until_end< float("inf")):
+	if(num_weeks_until_end< float('inf')):
 		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,0)
 	else:
 		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,current_user.carga_horaria)
@@ -388,15 +388,19 @@ def calculate_total_audios_annotation():
 	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.task == 0 ,Dataset.data_gold == 0).count()
 	return total
 
-def calculate_total_hours_validated():
-	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 0).scalar()
+def calculate_total_hours_not_validated():
+	total = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated == 0 , Dataset.task == 0 , Dataset.data_gold == 0).scalar()
+	return '{:.2f}'.format(float(total)/3600.0)
 
-	total_duration_valid_two_users = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
+def calculate_total_hours_validated():
+	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 0).scalar()
+
+	total_duration_valid_two_users = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(
 		Dataset.number_validated >=2, Dataset.task==0, or_(and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user2 == 0)
 		,and_(Dataset.invalid_user2 == 0 , Dataset.invalid_user3 == 0)
 		,and_(Dataset.invalid_user1 == 0 , Dataset.invalid_user3 == 0))).scalar()
 
-	total_duration_valid_one_user = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(
+	total_duration_valid_one_user = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(
 		Dataset.number_validated == 1 , Dataset.task==0, Dataset.invalid_user1 == 0).scalar()
 
 	total_duration = float(total_duration)
@@ -410,10 +414,13 @@ def calculate_total_audios_transcribed():
 	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0, Dataset.text_asr != None).count()
 	return total
 
+def calculate_total_hours_not_transcribed():
+	total = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated == 0 , Dataset.task == 1 ,Dataset.data_gold == 0).scalar()
+	return '{:.2f}'.format(float(total)/3600.0)
 
 def calculate_total_hours_trancribed_validated():
-	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 1).scalar()
-	total_duration_valid = Dataset.query.with_entities(func.sum(Dataset.duration).label("total_duration")).filter(Dataset.number_validated >0, Dataset.task == 1,not_(Dataset.text.ilike('%###%'))).scalar()
+	total_duration = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated >0, Dataset.data_gold == 0, Dataset.task == 1).scalar()
+	total_duration_valid = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated >0, Dataset.task == 1,not_(Dataset.text.ilike('%###%'))).scalar()
 
 
 	return '{:.2f}'.format(float(total_duration)/3600.0), '{:.2f}'.format(float(total_duration_valid)/3600.0)
@@ -425,13 +432,17 @@ def admin_audios_info():
 	audios_info={}
 	total_audios_annotation = calculate_total_audios_annotation()
 	total_hours_validated, valid_hours = calculate_total_hours_validated()
+	total_hours_not_validated = calculate_total_hours_not_validated()
 	total_audios_transcribe = calculate_total_audios_transcribed()
+	total_hours_not_transcribed = calculate_total_hours_not_transcribed()
 	total_hours_transcribe, valid_hours_transcribed = calculate_total_hours_trancribed_validated()
 
 	audios_info['audios_annotated'] = total_audios_annotation
 	audios_info['total_hours']	= total_hours_validated
+	audios_info['total_hours_remaining']= total_hours_not_validated
 	audios_info['valid_hours'] = valid_hours
 	audios_info['audios_transcribed'] = total_audios_transcribe
+	audios_info['total_hours_transcribed_remaining'] = total_hours_not_transcribed
 	audios_info['total_hours_transcribed'] = total_hours_transcribe
 	audios_info['valid_hours_transcribed'] = valid_hours_transcribed
 
