@@ -390,6 +390,7 @@ def calculate_total_audios_annotation():
 
 def calculate_total_hours_not_validated():
 	total = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated == 0 , Dataset.task == 0 , Dataset.data_gold == 0).scalar()
+	total = 0 if total is None else total
 	return '{:.2f}'.format(float(total)/3600.0)
 
 def calculate_total_hours_validated():
@@ -416,6 +417,7 @@ def calculate_total_audios_transcribed():
 
 def calculate_total_hours_not_transcribed():
 	total = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated == 0 , Dataset.task == 1 ,Dataset.data_gold == 0).scalar()
+	total = 0 if total is None else total
 	return '{:.2f}'.format(float(total)/3600.0)
 
 def calculate_total_hours_trancribed_validated():
