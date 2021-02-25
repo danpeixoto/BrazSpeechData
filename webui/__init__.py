@@ -643,6 +643,10 @@ def transcribe_page():
 			data.file_path = data.file_path.replace('./data/','alip/data/')		
 			data.file_path = os.path.join(
 				'Dataset', data.file_path).replace('\\', '/')
+		elif './wavs_TED3' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
 		else:
 			data.file_path = data.file_path.replace('./','data/')		
 			data.file_path = os.path.join(
