@@ -61,14 +61,15 @@
 			</table>
 
 		</div>
-		<input class="submit-button" id="inputEscondidoInvalido" type="button" value="Submit" onclick="formSubmitInvalido()" hidden>
+		<input class="submit-button" id="inputEscondidoInvalido" type="button" value="Submit"
+			onclick="formSubmitInvalido()" hidden>
 	</form>
 </div>
 
 
 
 <script>
-	const mudaValorTextIput = (valor)=> valor===""? " ": valor;
+	const mudaValorTextIput = (valor) => valor === "" ? " " : valor;
 	function lidaClickRadio(radioButton) {
 
 		// Desabilita o input text caso o radioButton seja o 5 
@@ -83,13 +84,45 @@
 
 	}
 
+
+	function checarBot() {
+		RVerify.action(function (code) {
+			switch (code) {
+				case 1:
+					document.cookie = `dataUltimaChecagem=${new Date()}`
+					document.getElementById("formInvalid").submit();
+					return true;
+					break;
+				case 2:
+					alert("Valide o captcha!");
+					return false;
+					break;
+			}
+		});
+	}
+
+	function retornarValorCookie() {
+
+		cookieRe = /dataUltimaChecagem=.*/g;
+
+		const dataUltimaChecagem = document.cookie.match(cookieRe)[0].split("=")[1];
+		console.log(document.cookie.match(cookieRe))
+		return dataUltimaChecagem;
+	}
+
 	function formSubmitInvalido() {
 		let button = document.getElementById("inputEscondidoInvalido");
 		if (!button.disabled) {
 			button.disabled = true;
 			let textInput = document.getElementById("razaoInvalido")
 			textInput.value = mudaValorTextIput(textInput.value);
-			document.getElementById("formInvalid").submit();
+			const dataUltimaChecagem = retornarValorCookie();
+			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > 10) {
+				button.disabled = checarBot();
+			} else {
+				document.getElementById("formInvalid").submit();
+			}
+
 		}
 	}
 

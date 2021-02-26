@@ -1,70 +1,75 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/styles.css') }}" media="screen">
-    <title>BrazSpeechData</title>
-    {% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul>
-  {% for message in messages %}
-  <li>{{message}}</li>
-  {% endfor %}
-{% endif %}
-</ul>
-{% endwith %}
+	<link rel="stylesheet" href="{{ url_for('webui.static', filename='css/RVerify.css') }}" />
 
-  </head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('webui.static', filename='css/styles.css') }}"
+		media="screen">
+	<title>BrazSpeechData</title>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<ul>
+		{% for message in messages %}
+		<li>{{message}}</li>
+		{% endfor %}
+		{% endif %}
+	</ul>
+	{% endwith %}
+
+</head>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="{{ url_for('webui.static', filename='js/jquery.md5.js') }}"></script>
 
 <body>
 
-{% if not custom_header %}
-<header>
-  <div class="container">
-	<div class="project-info">
-		<h1 class="project-name">{{ title }}</h1>
-		<img class="logo-copel" src='{{url_for("webui.static", filename="images/Copel.svg")}}' alt="Logo da Copel"/>
-	</div>
-	
-	<nav>
-		<div class="nav-info">
-			{% if session.username %}
-			<h3 style="text-align: right">Logged in as {{ session.username }}</h3>
-		</div>
-		
-		<ul class="nav-list">
-			<li class="nav-item first">
-				<a class="link" href="{{ url_for('webui.index') }}">Anotação</a> 
-			</li>
-			<li class="nav-item">
-				<a class="link" href="{{ url_for('webui.tutorial') }}">Tutorial Anotação</a>
-			</li>
-			<li class="nav-item">
-				<a class="link" href="{{ url_for('webui.hours_worked') }}">Horas</a> 
-			</li>
-			<li class="nav-item">
-				<a class="link" href="{{ url_for('webui.transcribe_page') }}">Transcrição</a>
-			</li>
-			<li class="nav-item">
-				<a class="link" href="{{ url_for('webui.tutorial_transcribe') }}">Tutorial transcrição</a> 
-			</li>
-			<li class="nav-item">
-				<a class="link" href="{{ url_for('webui.change_password') }}">Trocar a senha</a>
-			</li>
-			<li class="nav-item last">
-				<a class="link" href="{{ url_for('webui.logout') }}">Logout</a>
-			</li>
-		</ul>
-	</nav>
+	{% if not custom_header %}
+	<header>
+		<div class="container">
+			<div class="project-info">
+				<h1 class="project-name">{{ title }}</h1>
+				<img class="logo-copel" src='{{url_for("webui.static", filename="images/Copel.svg")}}'
+					alt="Logo da Copel" />
+			</div>
 
+			<nav>
+				<div class="nav-info">
+					{% if session.username %}
+					<h3 style="text-align: right">Logged in as {{ session.username }}</h3>
+				</div>
+
+				<ul class="nav-list">
+					<li class="nav-item first">
+						<a class="link" href="{{ url_for('webui.index') }}">Anotação</a>
+					</li>
+					<li class="nav-item">
+						<a class="link" href="{{ url_for('webui.tutorial') }}">Tutorial Anotação</a>
+					</li>
+					<li class="nav-item">
+						<a class="link" href="{{ url_for('webui.hours_worked') }}">Horas</a>
+					</li>
+					<li class="nav-item">
+						<a class="link" href="{{ url_for('webui.transcribe_page') }}">Transcrição</a>
+					</li>
+					<li class="nav-item">
+						<a class="link" href="{{ url_for('webui.tutorial_transcribe') }}">Tutorial transcrição</a>
+					</li>
+					<li class="nav-item">
+						<a class="link" href="{{ url_for('webui.change_password') }}">Trocar a senha</a>
+					</li>
+					<li class="nav-item last">
+						<a class="link" href="{{ url_for('webui.logout') }}">Logout</a>
+					</li>
+				</ul>
+			</nav>
+
+			{% endif %}
+		</div>
+
+	</header>
 	{% endif %}
-   </div>
-   
-</header>
-{% endif %}

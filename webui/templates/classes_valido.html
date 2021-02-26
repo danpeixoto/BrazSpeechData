@@ -45,7 +45,8 @@
 		</div>
 
 
-		<input class="submit-button" id="inputEscondidoValido" type="button" value="Submit" disabled="true" onclick="formSubmitValido()" hidden>
+		<input class="submit-button" id="inputEscondidoValido" type="button" value="Submit" disabled="true"
+			onclick="formSubmitValido()" hidden>
 	</form>
 </div>
 
@@ -64,11 +65,42 @@
 		}
 	}
 
+
+	function checarBot() {
+		RVerify.action(function (code) {
+			switch (code) {
+				case 1:
+					document.cookie = `dataUltimaChecagem=${new Date()}`
+					document.getElementById("formValid").submit();
+					return true;
+					break;
+				case 2:
+					alert("Valide o captcha!");
+					return false;
+					break;
+			}
+		});
+	}
+
+	function retornarValorCookie() {
+
+		cookieRe = /dataUltimaChecagem=.*/g;
+
+		const dataUltimaChecagem = document.cookie.match(cookieRe)[0].split("=")[1];
+		console.log(document.cookie.match(cookieRe))
+		return dataUltimaChecagem;
+	}
+
 	function formSubmitValido() {
 		let button = document.getElementById("inputEscondidoValido")
 		if (!button.disabled) {
 			button.disabled = true;
-			document.getElementById("formValid").submit();
+			const dataUltimaChecagem = retornarValorCookie();
+			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > 10) {
+				button.disabled = checarBot();
+			} else {
+				document.getElementById("formValid").submit();
+			}
 		}
 	}
 

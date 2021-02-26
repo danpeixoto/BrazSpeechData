@@ -37,11 +37,25 @@
 
 
 
-
-
+<script src="{{ url_for('webui.static', filename='js/RVerify.js') }}"></script>
 
 
 <script>
+
+	RVerify.configure({
+		tolerance: 15,
+		duration: 500,
+		mask: 0.5,
+		title: "Proteção contra bots",
+		text: "Deixe a imagem com o ângulo certo.",
+		album: [
+			"{{ url_for('webui.static', filename='images/image1.jpg') }}",
+			"{{ url_for('webui.static', filename='images/image2.jpg') }}",
+			"{{ url_for('webui.static', filename='images/image3.jpg') }}",
+			"{{ url_for('webui.static', filename='images/image4.jpg') }}",
+		]
+	});
+
 	setTimeout(() => {
 		//disabilita o botão de submit por 3 segundos
 
@@ -95,11 +109,43 @@
 	}
 
 
+	function checarBot() {
+		RVerify.action(function (code) {
+			switch (code) {
+				case 1:
+					document.cookie = `dataUltimaChecagem=${new Date()}`
+					document.getElementById("form").submit();
+					return true;
+					break;
+				case 2:
+					alert("Valide o captcha!");
+					return false;
+					break;
+			}
+		});
+	}
+
+	function retornarValorCookie() {
+
+		cookieRe = /dataUltimaChecagem=.*/g;
+
+		const dataUltimaChecagem = document.cookie.match(cookieRe)[0].split("=")[1];
+		console.log(document.cookie.match(cookieRe))
+		return dataUltimaChecagem;
+	}
+
+
 	function formSubmit() {
 		let button = document.getElementById("submitButton");
 		if (!button.disabled) {
 			button.disabled = true;
-			document.getElementById("form").submit();
+
+			const dataUltimaChecagem = retornarValorCookie();
+			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > 10) {
+				button.disabled = checarBot();
+			} else {
+				document.getElementById("form").submit();
+			}
 		}
 	}
 
