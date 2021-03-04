@@ -417,7 +417,6 @@ def calculate_total_audios_transcribed():
 
 def calculate_total_hours_not_transcribed():
 	total = Dataset.query.with_entities(func.sum(Dataset.duration).label('total_duration')).filter(Dataset.number_validated == 0 , Dataset.task == 1 ,Dataset.data_gold == 0).scalar()
-	total = 0 if total is None else total
 	return '{:.2f}'.format(float(total)/3600.0)
 
 def calculate_total_hours_trancribed_validated():
@@ -614,7 +613,7 @@ def transcribe_page():
 		return redirect(url_for('webui.transcribe_page'))
 
 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%_alip_%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs/segme%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 
@@ -645,6 +644,10 @@ def transcribe_page():
 				'Dataset', data.file_path).replace('\\', '/')
 		elif './wavs_TED3' in data.file_path:
 			data.file_path = data.file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		elif './wavs/segmented_wpp_cybervox_v3' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
 			data.file_path = os.path.join(
 				'Dataset', data.file_path).replace('\\', '/')
 		else:

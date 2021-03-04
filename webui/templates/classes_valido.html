@@ -96,7 +96,7 @@
 		if (!button.disabled) {
 			button.disabled = true;
 			const dataUltimaChecagem = retornarValorCookie();
-			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > 10) {
+			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > Infinity) {
 				button.disabled = checarBot();
 			} else {
 				document.getElementById("formValid").submit();

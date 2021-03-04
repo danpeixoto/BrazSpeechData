@@ -47,7 +47,7 @@
 		duration: 500,
 		mask: 0.5,
 		title: "Proteção contra bots",
-		text: "Deixe a imagem com o ângulo certo.",
+		text: "Corrija a imagem.",
 		album: [
 			"{{ url_for('webui.static', filename='images/image1.jpg') }}",
 			"{{ url_for('webui.static', filename='images/image2.jpg') }}",
@@ -141,7 +141,7 @@
 			button.disabled = true;
 
 			const dataUltimaChecagem = retornarValorCookie();
-			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > 10) {
+			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > Infinity) {
 				button.disabled = checarBot();
 			} else {
 				document.getElementById("form").submit();

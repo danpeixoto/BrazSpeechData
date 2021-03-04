@@ -117,7 +117,7 @@
 			let textInput = document.getElementById("razaoInvalido")
 			textInput.value = mudaValorTextIput(textInput.value);
 			const dataUltimaChecagem = retornarValorCookie();
-			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > 10) {
+			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > Infinity) {
 				button.disabled = checarBot();
 			} else {
 				document.getElementById("formInvalid").submit();
