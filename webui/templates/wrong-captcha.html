@@ -1,0 +1,17 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html" %}
+{% endwith %}
+
+
+<div class="container" style="text-align: center;">
+	<section id="main_content">
+		<form action="{{'/captcha/'+route.to}}" method="GET">
+			<p style="font-size:68px;">Por favor coloque o captcha correto.</p>
+			<input type="submit" value="Voltar para o captcha" />
+		</form>
+
+	</section>
+</div>
+
+
+{% include "footer.html" %}

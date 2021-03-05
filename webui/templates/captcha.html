@@ -1,0 +1,34 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html"%}
+{% endwith %}
+
+
+<div class="container" style="text-align: center;">
+	<section id="main_content">
+
+		<p style="font-size:3.5rem; margin-bottom: 2rem;">Digete o código que está na imagem no campo abaixo dela.</p>
+
+		<form class="captcha-form" id="form" method="post" action="{{'/captcha/'+route.to}}">
+
+			<img class="captcha-img" src="{{url_for('webui.static',filename='captcha/'+session.username+'.jpg')}}"
+				alt="">
+
+			<input class="captcha-input" type="text" name="captcha" placeholder="Digite o valor da imagem">
+
+			<input class="submit-button" id="submitButton" type="submit" value="Submit">
+
+		</form>
+
+	</section>
+</div>
+
+<script type="application/javascript">
+	// remove o cache do captcha
+	let captchaImg = document.querySelector(".captcha-img");
+	const antiBotNumero = (Math.random() * 9999);
+
+	captchaImg.src += `?anti-bot=${antiBotNumero}`;
+
+</script>
+
+{% include "footer.html" %}

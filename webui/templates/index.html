@@ -4,11 +4,10 @@
 <section class="annotation">
 	<div class="container">
 		<p class="sentence">Sentença: {{dataset.text}}</p>
-
 		<div class="audio-controls">
 			<div class="current-audio">
 				<audio id="current-audio" controls autoplay>
-					<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
+					<source src="{{ url_for('static', filename=dataset.file_path)}}" type="audio/wav"
 						media="(min-width: 900px)" preload>
 
 					Your browser does not support the audio element. Please contact the admin!
@@ -22,13 +21,12 @@
 		<div class="annotation-options">
 			<div class="container">
 				<div class="options-inputs">
-					<input id="valido" type="button" onclick="mostrarClassesSelecionada('Valido')" value="Valid"
+					<input id="valid" type="button" onclick="mostrarClassesSelecionada('Valid')" value="Valid"
 						name="ShowValidList" />
 
-					<input id="invalido" type="button" onclick="mostrarClassesSelecionada('Invalido')" value="Invalid"
+					<input id="invalid" type="button" onclick="mostrarClassesSelecionada('Invalid')" value="Invalid"
 						name="ShowInvalidList" />
 				</div>
-
 				{% include "classes_invalido.html" %}
 				{% include "classes_valido.html" %}
 			</div>
@@ -103,13 +101,13 @@
 
 	function esconderClassesNaoSelecionadas(classe) {
 
-		document.getElementById(`pEscondido${classe}`).hidden = true;
+		// document.getElementById(`pEscondido${classe}`).hidden = true;
+		document.getElementById(`form${classe}`).classList.add("annotation-form--hidden");
+		// document.getElementById(`inputEscondido${classe}`).hidden = true;
 
-		document.getElementById(`inputEscondido${classe}`).hidden = true;
-
-		let div = document.getElementById(`divEscondido${classe}`);
-		div.hidden = true;
-		div.className = null;
+		// let div = document.getElementById(`divEscondido${classe}`);
+		// div.hidden = true;
+		// div.className = null;
 
 	}
 
@@ -117,19 +115,19 @@
 
 		// Desabilita o input da classe selecionada e habilita o outro
 		document.getElementById(classe.toLowerCase()).disabled = true;
-		let classeInversa = classe === "Valido" ? "Invalido" : "Valido";
+		let classeInversa = classe === "Valid" ? "Invalid" : "Valid";
 		document.getElementById(classeInversa.toLowerCase()).disabled = false;
 
 		// Mostra o conteudo da classe selecionada e esconde da outra
-		document.getElementById(`pEscondido${classe}`).removeAttribute("hidden");
-		let div = document.getElementById(`divEscondido${classe}`);
-		div.removeAttribute("hidden");
-		div.className = "listado";
-		console.log(div)
+		document.getElementById(`form${classe}`).classList.toggle("annotation-form--hidden");
+		// let div = document.getElementById(`divEscondido${classe}`);
+		// div.removeAttribute("hidden");
+		// div.className = "listado";
+		// console.log(div)
 		esconderClassesNaoSelecionadas(classeInversa);
 
 		// Mostra o input de submit escondido
-		document.getElementById(`inputEscondido${classe}`).removeAttribute("hidden");
+		// document.getElementById(`inputEscondido${classe}`).removeAttribute("hidden");
 
 	}
 

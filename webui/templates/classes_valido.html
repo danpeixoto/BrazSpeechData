@@ -1,8 +1,8 @@
 <div class="valid-options">
-	<form id="formValid" method="post" action="/">
+	<form id="formValid" class="annotation-form annotation-form--hidden" method="post" action="/" hidden>
 
-		<p class="p-reason" id="pEscondidoValido" hidden>Selecione o motivo da validação:</p>
-		<div id="divEscondidoValido" hidden>
+		<p class="p-reason" id="pEscondidoValido">Selecione o motivo da validação:</p>
+		<div id="divEscondidoValido">
 			<table class="options-table">
 				<tbody>
 					<tr>
@@ -44,9 +44,8 @@
 			</table>
 		</div>
 
-
 		<input class="submit-button" id="inputEscondidoValido" type="button" value="Submit" disabled="true"
-			onclick="formSubmitValido()" hidden>
+			onclick="formSubmitValido()">
 	</form>
 </div>
 

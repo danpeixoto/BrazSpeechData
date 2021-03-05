@@ -4,3 +4,4 @@ database.db
 .vscode
 common/enviroment.json
 braz.log
+webui/static/captcha/*.jpg

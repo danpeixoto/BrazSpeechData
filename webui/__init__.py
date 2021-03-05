@@ -25,7 +25,7 @@ import math
 from models import db
 from models import User, Dataset, TimeValidated
 import os
-
+from captcha.image import ImageCaptcha
 
 def hash_and_salt(password):
 	password_hash = hashlib.sha256()
@@ -191,11 +191,44 @@ def check_valids(values_list):
 	return str(valid_list)
 
 
+def is_time_to_check_human(last_time):
+	return (dtt.datetime.today()-last_time).total_seconds() / 60 > 15
+
+
+@webui.route('/wrong_captcha/<string:route_to>')
+@require_login
+def wrong_captcha(route_to):
+	return render_template('wrong-captcha.html',route={'to':route_to})
+
+
+@webui.route('/captcha/<string:route_to>', methods=['GET','POST'])
+@require_login
+def captcha(route_to):
+	if request.method == 'POST':
+
+		if request.form.get('captcha') != session['secret']:
+			return redirect(url_for('webui.wrong_captcha',route_to=route_to))
+
+		session['last_time_checked'] = dtt.datetime.today()
+		return redirect(url_for('webui.{}'.format(route_to)))
+
+	image = ImageCaptcha().write(session['secret'],'./webui/static/captcha/{}.jpg'.format(session['username'].split('@')[0]))
+	
+	return render_template('captcha.html',route={'to':route_to})
+
+
 @webui.route('/', methods=['GET', 'POST'])
 @require_login
 def index():
-	if request.method == 'POST':
 
+	session['secret'] = str(random.randint(1000,9999))
+	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
+	if is_time_to_check_human(session['last_time_checked']):
+		return redirect(url_for('webui.captcha', route_to='index'))
+
+	
+
+	if request.method == 'POST':
 		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
 
 		data = Dataset.query.filter_by(file_path=session['file_path'],data_gold= data_gold_result).first()
@@ -210,7 +243,7 @@ def index():
 		data.file_with_user = 0
 		data.number_validated += 1
 		data.travado = datetime.now()
-		print(request.form)
+
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
 			valid_list = check_valids(values_list)
@@ -221,21 +254,22 @@ def index():
 			check_current_valids(data, 'None')
 			check_current_invalids(data, invalidClass)
 
+		
 		new_time.user_validated = session['username']
 		new_time.id_data = data.id
 		new_time.time_validated = datetime.now()
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
 		new_time.duration = Duration_calculation(
 			last_time_value, new_time.time_validated)
-
 		db.session.add(data)
 		db.session.add(new_time)
 		db.session.commit()
-		return redirect(url_for('webui.index'))
 
+		return redirect(url_for('webui.index'))
+		
 	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
-		data = Dataset.query.filter_by(
-			instance_validated=0, file_with_user=0, data_gold=1).first()
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
+		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
@@ -260,6 +294,7 @@ def index():
 
 
 @webui.route('/tutorial', methods=['GET', 'POST'])
+@require_login
 def tutorial():
 	if request.method == 'POST':
 		return redirect(url_for('webui.index'))
@@ -581,8 +616,14 @@ def Duration_calculation_transcribe(last_time, present_time, duration_data):
 @require_login
 def transcribe_page():
 
-	if request.method == 'POST':
+	session['secret'] = str(random.randint(1000,9999))
+	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
 
+	if is_time_to_check_human(session['last_time_checked']):
+		return redirect(url_for('webui.captcha', route_to='transcribe_page'))
+	
+	if request.method == 'POST':
+		
 		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
 
 		data = Dataset.query.filter_by(id=session['id'],data_gold= data_gold_result).first()
@@ -612,7 +653,12 @@ def transcribe_page():
 		db.session.commit()
 		return redirect(url_for('webui.transcribe_page'))
 
-	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+
+	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
+		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
+	else:
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs/segme%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
@@ -628,6 +674,7 @@ def transcribe_page():
 		session['id'] = data.id
 		db.session.add(data)
 		db.session.commit()
+
 
 		#if './wavs_TED1/' in data.file_path:
 		#	data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		

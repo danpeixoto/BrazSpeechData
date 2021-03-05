@@ -1,8 +1,8 @@
 <div class="invalid-options">
-	<form id="formInvalid" method="post" action="/">
+	<form id="formInvalid" class="annotation-form annotation-form--hidden" method="post" action="/" hidden>
 
-		<p class="p-reason" id="pEscondidoInvalido" hidden>Selecione o motivo da invalidação:</p>
-		<div id="divEscondidoInvalido" hidden>
+		<p class="p-reason" id="pEscondidoInvalido">Selecione o motivo da invalidação:</p>
+		<div id="divEscondidoInvalido">
 
 			<table class="options-table">
 				<tbody>
@@ -62,13 +62,14 @@
 
 		</div>
 		<input class="submit-button" id="inputEscondidoInvalido" type="button" value="Submit"
-			onclick="formSubmitInvalido()" hidden>
+			onclick="formSubmitInvalido()">
 	</form>
 </div>
 
 
 
 <script>
+
 	const mudaValorTextIput = (valor) => valor === "" ? " " : valor;
 	function lidaClickRadio(radioButton) {
 
@@ -89,7 +90,7 @@
 		RVerify.action(function (code) {
 			switch (code) {
 				case 1:
-					document.cookie = `dataUltimaChecagem=${new Date()}`
+					document.cookie = `dataUltimaChecagem = ${new Date()}`
 					document.getElementById("formInvalid").submit();
 					return true;
 					break;

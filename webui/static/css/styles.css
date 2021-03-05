@@ -53,9 +53,24 @@ section {
 	padding: 0 1.5rem;
 }
 
+.captcha-form {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.captcha-img {
+	max-width: 250px;
+	display: inline-block;
+}
+
+
 input {
 	font-size: 1.6rem;
-	border-radius: 0.8rem;
+	padding: 10px;
+	border-radius: 5px;
 	transition: all 650ms ease-in-out;
 	transition-property: background-color, color;
 	cursor: pointer;
@@ -152,9 +167,8 @@ input:disabled {
 }
 
 .submit-button {
-	height: 3.5rem;
-	width: 13rem;
-	margin-top: 7rem;
+	padding: 1rem 3rem;
+	margin-top: 2rem;
 }
 
 .heading {
@@ -288,7 +302,6 @@ nav {
 
 .options-inputs input {
 	width: 13rem;
-	height: 3.5rem;
 }
 
 .valid-options,
@@ -303,6 +316,19 @@ nav {
 	text-align: center;
 	font-size: 2rem;
 	margin: 2rem 0;
+}
+
+.annotation-form {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+
+.annotation-form--hidden {
+	display: none;
 }
 
 .options-table {
@@ -430,6 +456,10 @@ nav {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.transcribe-form-div form {
+	gap: 2rem;
 }
 
 .transcribe-form-div {
