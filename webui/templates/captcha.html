@@ -10,8 +10,8 @@
 
 		<form class="captcha-form" id="form" method="post" action="{{'/captcha/'+route.to}}">
 
-			<img class="captcha-img" src="{{url_for('webui.static',filename='captcha/'+session.username+'.jpg')}}"
-				alt="">
+			<img class="captcha-img"
+				src="{{url_for('webui.static',filename='captcha/'+session.username.split('@')[0]+'.jpg')}}" alt="">
 
 			<input class="captcha-input" type="text" name="captcha" placeholder="Digite o valor da imagem">
 
