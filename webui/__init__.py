@@ -148,12 +148,12 @@ def Total_duration_admin(date_1, date_2):
 			start_monday = start - dtt.timedelta(days=start.weekday())
 			
 			end = datetime.strptime(user_info[2].strip(),'%d/%m/%Y')
-			
+
 			first_week_workload = user_info[3] - (start.weekday()*user_info[3]/5)
 			first_week_workload = first_week_workload if first_week_workload > 0 else 0
 			last_week_workload = (end.weekday()+1)*(user_info[3]/5)
 			last_week_workload = last_week_workload if last_week_workload < user_info[3] else user_info[3]
-	
+
 			if(today > end):
 				num_weeks = abs(end-start_monday).days//7
 			else:
@@ -164,7 +164,7 @@ def Total_duration_admin(date_1, date_2):
 			end = datetime.strftime(end,'%d/%m/%Y')
 			users_data += u'{},{},{},{:.2f},{:.2f},{},{},{},{};'.format(user_info[0],start,end,
 											   total_hours,total_hours,user_info[3],num_weeks,first_week_workload,last_week_workload)
-
+	
 	return users_data
 
 # Altera o file_with_user
@@ -268,15 +268,11 @@ def index():
 		return redirect(url_for('webui.index'))
 		
 	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task < 1, 
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
-	elif session['username'] == 'carolalves@usp.br':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
-		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
@@ -323,7 +319,7 @@ def hours_worked():
 	since_start = 1
 
 	start = datetime.strptime(current_user.data_inicio.strip(),'%d/%m/%Y')
-	end = datetime.strptime(current_user.data_fim.strip(),'%d/%m/%Y')
+	end = datetime.strptime((current_user.data_fim).strip(),'%d/%m/%Y')
 	#2020-10-05 00:00:00
 	today = dtt.datetime.today()
 	#start = datetime(2020, 10, 5, 0, 0, 0)
@@ -331,8 +327,9 @@ def hours_worked():
 	start_monday = start - dtt.timedelta(days=start.weekday())
 	num_weeks_until_end = float('inf')
 	
-	if(today > end):
+	if(today >= end):
 		num_weeks_until_end = abs(end-start_monday).days//7 
+		
 
 	num_weeks = abs(today-start_monday).days//7 
 	for i in range(num_weeks):
@@ -364,8 +361,16 @@ def hours_worked():
 	hours_listened = Total_duration_user(
 		last_monday, today, session['username'])
 	#total_listened_since_start += hours_listened
-	if(num_weeks_until_end< float('inf')):
-		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,0)
+	if(num_weeks_until_end < float('inf')):
+		week_workload = 0
+		
+		next_end_monday = end + dtt.timedelta(days=(7-end.weekday()))
+
+		if(today <= next_end_monday):
+			week_workload = (end.weekday()+1)*(current_user.carga_horaria/5)
+			week_workload = week_workload if week_workload < current_user.carga_horaria else current_user.carga_horaria
+
+		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,week_workload)
 	else:
 		response_string += u'{},{},{:.2f},{};'.format(last_monday.strftime('%d-%m-%Y'), today.strftime('%d-%m-%Y'), hours_listened,current_user.carga_horaria)
 
@@ -663,7 +668,7 @@ def transcribe_page():
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%segmented_wpp_v4_p1%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs/segme%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 

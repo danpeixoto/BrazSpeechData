@@ -86,16 +86,16 @@
 			let listaDados = elemento.split(",");
 			let tr = document.createElement("tr");
 			//listaDados na posicao 6 é o total de semanas do anotador, esse valor vai ser substituido depois
-			let totalHorasDeProjeto = parseInt(listaDados[5]) * (parseInt(listaDados[6]) - 1) + parseInt(listaDados[7]) + parseInt(listaDados[8]);
+			let totalHorasDeProjeto = parseFloat(listaDados[5]) * (parseFloat(listaDados[6]) - 1) + parseFloat(listaDados[7]) + parseFloat(listaDados[8]);
 			let descansoInicio = 0;
 			//por algum motivo tem um caractere a mais na string
 			//console.log(listaDados[0],listaDados[7], totalHorasDeProjeto)
 
-			descansoInicio = parseInt(listaDados[7]) * (1.25 / 20.0);
-			descansoFim = parseInt(listaDados[8]) * (1.25 / 20.0);
+			descansoInicio = parseFloat(listaDados[7]) * (1.25 / 20.0);
+			descansoFim = parseFloat(listaDados[8]) * (1.25 / 20.0);
 
 			listaDados[4] = parseFloat(listaDados[4]);
-			listaDados[4] = calcularHoraComDescanso(listaDados[4], parseInt(listaDados[5]), parseInt(listaDados[6]) - 1, descansoInicio, descansoFim);
+			listaDados[4] = calcularHoraComDescanso(listaDados[4], parseFloat(listaDados[5]), parseFloat(listaDados[6]) - 1, descansoInicio, descansoFim);
 			listaDados[6] = (listaDados[4] - totalHorasDeProjeto).toFixed(2);
 			listaDados[4] = listaDados[4].toFixed(2);
 			listaDados.pop()//remove o 8dado da lista que é o total de horas de descanso da última semana de trabalho do anotador
