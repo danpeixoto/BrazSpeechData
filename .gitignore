@@ -1,5 +1,4 @@
-static/Dataset/*
-static/Gold/*
+static/
 database.db
 .vscode
 common/enviroment.json
