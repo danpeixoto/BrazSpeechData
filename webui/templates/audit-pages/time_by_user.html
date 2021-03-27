@@ -1,0 +1,60 @@
+{% with title="BrazSpeechData" %}
+{% include "header.html"%}
+{% endwith %}
+
+
+<div class="container" style="text-align: center;">
+	<section id="main_content">
+
+		<div class="lista-usuarios-table-div">
+			<p id="info" hidden>{{data}}</p>
+
+			<table id="table__usuarios">
+				<tr>
+					<th>Usuário</th>
+					<th>Tempo médio por áudio (segundos)</th>
+				</tr>
+			</table>
+		</div>
+</div>
+
+</section>
+</div>
+
+<script type="application/javascript">
+
+	function adicionarUsuariosNaTabela(lista, tabela) {
+
+		lista.forEach(elemento => {
+
+			let listaDados = elemento.split(",");
+			let tr = document.createElement("tr");
+
+			listaDados.forEach(dado => {
+				let td = document.createElement("td");
+				td.textContent = dado;
+				tr.appendChild(td);
+			});
+
+			tabela.appendChild(tr);
+		});
+
+	}
+
+
+	function gerenciarTabelasUsuarios() {
+
+		let listaNaoProcessada = document.getElementById('info').innerHTML;
+		let listaProcessada = listaNaoProcessada.split(';').slice(0, -1);
+
+
+		let tabela = document.getElementById("table__usuarios");
+
+		adicionarUsuariosNaTabela(listaProcessada, tabela);
+
+
+
+	}
+
+	gerenciarTabelasUsuarios();
+</script>
