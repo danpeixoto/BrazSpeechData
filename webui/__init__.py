@@ -268,11 +268,15 @@ def index():
 		return redirect(url_for('webui.index'))
 		
 	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task < 1, 
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
+	elif session['username'] == 'carolalves@usp.br':
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
@@ -286,8 +290,27 @@ def index():
 		db.session.add(data)
 		db.session.commit()
 
-		data.file_path = os.path.join(
-			'Dataset', data.file_path).replace('\\', '/')
+		if './wavs_TED1/' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		elif '_alip_' in data.file_path:
+			data.file_path = data.file_path.replace('./data/','alip/data/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		elif './wavs_TED3' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		elif './wavs/segmented_wpp_cybervox_v3' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		else:
+			data.file_path = data.file_path.replace('./','data/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+
 
 		return render_template('index.html', dataset=data)
 
@@ -668,7 +691,7 @@ def transcribe_page():
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%wavs/segme%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%TED%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 
@@ -685,16 +708,11 @@ def transcribe_page():
 		db.session.commit()
 
 
-		#if './wavs_TED1/' in data.file_path:
-		#	data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
-		#	data.file_path = os.path.join(
-		#		'Dataset', data.file_path).replace('\\', '/')
-		#else:
-		#	data.file_path = data.file_path.replace('./','data/')		
-		#	data.file_path = os.path.join(
-		#		'Dataset', data.file_path).replace('\\', '/')
-		
-		if '_alip_' in data.file_path:
+		if './wavs_TED1/' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
+		elif '_alip_' in data.file_path:
 			data.file_path = data.file_path.replace('./data/','alip/data/')		
 			data.file_path = os.path.join(
 				'Dataset', data.file_path).replace('\\', '/')
@@ -726,31 +744,43 @@ def logout():
 
 
 
+#-------------------Páginas de auditoria---------------
 
+@webui.route('/audit_main', methods=['GET'])
+@require_admin
+def audit_main():
+	return render_template('audit_main.html')
 
+@webui.route('/audit_main/time_by_user', methods=['GET'])
+@require_admin
+def audit_time_by_user():
+	#select user_validated, avg(duration) as media from TimeValidated where duration <= 180 group by user_validated order by media;
+	users_time= TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
+		.with_entities(TimeValidated.user_validated,func.avg(TimeValidated.duration).label('avg_duration'))\
+		.filter(TimeValidated.duration<=180).group_by(TimeValidated.user_validated).order_by(asc('avg_duration')).all()
+	users_data = ""
+	for user in users_time:
+		if('@' in user[0]):
+			users_data += u'{},{:.2f};'.format(user[0],user[1])
 
-
-
-
-
-
+	return render_template('./audit-pages/time_by_user.html',data=users_data)
 
 # ESSA FUNÇÂO É PARA ARRUMAR A COLUNA DURATION DO TIMEVALIDATED
-def funcao_soma_valores_anotadore():
-	all_users = User.query.all()
+# def funcao_soma_valores_anotadore():
+# 	all_users = User.query.all()
 
-	for user in all_users:
-		all_times = TimeValidated.query.filter_by(user_validated=user.username)
-		i = 0
-		last_time = 0
-		for time in all_times:
-			if(i == 0):
-				time.duration = 120
-				i += 1
-				last_time = time.time_validated
-			else:
-				time.duration = Duration_calculation(
-					last_time, time.time_validated)
-				last_time = time.time_validated
+# 	for user in all_users:
+# 		all_times = TimeValidated.query.filter_by(user_validated=user.username)
+# 		i = 0
+# 		last_time = 0
+# 		for time in all_times:
+# 			if(i == 0):
+# 				time.duration = 120
+# 				i += 1
+# 				last_time = time.time_validated
+# 			else:
+# 				time.duration = Duration_calculation(
+# 					last_time, time.time_validated)
+# 				last_time = time.time_validated
 
-			db.session.commit()
+# 			db.session.commit()

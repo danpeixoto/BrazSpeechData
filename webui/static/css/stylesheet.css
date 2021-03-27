@@ -292,6 +292,7 @@ a {
 .projectName {
 	font-size: 2.5em;
 }
+
 /* logo copel */
 .logoCopel {
 	width: 150px;
@@ -320,6 +321,6 @@ a {
 	transition: transform 650ms;
 }
 
-.link:hover::before{
-transform: scaleX(1);
+.link:hover::before {
+	transform: scaleX(1);
 }

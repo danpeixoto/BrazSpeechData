@@ -742,6 +742,33 @@ h3.invalido {
 
 /* end create-user */
 
+
+/* audits */
+.audits,
+.audit-list {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.audits {
+	align-items: center;
+}
+
+.audit-list {
+	align-items: flex-start;
+	gap: 15px;
+}
+
+.audit-item {
+	text-align: left;
+	font-size: 24px;
+}
+
+
+
+
+
 /* media querys */
 
 @media screen and (max-width: 800px) {
