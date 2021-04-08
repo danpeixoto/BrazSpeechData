@@ -221,10 +221,7 @@ def captcha(route_to):
 @require_login
 def index():
 
-	session['secret'] = str(random.randint(1000,9999))
-	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
-	if is_time_to_check_human(session['last_time_checked']):
-		return redirect(url_for('webui.captcha', route_to='index'))
+	
 
 	
 
@@ -267,6 +264,11 @@ def index():
 
 		return redirect(url_for('webui.index'))
 		
+	session['secret'] = str(random.randint(1000,9999))
+	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
+	if is_time_to_check_human(session['last_time_checked']):
+		return redirect(url_for('webui.captcha', route_to='index'))
+	
 	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task < 1, 
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
@@ -648,11 +650,7 @@ def Duration_calculation_transcribe(last_time, present_time, duration_data):
 @require_login
 def transcribe_page():
 
-	session['secret'] = str(random.randint(1000,9999))
-	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
-
-	if is_time_to_check_human(session['last_time_checked']):
-		return redirect(url_for('webui.captcha', route_to='transcribe_page'))
+	
 	
 	if request.method == 'POST':
 		
@@ -685,6 +683,12 @@ def transcribe_page():
 		db.session.commit()
 		return redirect(url_for('webui.transcribe_page'))
 
+
+	session['secret'] = str(random.randint(1000,9999))
+	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
+
+	if is_time_to_check_human(session['last_time_checked']):
+		return redirect(url_for('webui.captcha', route_to='transcribe_page'))
 
 	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
@@ -746,24 +750,54 @@ def logout():
 
 #-------------------Páginas de auditoria---------------
 
-@webui.route('/audit_main', methods=['GET'])
-@require_admin
-def audit_main():
-	return render_template('audit_main.html')
 
-@webui.route('/audit_main/time_by_user', methods=['GET'])
-@require_admin
+
+
 def audit_time_by_user():
 	#select user_validated, avg(duration) as media from TimeValidated where duration <= 180 group by user_validated order by media;
-	users_time= TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
-		.with_entities(TimeValidated.user_validated,func.avg(TimeValidated.duration).label('avg_duration'))\
-		.filter(TimeValidated.duration<=180).group_by(TimeValidated.user_validated).order_by(asc('avg_duration')).all()
-	users_data = ""
-	for user in users_time:
-		if('@' in user[0]):
-			users_data += u'{},{:.2f};'.format(user[0],user[1])
+	users_time = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
+		.with_entities(func.avg(TimeValidated.duration).label('avg_duration'))\
+		.filter(TimeValidated.duration<=180, User.username.ilike('%@%').label('username')).group_by(TimeValidated.user_validated).order_by(asc('username')).all()
+	
+	users_time = [float(i[0]) for i in users_time]
+	
+	return users_time
 
-	return render_template('./audit-pages/time_by_user.html',data=users_data)
+def audit_breaks_by_user():
+	# select user_validated, count(*) as paradas from TimeValidated where duration = 180 group by user_validated order by user_validated;
+	# select user_validated, sum(duration)/3600 as horas From TimeValidated where duration < 180 group by user_validated order by user_validated;
+
+	users_breaks = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
+		.with_entities(func.count())\
+		.filter(TimeValidated.duration == 180, User.username.ilike('%@%').label('username')).group_by(TimeValidated.user_validated).order_by(asc('username')).all()
+	
+	hours_working = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
+		.with_entities(func.sum(TimeValidated.duration).label('sum_duration'))\
+		.filter(TimeValidated.duration < 180, User.username.ilike('%@%').label('username')).group_by(TimeValidated.user_validated).order_by(asc('username')).all()
+
+	users_breaks = [int(i[0]) for i in users_breaks]
+	
+	hours_working = [float(i[0])/3600.0 for i in hours_working]
+	users_breaks_normalized =[i/(j/20.0) for i,j in zip(users_breaks,hours_working)] #pausas_totais_arnaldo / (horas_totais_arnaldo / 24) 
+
+	return users_breaks_normalized
+
+@webui.route('/audit_page', methods=['GET'])
+@require_admin
+def audit_main():
+	users = User.query.with_entities(User.username).filter(User.username.ilike('%@%').label('username')).order_by(asc('username')).all()
+	users = [i[0] for i in users]
+	
+	time_by_user = audit_time_by_user()
+	break_by_user = audit_breaks_by_user()
+
+	data = ""
+	ziped_info = zip(users,time_by_user,break_by_user)
+	for info in ziped_info:
+		# print(info)
+		data += "{},{},{:.2f},10000,10000,10000;".format(info[0],info[1],info[2])
+
+	return render_template('audit_page.html',data = data)
 
 # ESSA FUNÇÂO É PARA ARRUMAR A COLUNA DURATION DO TIMEVALIDATED
 # def funcao_soma_valores_anotadore():

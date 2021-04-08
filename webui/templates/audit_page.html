@@ -3,23 +3,30 @@
 {% endwith %}
 
 
-<div class="container" style="text-align: center;">
+<div class="container" style="text-align: center; overflow: auto;">
 	<section id="main_content">
 
-		<div class="lista-usuarios-table-div">
+		<div class="audit">
 			<p id="info" hidden>{{data}}</p>
 
-			<table id="table__usuarios">
-				<tr>
-					<th>Usuário</th>
-					<th>Tempo médio por áudio (segundos)</th>
-				</tr>
+			<table class="audit-table" id="table__usuarios">
+				<thead>
+					<tr>
+						<th>Usuário</th>
+						<th>Tempo médio por áudio (segundos)</th>
+						<th>Pausas por anotador (20 horas)</th>
+						<th>Máximo trabalhado em um dia </th>
+						<th>Anotações maiores que o tempo do áudio</th>
+						<th>Total de áudios por pessoa</th>
+					</tr>
+				</thead>
 			</table>
 		</div>
+	</section>
 </div>
 
-</section>
-</div>
+
+
 
 <script type="application/javascript">
 
