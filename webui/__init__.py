@@ -21,12 +21,19 @@ from flask import send_from_directory
 from flask import current_app, Response
 from sqlalchemy import asc, desc
 from sqlalchemy import func
+from sqlalchemy import text
 import math
 from models import db
 from models import User, Dataset, TimeValidated
 import os
 from captcha.image import ImageCaptcha
+from .controllers.admin_users_info_controller import AdminUsersInfoController
+from .controllers.audit_controller import AuditController
 
+# Para percorrer o código com mais eficiencia é possivel pesquisar por |\
+
+
+# |\ Funções gerais
 def hash_and_salt(password):
 	password_hash = hashlib.sha256()
 	salt = ''.join(random.choice(string.ascii_letters + string.digits)
@@ -128,44 +135,6 @@ def Total_duration_user(date_1, date_2, current_user):
 	return float(total_hours)/3600.0
 
 
-# Função que calcula o total de tempo gasto pelo usuário com base no intervalo de tempo, no caso de todos os usuários.
-def Total_duration_admin(date_1, date_2):
-	#all_users = User.query.all()
-	users_data = ''
-	today = dtt.datetime.today()
-
-	users_info = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
-		.with_entities(TimeValidated.user_validated,User.data_inicio,User.data_fim,User.carga_horaria,func.sum(TimeValidated.duration).label('sum_duration'))\
-		.group_by(TimeValidated.user_validated).all()
-
-	for user_info in users_info:
-		if(len(user_info[0]) > 10 and ' ' not in user_info[0]):
-			#all_duration = TimeValidated.query.filter_by(user_validated=user.username).all()
-			# all_duration = TimeValidated.query.filter(
-			# 	TimeValidated.user_validated == user.username, TimeValidated.time_validated >= date_1, TimeValidated.time_validated <= date_2)
-
-			start = datetime.strptime(user_info[1].strip(),'%d/%m/%Y')
-			start_monday = start - dtt.timedelta(days=start.weekday())
-			
-			end = datetime.strptime(user_info[2].strip(),'%d/%m/%Y')
-
-			first_week_workload = user_info[3] - (start.weekday()*user_info[3]/5)
-			first_week_workload = first_week_workload if first_week_workload > 0 else 0
-			last_week_workload = (end.weekday()+1)*(user_info[3]/5)
-			last_week_workload = last_week_workload if last_week_workload < user_info[3] else user_info[3]
-
-			if(today > end):
-				num_weeks = abs(end-start_monday).days//7
-			else:
-				num_weeks = abs(today-start_monday).days//7
-				
-			total_hours = float(user_info[-1])/3600
-			start = datetime.strftime(start,'%d/%m/%Y')
-			end = datetime.strftime(end,'%d/%m/%Y')
-			users_data += u'{},{},{},{:.2f},{:.2f},{},{},{},{};'.format(user_info[0],start,end,
-											   total_hours,total_hours,user_info[3],num_weeks,first_week_workload,last_week_workload)
-	
-	return users_data
 
 # Altera o file_with_user
 #def change_file_with_user():
@@ -216,18 +185,14 @@ def captcha(route_to):
 	
 	return render_template('captcha.html',route={'to':route_to})
 
-
+# |\ Página principal
 @webui.route('/', methods=['GET', 'POST'])
 @require_login
 def index():
 
-	
-
-	
-
 	if request.method == 'POST':
 		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
-
+		
 		data = Dataset.query.filter_by(file_path=session['file_path'],data_gold= data_gold_result).first()
 		last_time = TimeValidated.query.filter_by(
 			user_validated=session['username']).order_by(desc(TimeValidated.id)).first()
@@ -276,9 +241,14 @@ def index():
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	# else:
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
+	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 	else:
+		# query de teste
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
@@ -317,7 +287,7 @@ def index():
 		return render_template('index.html', dataset=data)
 
 
-
+# |\ Página tutorial anotação
 @webui.route('/tutorial', methods=['GET', 'POST'])
 @require_login
 def tutorial():
@@ -326,7 +296,7 @@ def tutorial():
 		# if request.form.get('sairtutorial') == 'Ir para Anotação':
 	return render_template('tutorial.html')
 
-
+# |\ Página horas trabalhadas
 @webui.route('/hours_worked', methods=['GET', 'POST'])
 @require_login
 def hours_worked():
@@ -406,7 +376,7 @@ def hours_worked():
 	return render_template('hours_worked.html', hours={'response_string': response_string, 'workload': workload,'since_start':since_start})
 
 
-
+# |\ Página admin
 @webui.route('/admin', methods=['GET', 'POST'])
 @require_admin
 def admin():
@@ -452,7 +422,7 @@ def admin():
 	return render_template('admin.html')
 
 
-
+# |\ Admin informação áudios
 def calculate_total_audios_annotation():
 	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.task == 0 ,Dataset.data_gold == 0).count()
 	return total
@@ -477,8 +447,6 @@ def calculate_total_hours_validated():
 	total_duration_valid = float(total_duration_valid_one_user )+float( total_duration_valid_two_users)
 	return '{:.2f}'.format(total_duration/3600.0), '{:.2f}'.format(total_duration_valid/3600.0)
 
-
-# admin_audios_info
 
 def calculate_total_audios_transcribed():
 	total = Dataset.query.filter(Dataset.number_validated >= 1, Dataset.data_gold == 0, Dataset.text_asr != None).count()
@@ -518,20 +486,15 @@ def admin_audios_info():
 
 	return render_template('admin-audios-info.html',data=audios_info)
 
-
+# |\ Admin horas usuários
 @webui.route('/admin-users-info', methods=['GET'])
 @require_admin
 def admin_users_info():
-	users_info = {}
-	today = dtt.datetime.today()
-	project_first_day_week_started = datetime(2020, 9, 28, 0, 0, 0)
-	num_weeks = abs(today-project_first_day_week_started).days//7 + 1
-	users_info['user_list'] = Total_duration_admin(project_first_day_week_started, today)
-	users_info['num_weeks'] = num_weeks
+	admin_users_info_controller = AdminUsersInfoController(User,TimeValidated)
+	
+	return render_template('admin-users-info.html',data=admin_users_info_controller.users_info)
 
-	return render_template('admin-users-info.html',data=users_info)
-
-
+# |\ Login
 @webui.route('/login', methods=['GET', 'POST'])
 def login():
 	admin_user = User.query.filter_by(username='admin').first()
@@ -584,7 +547,7 @@ def login():
 				flash('This user is not registered. Contact an administrator !')
 	return render_template('login.html')
 
-
+# |\ Trocar senha
 @webui.route('/passchange', methods=['GET', 'POST'])
 @require_login
 def change_password():
@@ -601,7 +564,7 @@ def change_password():
 			return redirect(url_for('webui.login'))
 	return render_template('create_password.html')
 
-
+# |\ Adicionar usuário
 @webui.route('/adduser', methods=['GET', 'POST'])
 @require_admin
 def add_user():
@@ -626,13 +589,14 @@ def add_user():
 			return redirect(url_for('webui.admin'))
 	return render_template('create_user.html')
 
-
+# |\ Tutorial de transcrição
 @webui.route('/tutorial_transcribe', methods=['GET', 'POST'])
 @require_login
 def tutorial_transcribe():
 	return render_template('tutorial_transcribe.html')
 
 
+# |\ Página de transcrição
 
 def Duration_calculation_transcribe(last_time, present_time, duration_data):
 	time_difference = present_time - last_time
@@ -650,8 +614,6 @@ def Duration_calculation_transcribe(last_time, present_time, duration_data):
 @require_login
 def transcribe_page():
 
-	
-	
 	if request.method == 'POST':
 		
 		data_gold_result = 1 if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3' else 0
@@ -683,7 +645,7 @@ def transcribe_page():
 		db.session.commit()
 		return redirect(url_for('webui.transcribe_page'))
 
-
+	
 	session['secret'] = str(random.randint(1000,9999))
 	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
 
@@ -736,7 +698,7 @@ def transcribe_page():
 
 	return render_template('transcribe_page.html',dataset = data)
 
-
+# |\ Logout
 @webui.route('/logout')
 def logout():
 	session.pop('username', None)
@@ -744,77 +706,12 @@ def logout():
 	return redirect(url_for('webui.login'))
 
 
-
-
-
-
-#-------------------Páginas de auditoria---------------
-
-
-
-
-def audit_time_by_user():
-	#select user_validated, avg(duration) as media from TimeValidated where duration <= 180 group by user_validated order by media;
-	users_time = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
-		.with_entities(func.avg(TimeValidated.duration).label('avg_duration'))\
-		.filter(TimeValidated.duration<=180, User.username.ilike('%@%').label('username')).group_by(TimeValidated.user_validated).order_by(asc('username')).all()
-	
-	users_time = [float(i[0]) for i in users_time]
-	
-	return users_time
-
-def audit_breaks_by_user():
-	# select user_validated, count(*) as paradas from TimeValidated where duration = 180 group by user_validated order by user_validated;
-	# select user_validated, sum(duration)/3600 as horas From TimeValidated where duration < 180 group by user_validated order by user_validated;
-
-	users_breaks = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
-		.with_entities(func.count())\
-		.filter(TimeValidated.duration == 180, User.username.ilike('%@%').label('username')).group_by(TimeValidated.user_validated).order_by(asc('username')).all()
-	
-	hours_working = TimeValidated.query.join(User, User.username == TimeValidated.user_validated)\
-		.with_entities(func.sum(TimeValidated.duration).label('sum_duration'))\
-		.filter(TimeValidated.duration < 180, User.username.ilike('%@%').label('username')).group_by(TimeValidated.user_validated).order_by(asc('username')).all()
-
-	users_breaks = [int(i[0]) for i in users_breaks]
-	
-	hours_working = [float(i[0])/3600.0 for i in hours_working]
-	users_breaks_normalized =[i/(j/20.0) for i,j in zip(users_breaks,hours_working)] #pausas_totais_arnaldo / (horas_totais_arnaldo / 24) 
-
-	return users_breaks_normalized
-
+# |\ Auditoria
 @webui.route('/audit_page', methods=['GET'])
 @require_admin
 def audit_main():
-	users = User.query.with_entities(User.username).filter(User.username.ilike('%@%').label('username')).order_by(asc('username')).all()
-	users = [i[0] for i in users]
 	
-	time_by_user = audit_time_by_user()
-	break_by_user = audit_breaks_by_user()
-
-	data = ""
-	ziped_info = zip(users,time_by_user,break_by_user)
-	for info in ziped_info:
-		# print(info)
-		data += "{},{},{:.2f},10000,10000,10000;".format(info[0],info[1],info[2])
-
-	return render_template('audit_page.html',data = data)
-
-# ESSA FUNÇÂO É PARA ARRUMAR A COLUNA DURATION DO TIMEVALIDATED
-# def funcao_soma_valores_anotadore():
-# 	all_users = User.query.all()
-
-# 	for user in all_users:
-# 		all_times = TimeValidated.query.filter_by(user_validated=user.username)
-# 		i = 0
-# 		last_time = 0
-# 		for time in all_times:
-# 			if(i == 0):
-# 				time.duration = 120
-# 				i += 1
-# 				last_time = time.time_validated
-# 			else:
-# 				time.duration = Duration_calculation(
-# 					last_time, time.time_validated)
-# 				last_time = time.time_validated
-
-# 			db.session.commit()
+	audit_controller = AuditController(User,TimeValidated,db)
+	audit_result = audit_controller.generate_audit_report()
+	
+	return render_template('audit_page.html',data = audit_result)
