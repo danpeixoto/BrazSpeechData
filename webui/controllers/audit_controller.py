@@ -1,11 +1,21 @@
 from sqlalchemy import func,asc
 
 class AuditController:
-	def __init__(self,UserDao,TimeValidatedDao,db):
+	def __init__(self,DatasetDao,UserDao,TimeValidatedDao,db):
+		self.Dataset = DatasetDao
 		self.User = UserDao
 		self.TimeValidated = TimeValidatedDao
 		self.db = db
 		self.users_dict = {}
+
+	def __audit_annotation_smaller_than_duration(self):
+		# select tv.user_validated, count(*) as total from TimeValidated as tv, Dataset as ds where tv.id_data = ds.id and ds.duration >  tv.duration group by user_validated order by total;
+		results = self.TimeValidated.query.join(self.Dataset,self.Dataset.id == self.TimeValidated.id_data)\
+					.with_entities(self.TimeValidated.user_validated,func.count())\
+					.filter(self.Dataset.duration > self.TimeValidated.duration).group_by(self.TimeValidated.user_validated).order_by(asc(self.TimeValidated.user_validated)).all()
+		
+		resutls_dict = {i[0]:i[1] for i in results}
+		return resutls_dict
 
 	def __audit_breaks_by_user(self):
 		# select user_validated, count(*) as paradas from TimeValidated where duration = 180 group by user_validated order by user_validated;
@@ -56,7 +66,7 @@ class AuditController:
 
 		return users_time_dict
 
-	def __append_values_to_key_of_users_dict(self,values_dict,separator):
+	def __append_values_to_key_of_users_dict(self,values_dict,separator=','):
 		for user,data in self.users_dict.items():
 			string_of_values = data
 			if user in values_dict:
@@ -73,13 +83,23 @@ class AuditController:
 		time_by_user_dict = self.__audit_time_by_user()
 		breaks_by_user_dict = self.__audit_breaks_by_user()
 		max_time_worked = self.__audit_max_time_worked()
+		annotation_smaller_than_duration = self.__audit_annotation_smaller_than_duration()
 
 		self.__append_values_to_key_of_users_dict(time_by_user_dict,'')
-		self.__append_values_to_key_of_users_dict(breaks_by_user_dict,',')
-		self.__append_values_to_key_of_users_dict(max_time_worked,',')
-		
+		self.__append_values_to_key_of_users_dict(breaks_by_user_dict)
+		self.__append_values_to_key_of_users_dict(max_time_worked)
+		self.__append_values_to_key_of_users_dict(annotation_smaller_than_duration)
+
 		for user, data in self.users_dict.items():
-			result += '{},{},NaN,NaN;'.format(user,data)
+			result += '{},{},NaN;'.format(user,data)
 		
 		return result
 
+
+
+
+# select tv.user_validated, count(*) as total from TimeValidated as tv, Dataset as ds where tv.id_data = ds.id and ds.duration >  tv.duration + 5 group by user_validated order by total;
+
+# -- total de audios por pessoa
+# create temporary table aux1 as select user_validated, count(*) as audios, sum(duration)/3600 as horas from TimeValidated where duration < 180 group by user_validated order by audios desc;
+# select *, (audios/horas) as audios_por_hora from aux1 order by audios_por_hora;

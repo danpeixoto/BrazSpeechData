@@ -241,15 +241,15 @@ def index():
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-	# else:
-	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
-	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 	else:
-		# query de teste
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	# else:
+	# 	# query de teste
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
@@ -657,7 +657,7 @@ def transcribe_page():
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%TED%'),
+		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%segmented_wpp_cybervox_v4_p2%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 
@@ -690,6 +690,10 @@ def transcribe_page():
 			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
 			data.file_path = os.path.join(
 				'Dataset', data.file_path).replace('\\', '/')
+		elif './wavs/segmented_wpp_cybervox_v4_p2' in data.file_path:
+			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v4_p2','data/wavs/segmented_wpp_cybervox_v4_p2')		
+			data.file_path = os.path.join(
+				'Dataset', data.file_path).replace('\\', '/')
 		else:
 			data.file_path = data.file_path.replace('./','data/')		
 			data.file_path = os.path.join(
@@ -711,7 +715,7 @@ def logout():
 @require_admin
 def audit_main():
 	
-	audit_controller = AuditController(User,TimeValidated,db)
+	audit_controller = AuditController(Dataset,User,TimeValidated,db)
 	audit_result = audit_controller.generate_audit_report()
 	
 	return render_template('audit_page.html',data = audit_result)
