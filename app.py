@@ -34,6 +34,13 @@ data_csv_transcribe = 'static/Dataset/metadata_transcribe.csv'
 data_validated_csv = 'static/Dataset/metadata_validated.csv'
 data_csv_gold = 'static/Gold/metadata_gold.csv' 
 data_ted = 'static/Dataset/metadata_ted.csv'
+data_alip = 'static/Dataset/metadata_alip.csv'
+data_wpp_v3 = 'static/Dataset/metadata_wpp_v3_utf8.csv' # separated by '|' so commas from phrases mix up with csv commas
+data_ted3 = 'static/Dataset/metadata_ted3.csv'
+data_wpp_v4_p1 = 'static/Dataset/metadata_wpp_v4_p1.csv'
+data_wpp_v4_p2 = 'static/Dataset/metadata_wpp_v4_p2.csv'
+data_wpp_v4_p3 = 'static/Dataset/metadata_wpp_v4_p3.csv'
+
 
 app = Flask(__name__)
 app.config.from_object(config['dev'])
@@ -59,13 +66,15 @@ def initdb():
 @manager.command
 def initdataset():
 
-	lines = list(open(data_ted,encoding='utf8').readlines())   
-	
+	lines = list(open(data_wpp_v4_p3, encoding='utf8').readlines())
+
 	for line in lines:
-		audio_path,lenght,text, text_asr = line.split(',')
+		print(line.split('|')[0].replace('\\', '/'))
+		audio_path, lenght, text, text_asr = line.split('|')
+		audio_path = audio_path.replace('\\', '/')
 		duration = text.replace('\n','')
 		text_asr = text_asr.replace('\n','')
-		new_data= Dataset()
+		new_data = Dataset()
 		new_data.text_asr = text_asr
 		new_data.text = ''
 		new_data.audio_lenght = lenght
