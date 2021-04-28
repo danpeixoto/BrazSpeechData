@@ -66,13 +66,23 @@ class AuditController:
 
 		return users_time_dict
 
+	def __audit_total_audios_by_user(self):
+		# create temporary table aux1 as select user_validated, count(*) as audios, sum(duration)/3600 as horas from TimeValidated where duration < 180 group by user_validated order by audios desc;
+		# select *, (audios/horas) as audios_por_hora from aux1 order by audios_por_hora;
+		query_result = self.TimeValidated.query.with_entities(self.TimeValidated.user_validated,func.count().label('audios'),func.sum(self.TimeValidated.duration/3600.0).label('horas'))\
+						.filter(self.TimeValidated.duration<180).group_by(self.TimeValidated.user_validated).all()
+		
+		
+		query_result_dict = {i[0]:float(i[1]/i[2]) for i in query_result}
+		return query_result_dict
+
 	def __append_values_to_key_of_users_dict(self,values_dict,separator=','):
 		for user,data in self.users_dict.items():
 			string_of_values = data
 			if user in values_dict:
 				string_of_values += '{}{:.2f}'.format(separator,values_dict[user])
 			else:
-				string_of_values += '{}NaN'.format(separator)
+				string_of_values += '{}0'.format(separator)
 			self.users_dict[user] = string_of_values
 	
 	def generate_audit_report(self):
@@ -84,14 +94,17 @@ class AuditController:
 		breaks_by_user_dict = self.__audit_breaks_by_user()
 		max_time_worked = self.__audit_max_time_worked()
 		annotation_smaller_than_duration = self.__audit_annotation_smaller_than_duration()
+		total_audios_hour_by_user = self.__audit_total_audios_by_user()
+
 
 		self.__append_values_to_key_of_users_dict(time_by_user_dict,'')
 		self.__append_values_to_key_of_users_dict(breaks_by_user_dict)
 		self.__append_values_to_key_of_users_dict(max_time_worked)
 		self.__append_values_to_key_of_users_dict(annotation_smaller_than_duration)
+		self.__append_values_to_key_of_users_dict(total_audios_hour_by_user)
 
 		for user, data in self.users_dict.items():
-			result += '{},{},NaN;'.format(user,data)
+			result += '{},{};'.format(user,data)
 		
 		return result
 
@@ -101,5 +114,4 @@ class AuditController:
 # select tv.user_validated, count(*) as total from TimeValidated as tv, Dataset as ds where tv.id_data = ds.id and ds.duration >  tv.duration + 5 group by user_validated order by total;
 
 # -- total de audios por pessoa
-# create temporary table aux1 as select user_validated, count(*) as audios, sum(duration)/3600 as horas from TimeValidated where duration < 180 group by user_validated order by audios desc;
-# select *, (audios/horas) as audios_por_hora from aux1 order by audios_por_hora;
+
