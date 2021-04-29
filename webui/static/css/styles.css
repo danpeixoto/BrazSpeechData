@@ -508,6 +508,7 @@ nav {
 
 .listaNegrito {
 	font-weight: bold;
+	transform: translateX(5rem);
 }
 
 .casosAnotacao,

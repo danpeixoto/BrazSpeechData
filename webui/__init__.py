@@ -154,7 +154,7 @@ def check_invalid_reason(invalid_reason):
 def check_valids(values_list):
 	valid_list = [0, 0, 0, 0, 0]
 
-	for i in range(5):
+	for i in range(6):
 		valid_list[i-1] = i if 'Valid'+str(i) in values_list else 0
 
 	return str(valid_list)
