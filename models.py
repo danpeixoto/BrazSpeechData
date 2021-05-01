@@ -57,6 +57,7 @@ class TimeValidated(db.Model):
 	id_data = db.Column(db.Integer)
 	time_validated = db.Column(db.DateTime())
 	duration = db.Column(db.Integer)
+	answer = db.Column(db.Text())
 	
 	
 

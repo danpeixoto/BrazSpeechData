@@ -5,3 +5,4 @@ database.db
 common/enviroment.json
 braz.log
 webui/static/captcha/*.jpg
+__pycache__/

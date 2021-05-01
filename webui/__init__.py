@@ -205,16 +205,18 @@ def index():
 		data.file_with_user = 0
 		data.number_validated += 1
 		data.travado = datetime.now()
-
+		answer = ''
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
 			valid_list = check_valids(values_list)
 			check_current_valids(data, valid_list)
 			data.instance_valid = 1
+			answer = u'v:{}'.format(valid_list)
 		elif request.form.get('Invalid')[:-1] == 'Invalid':
 			invalidClass = -int(request.form.get('Invalid')[-1])
 			check_current_valids(data, 'None')
 			check_current_invalids(data, invalidClass)
+			answer = u'i:{}'.format(invalidClass)
 
 		
 		new_time.user_validated = session['username']
@@ -223,6 +225,8 @@ def index():
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
 		new_time.duration = Duration_calculation(
 			last_time_value, new_time.time_validated)
+		new_time.answer = answer
+
 		db.session.add(data)
 		db.session.add(new_time)
 		db.session.commit()
@@ -245,11 +249,11 @@ def index():
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-	# else:
-	# 	# query de teste
-	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
-	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	
+	# # query de teste
+	# data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	# or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
@@ -639,6 +643,7 @@ def transcribe_page():
 		last_time_value = last_time.time_validated if last_time != None else datetime.now()
 		new_time.duration = Duration_calculation_transcribe(
 			last_time_value, new_time.time_validated, data.duration)
+		new_time.answer = u't:{}'.format(request.form.get('transcricao'))
 
 		db.session.add(data)
 		db.session.add(new_time)
@@ -659,7 +664,10 @@ def transcribe_page():
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%segmented_wpp_cybervox_v4_p2%'),
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-
+	# #query teste
+	# data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	if data is None:
 		return render_template('index-finish.html')
