@@ -32,7 +32,6 @@ from .controllers.audit_controller import AuditController
 
 # Para percorrer o código com mais eficiencia é possivel pesquisar por |\
 
-
 # |\ Funções gerais
 def hash_and_salt(password):
 	password_hash = hashlib.sha256()
@@ -77,9 +76,9 @@ def check_current_user(data):
 
 def check_current_valids(data, valid_list):
 
-	if (data.valids_user1 == ''):
+	if (data.number_validated == 1):
 		data.valids_user1 = valid_list
-	elif (data.valids_user2 == ''):
+	elif (data.number_validated == 2):
 		data.valids_user2 = valid_list
 	else:
 		data.valids_user3 = valid_list
@@ -87,9 +86,9 @@ def check_current_valids(data, valid_list):
 
 def check_current_invalids(data, invalidClass):
 
-	if (data.invalid_user1 == 0):
+	if (data.number_validated == 1):
 		data.invalid_user1 = invalidClass
-	elif (data.invalid_user2 == 0):
+	elif (data.number_validated == 2):
 		data.invalid_user2 = invalidClass
 	else:
 		data.invalid_user3 = invalidClass
@@ -97,9 +96,9 @@ def check_current_invalids(data, invalidClass):
 
 def check_current_reason(data, invalid_reason):
 
-	if (data.invalid_reason1 == ''):
+	if (data.number_validated == 1):
 		data.invalid_reason1 = invalid_reason
-	elif (data.invalid_reason2 == ''):
+	elif (data.number_validated == 2):
 		data.invalid_reason2 = invalid_reason
 	else:
 		data.invalid_reason3 = invalid_reason
@@ -198,14 +197,17 @@ def index():
 			user_validated=session['username']).order_by(desc(TimeValidated.id)).first()
 		check_current_user(data)
 
-		check_current_reason(data, check_invalid_reason(
-			request.form.get('InvalidReason')))
+		
 		new_time = TimeValidated()
 		data.instance_validated += 1
 		data.file_with_user = 0
 		data.number_validated += 1
 		data.travado = datetime.now()
 		answer = ''
+
+		check_current_reason(data, check_invalid_reason(
+			request.form.get('InvalidReason')))
+		
 		if request.form.getlist('Valid'):
 			values_list = request.form.getlist('Valid')
 			valid_list = check_valids(values_list)
@@ -235,9 +237,11 @@ def index():
 		
 	session['secret'] = str(random.randint(1000,9999))
 	session['last_time_checked'] = datetime.min if session.get('last_time_checked') is None else session['last_time_checked']
+
 	if is_time_to_check_human(session['last_time_checked']):
 		return redirect(url_for('webui.captcha', route_to='index'))
 	
+
 	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task < 1, 
 		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
@@ -251,9 +255,10 @@ def index():
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 	
 	# # query de teste
-	# data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# data = Dataset.query.filter(Dataset.instance_validated < 3, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 	# Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
 	# or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+
 
 	if data is None:
 		return render_template('index-finish.html')
