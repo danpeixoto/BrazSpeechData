@@ -249,6 +249,10 @@ def index():
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated == '',
 		Dataset.user_validated2 == '', Dataset.user_validated3 == '',
 		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	elif session['username'] == 'marialuizamorais@usp.br' or session['username'] == 'rafael.pac90@gmail.com' or session['username'] == 'paulomatheus@usp.br' or session['username'] == 'paulamarindeoliveira@usp.br' or session['username'] == 'renan.izaias@usp.br':
+		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated == '',
+		Dataset.user_validated2 == '', Dataset.user_validated3 == '',
+		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 	else:
 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
 		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
