@@ -241,63 +241,92 @@ def index():
 	if is_time_to_check_human(session['last_time_checked']):
 		return redirect(url_for('webui.captcha', route_to='index'))
 	
+	# if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task < 1, 
+	# 	Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
+	# elif session['username'] == 'carolalves@usp.br' or session['username'] == 'marinaaluisio@yahoo.com.br':
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated == '',
+	# 	Dataset.user_validated2 == '', Dataset.user_validated3 == '',
+	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	# else:
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
+	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	#### query de teste
+	#### data = Dataset.query.filter(Dataset.instance_validated < 3, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	#### Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	#### or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
-	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task < 1, 
-		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
-	elif session['username'] == 'carolalves@usp.br' or session['username'] == 'marinaaluisio@yahoo.com.br':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated == '',
-		Dataset.user_validated2 == '', Dataset.user_validated3 == '',
-		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-	elif session['username'] == 'marialuizamorais@usp.br' or session['username'] == 'rafael.pac90@gmail.com' or session['username'] == 'paulomatheus@usp.br' or session['username'] == 'paulamarindeoliveira@usp.br' or session['username'] == 'renan.izaias@usp.br':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated == '',
-		Dataset.user_validated2 == '', Dataset.user_validated3 == '',
-		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-	else:
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%ANOTACAOPARADA%'),
-		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	is_gold = 0
+	# current_corpus = '%ANOTACAOPARADA%'
+	current_corpus = '%/%'
+	task = 0
+
+	if session['username'] in ['sandra','sandra3','edresson']:
+		is_gold = 1
+		current_corpus = '%/%'
+	elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br','marialuizamorais@usp.br','rafael.pac90@gmail.com','paulomatheus@usp.br','paulamarindeoliveira@usp.br','renan.izaias@usp.br']:
+		is_gold = 0
+		current_corpus = '%/%'		
 	
-	# # query de teste
-	# data = Dataset.query.filter(Dataset.instance_validated < 3, Dataset.task < 1, Dataset.file_with_user < 1, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-	# Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
-	# or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	query = 'SELECT id,file_path,text,audio_lenght From Dataset WHERE number_validated < 1 AND instance_validated < 1 AND file_with_user < 1 AND'\
+			+' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
+			+' AND (travado IS Null OR (DATEDIFF(:time_now, travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
 
 
-	if data is None:
-		return render_template('index-finish.html')
+	try:
+		database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
+	
+		while database_locked < 1:
+			database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
+
+		data = db.session.execute(query,{'username':session['username'],'current_corpus':current_corpus,'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'task':task, 'is_gold':is_gold}).fetchone()
+
+		if data:
+			db.session.execute('UPDATE Dataset SET travado=:time_now WHERE id = :data_id',{'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'data_id':data.id})
+			db.session.commit()
+
+		db.session.execute('SELECT RELEASE_LOCK(:name)', {'name': 'travado'}).scalar()
+	except:
+		db.session.execute('SELECT RELEASE_LOCK(:name)', {'name': 'travado'}).scalar()
+		raise Exception('Sorry, there was an error in the critical region. Please inform the administrator')
+
+
+	if not data:
+			return render_template('index-finish.html')
+	
+
+	session['file_path'] = data.file_path
+	session['text'] = data.text
+	session['audio_lenght'] = data.audio_lenght
+	
+	
+
+	file_path = data.file_path
+
+	if './wavs_TED1/' in file_path:
+		file_path = file_path.replace('./wavs_TED1/','Ted_part1/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif '_alip_' in file_path:
+		file_path = file_path.replace('./data/','alip/data/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif './wavs_TED3' in file_path:
+		file_path = file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif './wavs/segmented_wpp_cybervox_v3' in file_path:
+		file_path = file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
 	else:
-		data.file_with_user = 0
-		data.travado = datetime.now()
-		session['text'] = data.text
-		session['audio_lenght'] = data.audio_lenght
-		session['file_path'] = data.file_path
-		db.session.add(data)
-		db.session.commit()
+		file_path = file_path.replace('./','data/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
 
-		if './wavs_TED1/' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif '_alip_' in data.file_path:
-			data.file_path = data.file_path.replace('./data/','alip/data/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif './wavs_TED3' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif './wavs/segmented_wpp_cybervox_v3' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		else:
-			data.file_path = data.file_path.replace('./','data/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-
-
-		return render_template('index.html', dataset=data)
+	# print(file_path)
+	return render_template('index.html', dataset={'file_path':file_path,'text':data.text})
 
 
 # |\ Página tutorial anotação
@@ -666,63 +695,95 @@ def transcribe_page():
 	if is_time_to_check_human(session['last_time_checked']):
 		return redirect(url_for('webui.captcha', route_to='transcribe_page'))
 
-	if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
-		Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
-	elif session['username'] == 'carolalves@usp.br' or session['username'] == 'marinaaluisio@yahoo.com.br':
-    		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%alip%'),
-		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-	else:
-		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-		Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%segmented_wpp_cybervox_v4_p2%'),
-		or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
-	# #query teste
-	# data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
-	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	# if session['username'] == 'sandra' or session['username'] == 'edresson' or session['username'] == 'sandra3':
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, 
+	# 	Dataset.data_gold == 1,or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).first()
+	# elif session['username'] == 'carolalves@usp.br' or session['username'] == 'marinaaluisio@yahoo.com.br':
+    # 		data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%alip%'),
 	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	# else:
+	# 	data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	# 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'], Dataset.file_path.ilike('%segmented_wpp_cybervox_v4_p2%'),
+	# 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
+	# ###query teste
+	## data = Dataset.query.filter(Dataset.instance_validated < 1, Dataset.number_validated < 1, Dataset.file_with_user < 1, Dataset.task > 0, Dataset.data_gold < 1, Dataset.user_validated != session['username'],
+	## 	Dataset.user_validated2 != session['username'], Dataset.user_validated3 != session['username'],
+	## 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
-	if data is None:
-		return render_template('index-finish.html')
+	is_gold = 0
+	# current_corpus = '%segmented_wpp_cybervox_v4_p2%'
+	current_corpus = '%/%'
+	task = 1
+	query = 'SELECT id,file_path,text_asr,audio_lenght FROM Dataset WHERE number_validated<1 AND instance_validated<1 AND file_with_user <1 AND'\
+			+' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
+			+' AND (travado IS Null OR  (DATEDIFF(:time_now, travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
+
+	if session['username'] in ['sandra','sandra3','edresson']:
+		is_gold = 1
+		current_corpus = '%/%'
+	elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br']:
+		is_gold = 0
+		current_corpus = '%/%'	
+
+	try:
+		database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
+ 
+		while database_locked < 1:
+			database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
+		
+		data = db.session.execute(query,{'username':session['username'],'current_corpus':current_corpus,'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'task':task, 'is_gold':is_gold}).fetchone()
+
+		if data:
+			db.session.execute('UPDATE Dataset SET travado=:time_now WHERE id = :data_id',{'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'data_id':data.id})
+			db.session.commit()
+
+		db.session.execute('SELECT RELEASE_LOCK(:name)', {'name': 'travado'}).scalar()
+	except:
+		db.session.execute('SELECT RELEASE_LOCK(:name)', {'name': 'travado'}).scalar()
+		raise Exception('Sorry, there was an error in the critical region. Please inform the administrator')
+
+	if not data:
+			return render_template('index-finish.html')
+	
+
+
+	
+	session['text'] = data.text_asr
+	session['audio_lenght'] = data.audio_lenght
+	session['file_path'] = data.file_path
+	session['id'] = data.id
+
+	file_path = data.file_path
+
+	if './wavs_TED1/' in file_path:
+		file_path = file_path.replace('./wavs_TED1/','Ted_part1/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif '_alip_' in file_path:
+		file_path = file_path.replace('./data/','alip/data/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif './wavs_TED3' in file_path:
+		file_path = file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif './wavs/segmented_wpp_cybervox_v3' in file_path:
+		file_path = file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
+	elif './wavs/segmented_wpp_cybervox_v4_p2' in file_path:
+		file_path = file_path.replace('./wavs/segmented_wpp_cybervox_v4_p2','data/wavs/segmented_wpp_cybervox_v4_p2')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
 	else:
-		data.file_with_user = 0
-		data.travado = datetime.now()
-		session['text'] = data.text_asr
-		session['audio_lenght'] = data.audio_lenght
-		session['file_path'] = data.file_path
-		session['id'] = data.id
-		db.session.add(data)
-		db.session.commit()
+		file_path = file_path.replace('./','data/')		
+		file_path = os.path.join(
+			'Dataset', file_path).replace('\\', '/')
 
 
-		if './wavs_TED1/' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs_TED1/','Ted_part1/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif '_alip_' in data.file_path:
-			data.file_path = data.file_path.replace('./data/','alip/data/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif './wavs_TED3' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif './wavs/segmented_wpp_cybervox_v3' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		elif './wavs/segmented_wpp_cybervox_v4_p2' in data.file_path:
-			data.file_path = data.file_path.replace('./wavs/segmented_wpp_cybervox_v4_p2','data/wavs/segmented_wpp_cybervox_v4_p2')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-		else:
-			data.file_path = data.file_path.replace('./','data/')		
-			data.file_path = os.path.join(
-				'Dataset', data.file_path).replace('\\', '/')
-
-
-	return render_template('transcribe_page.html',dataset = data)
-
+	return render_template('transcribe_page.html',dataset = {'text_asr':data.text_asr,'file_path':file_path})
+	
 # |\ Logout
 @webui.route('/logout')
 def logout():
