@@ -724,7 +724,7 @@ def transcribe_page():
 		current_corpus = '%/%'
 	elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br']:
 		is_gold = 0
-		current_corpus = '%/%'	
+		current_corpus = '%alip%'	
 
 	try:
 		database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
