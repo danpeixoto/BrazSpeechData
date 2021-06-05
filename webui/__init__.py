@@ -303,27 +303,7 @@ def index():
 	
 
 	file_path = data.file_path
-
-	if './wavs_TED1/' in file_path:
-		file_path = file_path.replace('./wavs_TED1/','Ted_part1/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif '_alip_' in file_path:
-		file_path = file_path.replace('./data/','alip/data/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif './wavs_TED3' in file_path:
-		file_path = file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif './wavs/segmented_wpp_cybervox_v3' in file_path:
-		file_path = file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	else:
-		file_path = file_path.replace('./','data/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
+	file_path = os.path.join('Dataset', file_path).replace('\\', '/')
 
 	# print(file_path)
 	return render_template('index.html', dataset={'file_path':file_path,'text':data.text})
@@ -755,31 +735,7 @@ def transcribe_page():
 	session['id'] = data.id
 
 	file_path = data.file_path
-
-	if './wavs_TED1/' in file_path:
-		file_path = file_path.replace('./wavs_TED1/','Ted_part1/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif '_alip_' in file_path:
-		file_path = file_path.replace('./data/','alip/data/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif './wavs_TED3' in file_path:
-		file_path = file_path.replace('./wavs_TED3/','Ted_part3/wavs_TED3/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif './wavs/segmented_wpp_cybervox_v3' in file_path:
-		file_path = file_path.replace('./wavs/segmented_wpp_cybervox_v3','data/wavs/segmented_wpp_cybervox_v3')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	elif './wavs/segmented_wpp_cybervox_v4_p2' in file_path:
-		file_path = file_path.replace('./wavs/segmented_wpp_cybervox_v4_p2','data/wavs/segmented_wpp_cybervox_v4_p2')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
-	else:
-		file_path = file_path.replace('./','data/')		
-		file_path = os.path.join(
-			'Dataset', file_path).replace('\\', '/')
+	file_path = os.path.join('Dataset', file_path).replace('\\', '/')
 
 
 	return render_template('transcribe_page.html',dataset = {'text_asr':data.text_asr,'file_path':file_path})
