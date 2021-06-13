@@ -258,16 +258,16 @@ def index():
 	#### or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	is_gold = 0
-	current_corpus = '%ANOTACAOPARADA%'
-	# current_corpus = '%/%'
+	# current_corpus = '%ANOTACAOPARADA%'
+	current_corpus = '%/%'
 	task = 0
 
 	if session['username'] in ['sandra','sandra3','edresson']:
 		is_gold = 1
 		current_corpus = '%/%'
-	elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br','marialuizamorais@usp.br','rafael.pac90@gmail.com','paulomatheus@usp.br','paulamarindeoliveira@usp.br','renan.izaias@usp.br']:
-		is_gold = 0
-		current_corpus = '%/%'		
+	# elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br','marialuizamorais@usp.br','rafael.pac90@gmail.com','paulomatheus@usp.br','paulamarindeoliveira@usp.br','renan.izaias@usp.br']:
+	# 	is_gold = 0
+	# 	current_corpus = '%/%'		
 	
 	query = 'SELECT id,file_path,text,audio_lenght From Dataset WHERE number_validated < 1 AND instance_validated < 1 AND file_with_user < 1 AND'\
 			+' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
@@ -692,7 +692,8 @@ def transcribe_page():
 	## 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	is_gold = 0
-	current_corpus = '%segmented_wpp_cybervox_v4_p2%'
+	# current_corpus = '%segmented_wpp_cybervox_v4_p2%'
+	current_corpus = '%alip%'
 	# current_corpus = '%/%'
 	task = 1
 	query = 'SELECT id,file_path,text_asr,audio_lenght FROM Dataset WHERE number_validated<1 AND instance_validated<1 AND file_with_user <1 AND'\
@@ -702,9 +703,9 @@ def transcribe_page():
 	if session['username'] in ['sandra','sandra3','edresson']:
 		is_gold = 1
 		current_corpus = '%/%'
-	elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br']:
-		is_gold = 0
-		current_corpus = '%alip%'	
+	# elif session['username'] in ['carolalves@usp.br','marinaaluisio@yahoo.com.br']:
+	# 	is_gold = 0
+	# 	current_corpus = '%alip%'	
 
 	try:
 		database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
