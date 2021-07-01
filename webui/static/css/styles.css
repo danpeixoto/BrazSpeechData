@@ -68,6 +68,7 @@ section {
 
 
 input {
+	border: none;
 	font-size: 1.6rem;
 	padding: 10px;
 	border-radius: 5px;
@@ -620,22 +621,23 @@ h3.invalido {
 }
 
 .download-csv h3 {
+	display: block;
 	font-size: 2rem;
 	text-align: center;
+	margin-bottom: 1.5rem;
 }
 
-.download-csv ol {
-	list-style-type: none;
+
+.download-csv__forms {
+	display: flex;
+	justify-content: space-between;
+	gap: 5rem;
+	flex-wrap: wrap;
 }
 
-.download-csv li {
-	margin: 10px;
-}
-
-.download-csv input {
-	font-size: 1.6rem;
-	width: 15rem;
-	height: 3rem;
+.download-csv__input {
+	width: 100%;
+	min-width: 100px;
 }
 
 /* end admin */
