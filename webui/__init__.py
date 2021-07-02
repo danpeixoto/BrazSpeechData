@@ -408,13 +408,13 @@ def admin():
 		# print(request.form.get('anotacao'))
 		compression_opts = dict(method='zip',archive_name='resultado.csv') 
 		if(request.form.get('anotacao')):
-			data = Dataset.query.with_entities(Dataset.text,Dataset.file_path,Dataset.task).filter(Dataset.invalid_user1 ==0,Dataset.task == 0, Dataset.data_gold == 0).all()
+			data = Dataset.query.with_entities(Dataset.text,Dataset.file_path,Dataset.task).filter(Dataset.invalid_user1 ==0,Dataset.task == 0, Dataset.data_gold == 0, Dataset.number_validated >0).all()
 			data_df = pd.DataFrame(data,columns=['text','file_path','task'])
 			data_df.to_csv('anotacao.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
 			return send_file('./anotacao.zip',mimetype='application/zip',as_attachment=True,attachment_filename='anotacao.zip')
 
 		elif(request.form.get('transcricao')):
-			data = Dataset.query.with_entities(Dataset.text,Dataset.file_path,Dataset.task).filter(not_(Dataset.text.ilike('%#%')),Dataset.task == 1, Dataset.data_gold == 0).all()
+			data = Dataset.query.with_entities(Dataset.text,Dataset.file_path,Dataset.task).filter(not_(Dataset.text.ilike('%#%')),Dataset.task == 1, Dataset.data_gold == 0,Dataset.number_validated>0).all()
 			data_df = pd.DataFrame(data,columns=['text','file_path','task'])
 			data_df.to_csv('transcricao.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
 			return send_file('./transcricao.zip',mimetype='application/zip',as_attachment=True,attachment_filename='transcricao.zip')	

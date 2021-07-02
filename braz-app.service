@@ -6,7 +6,7 @@ Type=simple
 ExecStart=/bin/bash /home/utf/BrazSpeechData/lanca-app.sh
 User=utf
 Group=utf
-Restart=on-failure
+Restart=always
 WorkingDirectory=/home/utf/BrazSpeechData/
 [Install]
 WantedBy=multi-user.target
