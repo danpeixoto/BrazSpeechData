@@ -259,8 +259,8 @@ def index():
 	#### or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	is_gold = 0
-	# current_corpus = '%ANOTACAOPARADA%'
-	current_corpus = '%/%'
+	current_corpus = '%ANOTACAOPARADA%'
+	#current_corpus = '%/%'
 	task = 0
 
 	if session['username'] in ['sandra','sandra3','edresson']:
@@ -706,8 +706,8 @@ def transcribe_page():
 	## 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	is_gold = 0
-	# current_corpus = '%segmented_wpp_cybervox_v4_p2%'
-	current_corpus = '%alip%'
+	current_corpus = '%segmented_wpp_cybervox_v4_p2%'
+	#current_corpus = '%alip%'
 	# current_corpus = '%/%'
 	task = 1
 	query = 'SELECT id,file_path,text_asr,audio_lenght FROM Dataset WHERE number_validated<1 AND instance_validated<1 AND file_with_user <1 AND'\
