@@ -30,6 +30,7 @@ import os
 from captcha.image import ImageCaptcha
 from .controllers.admin_users_info_controller import AdminUsersInfoController
 from .controllers.audit_controller import AuditController
+from .controllers.admin_controller import AdminController
 import pandas as pd
 # Para percorrer o código com mais eficiencia é possivel pesquisar por |\
 
@@ -403,58 +404,13 @@ def hours_worked():
 @webui.route('/admin', methods=['GET', 'POST'])
 @require_admin
 def admin():
-	instances = []
+	
+	admin_controller = AdminController(Dataset)
+
 	if request.method == 'POST':
-		# print(request.form.get('anotacao'))
-		compression_opts = dict(method='zip',archive_name='resultado.csv') 
-		if(request.form.get('anotacao')):
-			data = Dataset.query.with_entities(Dataset.text,Dataset.file_path,Dataset.task).filter(Dataset.invalid_user1 ==0,Dataset.task == 0, Dataset.data_gold == 0, Dataset.number_validated >0).all()
-			data_df = pd.DataFrame(data,columns=['text','file_path','task'])
-			data_df.to_csv('anotacao.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
-			return send_file('./anotacao.zip',mimetype='application/zip',as_attachment=True,attachment_filename='anotacao.zip')
+		admin_controller.handle_post_request()
+		return send_file('./dataset.zip',mimetype='application/zip',as_attachment=True,attachment_filename='dataset.zip')
 
-		elif(request.form.get('transcricao')):
-			data = Dataset.query.with_entities(Dataset.text,Dataset.file_path,Dataset.task).filter(not_(Dataset.text.ilike('%#%')),Dataset.task == 1, Dataset.data_gold == 0,Dataset.number_validated>0).all()
-			data_df = pd.DataFrame(data,columns=['text','file_path','task'])
-			data_df.to_csv('transcricao.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
-			return send_file('./transcricao.zip',mimetype='application/zip',as_attachment=True,attachment_filename='transcricao.zip')	
-
-
-		# if request.form.get('Download Valid instances'):
-		# 	if request.form.get('Download Valid instances')[-5:] == 'Valid':
-
-		# 		gold = 0 if 'Gold' not in request.form.get(
-		# 			'Download Valid instances') else 1
-		# 		# tive que colocar dessa maneira, pq tinhamos decidido que a sandra e o edresson validariam audios diferentes
-		# 		total_pessoas = 3-(gold*2)
-		# 		data = Dataset.query.filter(
-		# 			Dataset.number_validated >= total_pessoas, (Dataset.valids_user1 != 'None') or (Dataset.valids_user2 != 'None') or (Dataset.valids_user3 != 'None'), Dataset.data_gold == gold)
-		# 		csv = ''
-
-		# 		for dt in data:
-		# 			string = dt.file_path+';'+str(dt.audio_lenght)+';'+dt.text+';'+dt.valids_user1+';'+dt.valids_user2+';'+dt.valids_user3+';'+str(dt.invalid_user1)+';'+str(dt.invalid_user2)+';'+str(dt.invalid_user3) +\
-		# 				';'+dt.invalid_reason1+';'+dt.invalid_reason2+';'+dt.invalid_reason3+';' +\
-		# 				str(dt.data_gold)+';'+str(dt.number_validated)+'\n'
-		# 			csv += string
-		# 		return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=valid_instances_{}.csv'.format(gold)})
-
-		# elif request.form.get('Download Invalid instances')[-9:-2] == 'Invalid':
-
-		# 	classe_invalid = - \
-		# 		int(request.form.get('Download Invalid instances')[-1])
-		# 	gold = 0 if 'Gold' not in request.form.get(
-		# 		'Download Invalid instances') else 1
-		# 	# tive que colocar dessa maneira, pq tinhamos decidido que a sandra e o edresson validariam audios diferentes
-		# 	total_pessoas = 3-(gold*2)
-		# 	data = Dataset.query.filter(Dataset.number_validated >= total_pessoas, (Dataset.invalid_user1 == classe_invalid) | (
-		# 		Dataset.invalid_user2 == classe_invalid) | (Dataset.invalid_user3 == classe_invalid), Dataset.data_gold == gold)
-		# 	csv = ''
-		# 	for dt in data:
-		# 		string = dt.file_path+';'+str(dt.audio_lenght)+';'+dt.text+';'+dt.valids_user1+';'+dt.valids_user2+';'+dt.valids_user3+';'+str(dt.invalid_user1)+';'+str(dt.invalid_user2)+';'+str(dt.invalid_user3) +\
-		# 			';'+dt.invalid_reason1+';'+dt.invalid_reason2+';'+dt.invalid_reason3+';' +\
-		# 			str(dt.data_gold)+';'+str(dt.number_validated)+'\n'
-		# 		csv += string
-		# 	return Response(csv, mimetype='text/csv', headers={'Content-disposition': 'attachment; filename=invalid_instances_{}.csv'.format(-classe_invalid)})
 	return render_template('admin.html')
 
 
