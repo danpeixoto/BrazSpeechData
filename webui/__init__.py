@@ -405,11 +405,13 @@ def hours_worked():
 @require_admin
 def admin():
 	
-	admin_controller = AdminController(Dataset)
+	admin_controller = AdminController()
 
 	if request.method == 'POST':
-		admin_controller.handle_post_request()
-		return send_file('./dataset.zip',mimetype='application/zip',as_attachment=True,attachment_filename='dataset.zip')
+		if('download' in request.form):
+			return send_file('./dataset.zip',mimetype='application/zip',as_attachment=True,attachment_filename='dataset.zip')
+		elif('export' in request.form):
+			admin_controller.generate_csv()
 
 	return render_template('admin.html')
 

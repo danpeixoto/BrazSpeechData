@@ -628,15 +628,15 @@ h3.invalido {
 }
 
 
-.download-csv__forms {
+.download-csv__form {
 	display: flex;
-	justify-content: space-between;
-	gap: 5rem;
+	justify-content: center;
+	align-items: center;
 	flex-wrap: wrap;
+	gap: 5rem;
 }
 
 .download-csv__input {
-	width: 100%;
 	min-width: 100px;
 }
 
