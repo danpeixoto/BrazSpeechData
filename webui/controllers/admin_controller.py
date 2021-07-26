@@ -3,4 +3,5 @@ import os
 class AdminController:
 
 	def generate_csv(self):
-		os.system("python ./webui/utils/generate_csv.py &")
+		#trocar path pelo o path do seu python quando for testar
+		os.system("/home/utf/miniconda3/bin/python3 ./webui/utils/generate_csv.py &")
