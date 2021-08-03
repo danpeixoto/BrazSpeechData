@@ -409,7 +409,7 @@ def admin():
 
 	if request.method == 'POST':
 		if('download' in request.form):
-			return send_file('./dataset.zip',mimetype='application/zip',as_attachment=True,attachment_filename='dataset.zip')
+			return send_file('./static/Dataset/export-v2/dataset.zip',mimetype='application/zip',as_attachment=True,attachment_filename='dataset.zip')
 		elif('export' in request.form):
 			admin_controller.generate_csv()
 
