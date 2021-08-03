@@ -90,7 +90,7 @@ def generate_csv():
 	final_df = pd.DataFrame.from_dict(df_output, orient='columns')
 	final_df.to_csv('dataset.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
 
-with open('./enviroment.json') as json_file:
+with open('./common/enviroment.json') as json_file:
 	JSON = json.load(json_file)
 	DB_PASSWORD = JSON['dbPassword']
 	DB_DATABASE = JSON['dbDatabase']
