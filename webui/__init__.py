@@ -273,7 +273,7 @@ def index():
 	
 	query = 'SELECT id,file_path,text,audio_lenght From Dataset WHERE number_validated < 1 AND instance_validated < 1 AND file_with_user < 1 AND'\
 			+' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
-			+' AND (travado IS Null OR (DATEDIFF(:time_now, travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
+			+' AND (travado IS Null OR (DATEDIFF(DATE_ADD(NOW(), INTERVAL 2 DAY),travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
 
 
 	try:
@@ -282,7 +282,7 @@ def index():
 		while database_locked < 1:
 			database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
 
-		data = db.session.execute(query,{'username':session['username'],'current_corpus':current_corpus,'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'task':task, 'is_gold':is_gold}).fetchone()
+		data = db.session.execute(query,{'username':session['username'],'current_corpus':current_corpus,'task':task, 'is_gold':is_gold}).fetchone()
 
 		if data:
 			db.session.execute('UPDATE Dataset SET travado=:time_now WHERE id = :data_id',{'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'data_id':data.id})
@@ -664,13 +664,13 @@ def transcribe_page():
 	## 	or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
 	is_gold = 0
-	current_corpus = '%segmented_wpp_cybervox_v4_p2%'
+	current_corpus = '%/wpp/wppv%'
 	#current_corpus = '%alip%'
 	# current_corpus = '%/%'
 	task = 1
 	query = 'SELECT id,file_path,text_asr,audio_lenght FROM Dataset WHERE number_validated<1 AND instance_validated<1 AND file_with_user <1 AND'\
 			+' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
-			+' AND (travado IS Null OR  (DATEDIFF(:time_now, travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
+			+' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
 
 	if session['username'] in ['sandra','sandra3','edresson']:
 		is_gold = 1
@@ -685,7 +685,7 @@ def transcribe_page():
 		while database_locked < 1:
 			database_locked =  db.session.execute('SELECT GET_LOCK(:name,:timeout)', {'name': 'travado','timeout':10}).scalar()
 		
-		data = db.session.execute(query,{'username':session['username'],'current_corpus':current_corpus,'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'task':task, 'is_gold':is_gold}).fetchone()
+		data = db.session.execute(query,{'username':session['username'],'current_corpus':current_corpus,'task':task, 'is_gold':is_gold}).fetchone()
 
 		if data:
 			db.session.execute('UPDATE Dataset SET travado=:time_now WHERE id = :data_id',{'time_now':datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'data_id':data.id})

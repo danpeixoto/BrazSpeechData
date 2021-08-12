@@ -3,6 +3,7 @@ import pymysql
 import json
 import pandas as pd
 import re
+import check_audio_variety as cav
 from zipfile import ZipFile
 
 
@@ -71,7 +72,6 @@ test_inquiries = { 'alip': [(42389, 43336), (80027, 80670), (3159,3704), (9630,9
 						   'bfammn35'],
 				 'sp': [(44928, 46578), (47450,49028), (70578,71973), (42881,43677)]
 			   }
-
 
 def get_destination(line):
 
@@ -172,6 +172,8 @@ def filter_dataset(data_df):
 		else:
 			line['task'] = 'annotation'
 
+		variety = "pt_br"
+
 		if '/alip/' in line['file_path']:
 			dataset = 'ALIP' 
 			accent = 'São Paulo (int.)'
@@ -187,13 +189,15 @@ def filter_dataset(data_df):
 		elif '/sp/' in line['file_path']:
 			dataset = 'SP2010'
 			accent = 'São Paulo (cap.)'
-			speech_form = 'Conversation or Interview or Reading'
+			speech_form = 'Conversation or Interview'
 		elif '/Ted_' in line['file_path']:
 			dataset = 'TEDx Talks'
 			accent = 'Misc.'
 			speech_form = 'Prepared Speech'
+			variety = cav.check_variety(line['file_path'].split("/")[2][:-9])
+		
 
-		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": valid_score, "invalid_score": invalid_score, "dataset": dataset, "accent": accent, "speech_form": speech_form}
+		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": valid_score, "invalid_score": invalid_score, "dataset": dataset, "accent": accent, "speech_form": speech_form,"variety":variety}
 		df_output.append(data_dict)
 		
 	return df_output
@@ -209,7 +213,7 @@ def split_dataset_on_train_test_eval(dataframe):
 
 	# loop principal-------------------------------
 	for index, line in dataframe.iterrows():
-		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": line['valid_score'], "invalid_score": line['invalid_score'], "dataset": line['dataset'], "accent": line['accent'], "speech_form": line['speech_form']}
+		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": line['valid_score'], "invalid_score": line['invalid_score'],"variety":line['variety'] ,"dataset": line['dataset'], "accent": line['accent'], "speech_form": line['speech_form']}
 		try:
 			dest = get_destination(line)
 			if(dest == 'dev'):
@@ -271,10 +275,10 @@ def generate_csv():
 	train_df,dev_df,test_df,failed_df = split_dataset_on_train_test_eval(final_df)
 
 
-	train_df.to_csv(CSV_SAVE_PATH+"metadata_train.csv", sep=',', encoding='utf-8', header=True, index=False)
-	dev_df.to_csv(CSV_SAVE_PATH+"metadata_dev.csv", sep=',', encoding='utf-8', header=True, index=False)
-	test_df.to_csv(CSV_SAVE_PATH+"metadata_test.csv", sep=',', encoding='utf-8', header=True, index=False)
-	failed_df.to_csv(CSV_SAVE_PATH+"failed_files.txt", sep=',', encoding='utf-8', header=True, index=False)
+	train_df.to_csv(CSV_SAVE_PATH+"metadata_train.csv", sep="|", encoding='utf-8', header=True, index=False)
+	dev_df.to_csv(CSV_SAVE_PATH+"metadata_dev.csv", sep="|", encoding='utf-8', header=True, index=False)
+	test_df.to_csv(CSV_SAVE_PATH+"metadata_test.csv", sep="|", encoding='utf-8', header=True, index=False)
+	failed_df.to_csv(CSV_SAVE_PATH+"failed_files.txt", sep="|", encoding='utf-8', header=True, index=False)
 
 	# final_df.to_csv('dataset.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
 
