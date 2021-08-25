@@ -213,7 +213,7 @@ def split_dataset_on_train_test_eval(dataframe):
 
 	# loop principal-------------------------------
 	for index, line in dataframe.iterrows():
-		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": line['valid_score'], "invalid_score": line['invalid_score'],"variety":line['variety'] ,"dataset": line['dataset'], "accent": line['accent'], "speech_form": line['speech_form']}
+		data_dict = { "file_path": line['file_path'], "task": line['task'], "valid_score": line['valid_score'], "invalid_score": line['invalid_score'],"variety":line['variety'] ,"dataset": line['dataset'], "accent": line['accent'], "speech_form": line['speech_form'], "text": line['text']}
 		try:
 			dest = get_destination(line)
 			if(dest == 'dev'):
@@ -257,7 +257,7 @@ def generate_csv():
 
 	cur = conn.cursor()
 
-	cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3 FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\'')
+	cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3 FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND duration <= 40 AND LENGTH(text)<=200')
 
 	output = cur.fetchall()
 
