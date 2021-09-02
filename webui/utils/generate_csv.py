@@ -139,8 +139,9 @@ def get_destination(line):
 def filter_dataset(data_df):
 
 	df_output = []
-	
+	sum_indios,br,sum_pt,lines = 0,0,0,0
 	for index, line in data_df.iterrows():
+		lines +=1
 		text = line['text']
 		text = re.sub("[^{}]".format(alphabet), '', text)
 
@@ -177,29 +178,43 @@ def filter_dataset(data_df):
 		if '/alip/' in line['file_path']:
 			dataset = 'ALIP' 
 			accent = 'São Paulo (int.)'
-			speech_form = 'Interview or Dialogue'
+			speech_genre = 'Interview or Dialogue'
+			speech_style = 'Spontaneous Speech'
 		elif '/CORAL/' in line['file_path']:
 			dataset = 'C-ORAL-BRASIL I'
 			accent = 'Minas Gerais'
-			speech_form = 'Monologue or Dialogue or Conversation'
+			speech_genre = 'Monologue or Dialogue or Conversation'
+			speech_style = 'Spontaneous Speech'
 		elif '/NURC_RE/' in line['file_path']:
 			dataset = 'NURC-Recife'
 			accent = 'Recife'
-			speech_form = 'Dialogue or Interview or Prepared Speech'
+			speech_genre = 'Dialogue or Interview or Conference and Class Talks'
+			speech_style = 'Spontaneous Speech'
+			if('/NURC_RE_EF/' in line['file_path']):
+				speech_style = 'Prepared Speech'
 		elif '/sp/' in line['file_path']:
 			dataset = 'SP2010'
 			accent = 'São Paulo (cap.)'
-			speech_form = 'Conversation or Interview'
+			speech_genre = 'Conversation or Interview or Reading'
+			speech_style = 'Spontaneous and Read Speech'
 		elif '/Ted_' in line['file_path']:
 			dataset = 'TEDx Talks'
 			accent = 'Misc.'
-			speech_form = 'Prepared Speech'
+			speech_genre = 'Stage Talks'
 			variety = cav.check_variety(line['file_path'].split("/")[2][:-9])
+			if(variety == "pt_br"):
+				br+=1
+			if(variety == "pt_pt"):
+				sum_pt += 1
+			if(not variety):
+				sum_indios += 1
+				continue
+			speech_style = 'Prepared Speech'
 		
-
-		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": valid_score, "invalid_score": invalid_score, "dataset": dataset, "accent": accent, "speech_form": speech_form,"variety":variety}
+		data_dict = { "text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": valid_score, "invalid_score": invalid_score, "dataset": dataset, "accent": accent, "speech_genre": speech_genre,"speech_style":speech_style,"variety":variety}
 		df_output.append(data_dict)
-		
+	
+	print(br,sum_pt,sum_indios,lines)
 	return df_output
 
 
@@ -213,7 +228,7 @@ def split_dataset_on_train_test_eval(dataframe):
 
 	# loop principal-------------------------------
 	for index, line in dataframe.iterrows():
-		data_dict = { "file_path": line['file_path'], "task": line['task'], "valid_score": line['valid_score'], "invalid_score": line['invalid_score'],"variety":line['variety'] ,"dataset": line['dataset'], "accent": line['accent'], "speech_form": line['speech_form'], "text": line['text']}
+		data_dict = { "file_path": line['file_path'], "task": line['task'], "valid_score": line['valid_score'], "invalid_score": line['invalid_score'],"variety":line['variety'] ,"dataset": line['dataset'], "accent": line['accent'], "speech_genre": line['speech_genre'],"speech_style":line['speech_style'], "text": line['text']}
 		try:
 			dest = get_destination(line)
 			if(dest == 'dev'):
@@ -257,7 +272,7 @@ def generate_csv():
 
 	cur = conn.cursor()
 
-	cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3 FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND duration <= 40 AND LENGTH(text)<=200')
+	cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3 FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND (duration <= 40 OR LENGTH(text)<=200)')
 
 	output = cur.fetchall()
 
