@@ -1,155 +1,121 @@
-{% with title="BrazSpeechData" %}
-{% include "header.html" %}
-{% endwith %}
+{% with title="BrazSpeechData" %} {% include "header.html" %} {% endwith %}
 <section class="transcribe-page">
-	<div class="container">
+  <div class="container">
+    <p class="sentence">Texto atual: {{dataset.text_asr}}</p>
 
-		<p class="sentence">Texto atual: {{dataset.text_asr}}</p>
+    <div class="audio-controls">
+      <div class="current-audio">
+        <audio id="current-audio" controls autoplay>
+          <source
+            src="{{ url_for('static', filename=dataset.file_path) }}"
+            type="audio/wav"
+            media="(min-width: 900px)"
+            preload
+          />
 
-		<div class="audio-controls">
-			<div class="current-audio">
-				<audio id="current-audio" controls autoplay>
-					<source src="{{ url_for('static', filename=dataset.file_path) }}" type="audio/wav"
-						media="(min-width: 900px)" preload>
+          Your browser does not support the audio element. Please contact the
+          admin!
+        </audio>
+      </div>
+      <div class="loop-button">
+        <i
+          id="loop-button"
+          class="fas fa-redo"
+          onclick="gerenciarCookie()"
+          ativo
+        ></i>
+      </div>
+    </div>
 
-					Your browser does not support the audio element. Please contact the admin!
-				</audio>
-			</div>
-			<div class="loop-button">
-				<i id="loop-button" class="fas fa-redo" onclick="gerenciarCookie()" ativo></i>
-			</div>
-		</div>
+    <div class="transcribe-form-div">
+      <form id="form" method="post" action="/transcribe_page">
+        <div>
+          <textarea id="transcricao" name="transcricao" rows="5" cols="50">
+{{dataset.text_asr}}</textarea
+          >
+        </div>
 
-		<div class="transcribe-form-div">
-			<form id="form" method="post" action="/transcribe_page">
-				<div>
-					<textarea id="transcricao" name="transcricao" rows="5" cols="50">{{dataset.text_asr}}</textarea>
-				</div>
-
-				<div>
-					<input class="submit-button" id="submitButton" type="button" value="Submit" onclick="formSubmit()"
-						disabled>
-				</div>
-			</form>
-		</div>
-	</div>
+        <div class="submit-div">
+          <input
+            class="submit-button"
+            id="submitValid"
+            type="button"
+            value="Submeter"
+            onclick="formSubmit('submitValid')"
+            disabled
+          />
+          <input
+            class="submit-button submit-button--red"
+            id="submitInvalid"
+            type="button"
+            value="Invalidar"
+            onclick="formSubmit('submitInvalid',false)"
+            disabled
+          />
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
 
-
-
-
-<script src="{{ url_for('webui.static', filename='js/RVerify.js') }}"></script>
-
-
 <script>
+  setTimeout(() => {
+    document.querySelectorAll("input").forEach((input) => {
+      input.disabled = false;
+    });
+  }, 3000);
 
+  gerenciarLoop();
 
+  function gerenciarCookie() {
+    let botaoLoop = document.getElementById("loop-button");
 
-	RVerify.configure({
-		tolerance: 15,
-		duration: 500,
-		mask: 0.5,
-		title: "Proteção contra bots",
-		text: "Corrija a imagem.",
-		album: [
-			"{{ url_for('webui.static', filename='images/image1.jpg') }}",
-			"{{ url_for('webui.static', filename='images/image2.jpg') }}",
-			"{{ url_for('webui.static', filename='images/image3.jpg') }}",
-			"{{ url_for('webui.static', filename='images/image4.jpg') }}",
-		]
-	});
+    if (botaoLoop.loopAtivo) {
+      document.cookie = "loop=false";
+    } else {
+      document.cookie = "loop=true";
+    }
 
-	setTimeout(() => {
-		//disabilita o botão de submit por 3 segundos
+    gerenciarLoop();
+  }
 
-		let submit = document.getElementById("submitButton");
-		submit.disabled = false;
+  function getCookieValue() {
+    let cookieRe = /loop=\w*/g;
+    let cookieString = document.cookie.match(cookieRe);
+    // verifica se já foi estabelecido algum valor ao cookie e depois retorna o valor
+    if (cookieString) {
+      let cookieValue = cookieString[0].split("=")[1] === "true";
+      return cookieValue;
+    }
 
-	}, 3000)
+    return false;
+  }
 
-	gerenciarLoop();
+  function gerenciarLoop() {
+    let botaoLoop = document.getElementById("loop-button");
+    let audioTag = document.getElementById("current-audio");
+    let cookieValue = getCookieValue();
 
-	function gerenciarCookie() {
-		let botaoLoop = document.getElementById("loop-button");
+    if (cookieValue !== null) {
+      botaoLoop.style.opacity = cookieValue ? 1.0 : 0.5;
+      botaoLoop.loopAtivo = cookieValue;
+      audioTag.loop = cookieValue;
+    } else {
+      botaoLoop.style.opacity = 0.5;
+      botaoLoop.loopAtivo = false;
+      audioTag.loop = false;
+    }
+  }
 
-		if (botaoLoop.loopAtivo) {
-			document.cookie = "loop=false";
-		} else {
-			document.cookie = "loop=true";
-		}
-
-		gerenciarLoop();
-	}
-
-	function getCookieValue() {
-		let cookieRe = /loop=\w*/g;
-		let cookieString = document.cookie.match(cookieRe);
-		// verifica se já foi estabelecido algum valor ao cookie e depois retorna o valor
-		if (cookieString) {
-			let cookieValue = cookieString[0].split("=")[1] === 'true';
-			return cookieValue;
-		}
-
-		return false;
-	}
-
-	function gerenciarLoop() {
-		let botaoLoop = document.getElementById("loop-button");
-		let audioTag = document.getElementById("current-audio");
-		let cookieValue = getCookieValue();
-
-		if (cookieValue !== null) {
-			botaoLoop.style.opacity = cookieValue ? 1.0 : 0.5;
-			botaoLoop.loopAtivo = cookieValue;
-			audioTag.loop = cookieValue;
-		} else {
-			botaoLoop.style.opacity = 0.5;
-			botaoLoop.loopAtivo = false;
-			audioTag.loop = false;
-		}
-
-
-	}
-
-
-	function checarBot() {
-		RVerify.action(function (code) {
-			switch (code) {
-				case 1:
-					document.cookie = `dataUltimaChecagem=${new Date()}`
-					document.getElementById("form").submit();
-					return true;
-					break;
-				case 2:
-					alert("Valide o captcha!");
-					return false;
-					break;
-			}
-		});
-	}
-
-	function retornarValorCookie() {
-
-		cookieRe = /dataUltimaChecagem=.*/g;
-
-		const dataUltimaChecagem = document.cookie.match(cookieRe)[0].split("=")[1];
-		console.log(document.cookie.match(cookieRe))
-		return dataUltimaChecagem;
-	}
-
-
-	function formSubmit() {
-		let button = document.getElementById("submitButton");
-		if (!button.disabled) {
-			button.disabled = true;
-
-			const dataUltimaChecagem = retornarValorCookie();
-			if ((new Date() - new Date(dataUltimaChecagem)) / 60000 > Infinity) {
-				button.disabled = checarBot();
-			} else {
-				document.getElementById("form").submit();
-			}
-		}
-	}
-
+  function formSubmit(id, isValid = true) {
+    let button = document.getElementById(id);
+    const textArea = document.getElementById("transcricao");
+    if (!button.disabled) {
+      button.disabled = true;
+      if (!isValid) {
+        textArea.value = "###";
+      }
+      document.getElementById("form").submit();
+    }
+  }
 </script>
