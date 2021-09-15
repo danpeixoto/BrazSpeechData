@@ -648,7 +648,7 @@ def transcribe_page():
         data.task = 1
         # é assim que pega o texto que a pessoa alterou
         data.text = request.form.get('transcricao')
-        # data.cer = -data.cer  #Aqui é o que vai ser implementado quando o whasapp acabar
+        data.CER = -data.CER  # Aqui é o que vai ser implementado quando o whasapp acabar
         new_time.user_validated = session['username']
         new_time.id_data = data.id
         new_time.time_validated = datetime.now()
@@ -686,16 +686,16 @@ def transcribe_page():
     # or_( func.datediff(datetime.now(), Dataset.travado) > 0, Dataset.travado == None)).order_by(desc(Dataset.duration)).first()
 
     is_gold = 0
-    current_corpus = '%/wpp/wppv%'
+    # current_corpus = '%/wpp/wppv%'
     #current_corpus = '%alip%'
-    # current_corpus = '%/%'
+    current_corpus = '%/%'
     task = 1
-    query = 'SELECT id,file_path,text_asr,audio_lenght FROM Dataset WHERE number_validated<1 AND instance_validated<1 AND file_with_user <1 AND'\
+    # query = 'SELECT id,file_path,text_asr,audio_lenght,text,task FROM Dataset WHERE number_validated<1 AND file_with_user <1 AND'\
+    # + ' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
+    # + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
+    query = 'SELECT id,file_path,text_asr,audio_lenght,text,task,CER FROM Dataset WHERE CER > 0 and CER IS NOT NULL AND file_with_user <1 AND'\
         + ' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
-        + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
-    # query = 'SELECT id,file_path,text_asr,audio_lenght FROM Dataset WHERE cer > 0 and cer IS NOT NULL AND file_with_user <1 AND'\
-    # 		+' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
-    # 		+' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) AND task = :task ORDER BY duration DESC, cer DESC LIMIT 1'
+        + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) ORDER BY duration DESC, CER DESC LIMIT 1'
 
     if session['username'] in ['sandra', 'sandra3', 'edresson']:
         is_gold = 1
@@ -704,34 +704,21 @@ def transcribe_page():
     # 	is_gold = 0
     # 	current_corpus = '%alip%'
 
-    try:
-        database_locked = db.session.execute('SELECT GET_LOCK(:name,:timeout)', {
-                                             'name': 'travado', 'timeout': 10}).scalar()
-
-        while database_locked < 1:
-            database_locked = db.session.execute('SELECT GET_LOCK(:name,:timeout)', {
-                                                 'name': 'travado', 'timeout': 10}).scalar()
-
-        data = db.session.execute(query, {
-                                  'username': session['username'], 'current_corpus': current_corpus, 'task': task, 'is_gold': is_gold}).fetchone()
-
-        if data:
-            db.session.execute('UPDATE Dataset SET travado=:time_now WHERE id = :data_id', {
-                               'time_now': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'data_id': data.id})
-            db.session.commit()
-
-        db.session.execute('SELECT RELEASE_LOCK(:name)',
-                           {'name': 'travado'}).scalar()
-    except:
-        db.session.execute('SELECT RELEASE_LOCK(:name)',
-                           {'name': 'travado'}).scalar()
-        raise Exception(
-            'Sorry, there was an error in the critical region. Please inform the administrator')
-
-    if not data:
+    data = db.session.execute(query, {
+                              'username': session['username'], 'current_corpus': current_corpus, 'task': task, 'is_gold': is_gold}).fetchone()
+    if data:
+        db.session.execute('UPDATE Dataset SET travado=:time_now WHERE id = :data_id', {
+                           'time_now': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'data_id': data.id})
+        db.session.commit()
+    else:
         return render_template('index-finish.html')
 
-    session['text'] = data.text_asr
+    if data.task == 0 or (data.task == 1 and data.CER >= 0.7):
+        text = data.text
+    else:
+        text = data.text_asr
+
+    session['text'] = text
     session['audio_lenght'] = data.audio_lenght
     session['file_path'] = data.file_path
     session['id'] = data.id
@@ -739,7 +726,7 @@ def transcribe_page():
     file_path = data.file_path
     file_path = os.path.join('Dataset', file_path).replace('\\', '/')
 
-    return render_template('transcribe_page.html', dataset={'text_asr': data.text_asr, 'file_path': file_path})
+    return render_template('transcribe_page.html', dataset={'text_asr': text, 'file_path': file_path})
 
 # |\ Logout
 @webui.route('/logout')
