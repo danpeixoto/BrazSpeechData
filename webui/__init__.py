@@ -695,7 +695,7 @@ def transcribe_page():
     # + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
     query = 'SELECT id,file_path,text_asr,audio_lenght,text,task,CER FROM Dataset WHERE CER > 0 and CER IS NOT NULL AND file_with_user <1 AND'\
         + ' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
-        + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) ORDER BY duration DESC, CER DESC LIMIT 1'
+        + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) ORDER BY CER DESC LIMIT 1'
 
     if session['username'] in ['sandra', 'sandra3', 'edresson']:
         is_gold = 1
