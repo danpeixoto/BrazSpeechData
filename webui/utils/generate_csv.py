@@ -5,6 +5,8 @@ import pandas as pd
 import re
 import check_audio_variety as cav
 from zipfile import ZipFile
+import hashlib
+#import coraa_normalize_and_filter
 
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÇÃÀÁÂÊÉÍÓÔÕÚÛabcdefghijklmnopqrstuvwxyzçãàáâêéíóôõũúû1234567890%\-\n/\\ "
@@ -152,6 +154,8 @@ def filter_dataset(data_df):
         if not len(text.replace(" ", '')):
             continue
 
+        #text = coraa_normalize_and_filter.normalize(text)
+
         invalid_score = 0
         valid_score = 0
 
@@ -181,16 +185,22 @@ def filter_dataset(data_df):
             accent = 'São Paulo (int.)'
             speech_genre = 'Interview or Dialogue'
             speech_style = 'Spontaneous Speech'
+            hash_object = hashlib.md5(line['file_path'].encode())
+            line['file_path'] = 'data/alip/' + str(hash_object.hexdigest())
         elif '/CORAL/' in line['file_path']:
             dataset = 'C-ORAL-BRASIL I'
             accent = 'Minas Gerais'
             speech_genre = 'Monologue or Dialogue or Conversation'
             speech_style = 'Spontaneous Speech'
+            hash_object = hashlib.md5(line['file_path'].encode())
+            line['file_path'] = 'data/CORAL/' + str(hash_object.hexdigest())
         elif '/NURC_RE/' in line['file_path']:
             dataset = 'NURC-Recife'
             accent = 'Recife'
             speech_genre = 'Dialogue or Interview or Conference and Class Talks'
             speech_style = 'Spontaneous Speech'
+            hash_object = hashlib.md5(line['file_path'].encode())
+            line['file_path'] = 'data/NURC_RE/' + str(hash_object.hexdigest())
             if('/NURC_RE_EF/' in line['file_path']):
                 speech_style = 'Prepared Speech'
         elif '/sp/' in line['file_path']:
@@ -198,6 +208,8 @@ def filter_dataset(data_df):
             accent = 'São Paulo (cap.)'
             speech_genre = 'Conversation or Interview or Reading'
             speech_style = 'Spontaneous and Read Speech'
+            hash_object = hashlib.md5(line['file_path'].encode())
+            line['file_path'] = 'data/sp/' + str(hash_object.hexdigest())
         elif '/Ted_' in line['file_path']:
             dataset = 'TEDx Talks'
             accent = 'Misc.'
@@ -206,6 +218,8 @@ def filter_dataset(data_df):
             if(not variety):
                 continue
             speech_style = 'Prepared Speech'
+            hash_object = hashlib.md5(line['file_path'].encode())
+            line['file_path'] = 'data/Ted_/' + str(hash_object.hexdigest())
 
         data_dict = {"text": line['text'], "file_path": line['file_path'], "task": line['task'], "valid_score": valid_score, "invalid_score": invalid_score,
                      "dataset": dataset, "accent": accent, "speech_genre": speech_genre, "speech_style": speech_style, "variety": variety}
@@ -303,7 +317,7 @@ def compress_all_csv_in_one_file():
         zipObj.write(CSV_SAVE_PATH+"failed_files.txt", "failed_files.txt")
 
 
-with open('./common/enviroment.json') as json_file:
+with open('./common/enviroment.json') as json_file: 
     JSON = json.load(json_file)
     DB_PASSWORD = JSON['dbPassword']
     DB_DATABASE = JSON['dbDatabase']
