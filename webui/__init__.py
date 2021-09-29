@@ -693,7 +693,7 @@ def transcribe_page():
     # query = 'SELECT id,file_path,text_asr,audio_lenght,text,task FROM Dataset WHERE number_validated<1 AND file_with_user <1 AND'\
     # + ' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
     # + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) AND task = :task ORDER BY duration DESC LIMIT 1'
-    query = 'SELECT id,file_path,text_asr,audio_lenght,text,task,CER FROM Dataset WHERE CER > 0 and CER IS NOT NULL AND file_with_user <1 AND'\
+    query = 'SELECT id,file_path,text_asr,audio_lenght,text,task,CER FROM Dataset WHERE CER > 0 and CER IS NOT NULL AND'\
         + ' data_gold = :is_gold AND user_validated != :username AND user_validated2 != :username AND user_validated3 != :username AND file_path LIKE :current_corpus'\
         + ' AND (travado IS Null OR  (DATEDIFF(DATE_ADD(NOW(), INTERVAL 1 DAY), travado)>0)) ORDER BY CER DESC LIMIT 1'
 
