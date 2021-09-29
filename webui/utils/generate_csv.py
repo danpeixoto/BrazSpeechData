@@ -8,7 +8,7 @@ import check_audio_variety as cav
 from zipfile import ZipFile
 import hashlib
 import coraa_normalizacao
-
+import os
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÇÃÀÁÂÊÉÍÓÔÕÚÛabcdefghijklmnopqrstuvwxyzçãàáâêéíóôõũúû1234567890%\-\n/\\ "
 
@@ -81,10 +81,8 @@ def get_destination(line):
     global dev_inquiries, test_inquiries
 
     if '/alip/' in line['file_path'].lower():
-
         file_path_id = int(os.path.basename(
             line['file_path']).replace('_alip_.wav', ''))
-
         for interval in dev_inquiries['alip']:
             if(file_path_id >= interval[0] and file_path_id <= interval[1]):
                 return 'dev'
@@ -251,7 +249,7 @@ def split_dataset_on_train_test_eval(dataframe):
 
         except Exception as e:
             failed_files.append(line['file_path'])
-            # print(e)
+            print(e)
 
     # escrevendo arquivos----------------------------------------
 
@@ -324,7 +322,7 @@ with open('./common/enviroment.json') as json_file:
     DB_HOST = JSON['dbHost']
     print("Export--", "Criação do csv começou",
           "--{}".format(datetime.now().strftime("%H:%M:%S")))
-    # generate_csv()
-    # compress_all_csv_in_one_file()
+    generate_csv()
+    compress_all_csv_in_one_file()
     print("Export--", "Criação do csv acabou",
           "--{}".format(datetime.now().strftime("%H:%M:%S")))

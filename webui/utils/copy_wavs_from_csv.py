@@ -48,7 +48,7 @@ def copy_wavs_to_the_correct_folder():
             new_wav_path = os.path.join(
                 dataset_info[1], file_path_without_data)
             new_corpus_folder = '/'.join(new_wav_path.split('/')[:-1])
-            os.mkdir(new_corpus_folder) if not os.path.isdir(
+            os.makedirs(new_corpus_folder) if not os.path.isdir(
                 new_corpus_folder) else None
             if(not os.path.isfile(new_wav_path)):
                 try:

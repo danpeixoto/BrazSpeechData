@@ -55,6 +55,9 @@ def normalize(text):
     # Converte maiúsculas para minúsculas
     text = text.lower()
 
+    # Remove hífens
+    text = re.sub('\-+', " ", text)
+
     # Remove espaços múltiplos
     text = re.sub(' +', ' ', text)
 
