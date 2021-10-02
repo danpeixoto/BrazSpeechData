@@ -91,7 +91,7 @@ def get_destination(line):
                 return 'test'
         return 'train'
 
-    elif '/ted/' in line['file_path'].lower():
+    elif '/ted_' in line['file_path'].lower():
 
         for id in dev_inquiries['ted']:
             if id in line['file_path']:
@@ -110,9 +110,7 @@ def get_destination(line):
             if id in line['file_path']:
                 return 'test'
         return 'train'
-
     elif '/coral/' in line['file_path'].lower():
-
         for id in dev_inquiries['coral']:
             if id in line['file_path']:
                 return 'dev'
@@ -120,24 +118,20 @@ def get_destination(line):
             if id in line['file_path']:
                 return 'test'
         return 'train'
-
-    elif '/sp2010/' in line['file_path'].lower():
+    elif '/sp/' in line['file_path'].lower():
 
         file_path_id = int(os.path.basename(line['file_path']).replace(
             '_sp_.wav', '').replace('data/', '').replace('wavs/SP2010/', ''))
-
         for interval in dev_inquiries['sp']:
             if(file_path_id >= interval[0] and file_path_id <= interval[1]):
                 return 'dev'
         for interval in test_inquiries['sp']:
             if(file_path_id >= interval[0] and file_path_id <= interval[1]):
                 return 'test'
-        else:
-            return 'train'
+        return 'train'
 
-    else:
-        RuntimeError(
-            " File não pertencente a nenhum dos datasets estabelecidos: "+line['file_path'])
+    raise RuntimeError(
+        "File não pertencente a nenhum dos datasets estabelecidos: "+line['file_path'])
 
 
 def filter_dataset(data_df):
