@@ -1,5 +1,6 @@
 #!/home/utf/miniconda3/bin/python3
 from datetime import datetime
+from numpy.testing._private.utils import raises
 import pymysql
 import json
 import pandas as pd
@@ -10,18 +11,55 @@ import hashlib
 import coraa_normalizacao
 import os
 
+# For easy navigation use |\
+
+
+# |\ Global variables
+
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZÇÃÀÁÂÊÉÍÓÔÕÚÛabcdefghijklmnopqrstuvwxyzçãàáâêéíóôõũúû1234567890%\-\n/\\ "
 
+# DB variables receive values from the enviroment.json
 DB_PASSWORD = ''
 DB_DATABASE = ''
 DB_USER = ''
 DB_HOST = ''
+# path based on where the script is called
 CSV_SAVE_PATH = "./static/Dataset/export-v2/"
+FAILED_FILES = []
 
-
+# dev_inquiries_old = {'alip': [(5101, 5611), (69594, 69901), (90223, 91256), (62920, 63181)],
+#                  'nurc': ['NURC_RE_D2_026', 'NURC_RE_DID_012', 'NURC_RE_EF_171'],
+#                  'ted': ['Afx_N1ce6_0',
+#                          'A56feDb1UF4',
+#                          'hXMU0sw9foQ',
+#                          'A-c8_6wy5YM',
+#                          'a-q3uOApnCM',
+#                          'a-8Sf1hUtBk',
+#                          'a0OumyN805Q',
+#                          'A_iVo-GilAo'],
+#                  'coral': ['bfamcv01',
+#                            'bfamcv02',
+#                            'bfamcv03',
+#                            'bfamcv04',
+#                            'bfamcv05',
+#                            'bfamcv07',
+#                            'bfamcv08',
+#                            'bfamcv13',
+#                            'bfamcv15',
+#                            'bfamcv17',
+#                            'bfamcv18',
+#                            'bfamcv23',
+#                            'bfammn01',
+#                            'bfammn03',
+#                            'bfammn04',
+#                            'bfammn05',
+#                            'bfammn06',
+#                            'bfammn08'],
+#                  'sp': [(62924, 64782), (58030, 59427)]
+#                  }
 dev_inquiries = {'alip': [(5101, 5611), (69594, 69901), (90223, 91256), (62920, 63181)],
                  'nurc': ['NURC_RE_D2_026', 'NURC_RE_DID_012', 'NURC_RE_EF_171'],
-                 'ted': ['Afx_N1ce6_0', 'A56feDb1UF4', 'hXMU0sw9foQ', 'A-c8_6wy5YM', 'a-q3uOApnCM', 'a-8Sf1hUtBk', 'a0OumyN805Q', 'A_iVo-GilAo'],
+                 'ted': ['Afx_N1ce6_0', 'A56feDb1UF4', 'hXMU0sw9foQ', 'A-c8_6wy5YM', 'a-q3uOApnCM', 'a-8Sf1hUtBk', 'a0OumyN805Q', 'A_iVo-GilAo', '_1yNRrSf0BU', '7J-Z-k0ewDI', '7LqV2GVcaEw', '7o7FDCU_-zE', '7oes6OulbYg', '7pUjNZKckrY', '7PYKXMC1WPE', '7slENTYU2gU', '7WZRxfmeuEY', '7XJCLa1xWfk', '7zzRywQCo-Y', '81ZFuEHRfB8', '86OG8yN9muk', '_8iCvZ2WRQU', '8iWtTBR4kYo', '8lHrmpqWq_4', '9LJ-g9If8PY', '9QTNqR_vhV0', '9t9GshqRQZc', '9wNDowlBmo0', '9YU6zcr2z28', 'a0mXmqCcoso', 'a5Ua7Xq9I6Y', 'a6vF8ywAknk', 'a87BeNA3xVI'],
                  'coral': ['bfamcv01',
                            'bfamcv02',
                            'bfamcv03',
@@ -43,10 +81,40 @@ dev_inquiries = {'alip': [(5101, 5611), (69594, 69901), (90223, 91256), (62920, 
                  'sp': [(62924, 64782), (58030, 59427)]
                  }
 
+# test_inquiries_old = {'alip': [(42389, 43336), (80027, 80670), (3159, 3704), (9630, 9925), (50734, 51374), (64387, 64745), (62514, 62918), (39927, 40392), (44171, 44470)],
+#                   'nurc': ['NURC_RE_D2_215', 'NURC_RE_DID_051', 'NURC_RE_EF_332', 'NURC_RE_D2_287', 'NURC_RE_DID_029', 'NURC_RE_EF_271'],
+#                   'ted': ['AxwfIffqIXo', 'aETOz3IGfG0', 'aXZ9Cb9ffE8', 'A0dfeodJL8Q', 'A4wi3jmf9uY', 'a4ZFKFLLORE', 'A04wa_SH1WM', 'A1yGXAJx-x8', 'a8gyl6MPHsI', 'Ab5xNf5VoEc', 'a9qsp7l5C3o', 'a24A8MyzR2Y', 'AB8_pog3Lt8', 'aai3QcbLetk'],
+#                   'coral': ['bfamcv20',
+#                             'bfammn09',
+#                             'bfammn10',
+#                             'bfammn11',
+#                             'bfammn12',
+#                             'bfammn15',
+#                             'bfammn16',
+#                             'bfammn17',
+#                             'bfammn18',
+#                             'bfammn19',
+#                             'bfammn20',
+#                             'bfammn22',
+#                             'bfammn23',
+#                             'bfammn24',
+#                             'bfammn25',
+#                             'bfammn26',
+#                             'bfammn27',
+#                             'bfammn28',
+#                             'bfammn29',
+#                             'bfammn30',
+#                             'bfammn31',
+#                             'bfammn32',
+#                             'bfammn33',
+#                             'bfammn34',
+#                             'bfammn35'],
+#                   'sp': [(44928, 46578), (47450, 49028), (70578, 71973), (42881, 43677)]
+#                   }
 
 test_inquiries = {'alip': [(42389, 43336), (80027, 80670), (3159, 3704), (9630, 9925), (50734, 51374), (64387, 64745), (62514, 62918), (39927, 40392), (44171, 44470)],
                   'nurc': ['NURC_RE_D2_215', 'NURC_RE_DID_051', 'NURC_RE_EF_332', 'NURC_RE_D2_287', 'NURC_RE_DID_029', 'NURC_RE_EF_271'],
-                  'ted': ['AxwfIffqIXo', 'aETOz3IGfG0', 'aXZ9Cb9ffE8', 'A0dfeodJL8Q', 'A4wi3jmf9uY', 'a4ZFKFLLORE', 'A04wa_SH1WM', 'A1yGXAJx-x8', 'a8gyl6MPHsI', 'Ab5xNf5VoEc', 'a9qsp7l5C3o', 'a24A8MyzR2Y', 'AB8_pog3Lt8', 'aai3QcbLetk'],
+                  'ted': ['AxwfIffqIXo', 'aETOz3IGfG0', 'aXZ9Cb9ffE8', 'A0dfeodJL8Q', 'A4wi3jmf9uY', 'a4ZFKFLLORE', 'A04wa_SH1WM', 'A1yGXAJx-x8', 'a8gyl6MPHsI', 'Ab5xNf5VoEc', 'a9qsp7l5C3o', 'a24A8MyzR2Y', 'AB8_pog3Lt8', 'aai3QcbLetk', 'a8bFAd--TMo', 'ACsrAr078s0', 'aE1GNHkyaSA', 'aejhRTw0D0g', 'AeyUze9hChw', 'afswsiDBB6Q', 'aIndPtZGDz4', 'air_84KLk0E', 'aj6_ZRuUm04', 'akDoEll2QGk', 'akUTDpfWZUk', 'An42G86kZEk', 'AP-bmCOGOH8', 'AqQJz1j_4rY', 'AS_w0fiMQgc', 'av2bOcV8yPU', 'axJSBG9DNKQ', 'AxOK90gji-o', 'b321AmixDeA', 'B32hWJqIyQM', 'b7DAWzoV1sE', 'b8PrusSGUn4', 'BaIwFh3geLU', 'bAO--a13WZ4', 'Bb0bY4o5y9E', 'BbqOyyKXaqY', 'bbqqsRE_ZFc', 'Bc7Sv7AE44s', 'bdGjUmau5Kg', 'bDGSJ_HNU14', 'BD_LL73Yjic', 'BdLU9I4JDAA', 'bDqGZT3OTgw', 'bE-4E1eUk6o', 'bHXkqtjb0O0', 'BILl-ziMwDY', 'bl4wxKurOvM', 'Bm3S2BiS-2Y', 'BMZ-NF79hwE', 'bnj979xWDTU', 'bnoorgXkmWE', 'bo3_ncIpin8', 'Bqon4_rKigs', 'bRSGaB-iZck', 'bRVYfip4ErU', 'Bs1bmBCCMas', 'bsqJmqNPUI0', '__BtfBTQJoM', 'BvlRNXbCD5M', 'C6wasqRsDug', 'c9itqVKg8gM', 'Cb1o0K5V11I', 'cCbKdmiiMRg', 'cFFFwDmfOf8', 'CGaxtJzpEa0', 'Ci7zHYozq8o', 'cix55h305q0', 'CJma5FsE7Ig', 'CKOvfEpgc6k', 'CkVQUa2xig8', 'CKY8NHaWmXg', 'CLxeqgtKWs0', 'C_m4EUdcghY', 'CMEwr5RuvOY', 'CnlGkxksy_g', 'CR02Z-wDwNs', 'cVZSicAvgAg', 'cW7w5NCenxI', 'cxeN1XIP8Fs', 'cYrgbptYcho', 'D1hcRxpYCIs'],
                   'coral': ['bfamcv20',
                             'bfammn09',
                             'bfammn10',
@@ -75,12 +143,26 @@ test_inquiries = {'alip': [(42389, 43336), (80027, 80670), (3159, 3704), (9630, 
                   'sp': [(44928, 46578), (47450, 49028), (70578, 71973), (42881, 43677)]
                   }
 
+# |\ Get audio correct file (train,test,eval,fail)
+
 
 def get_destination(line):
+    """Gets file destination.
 
+        Set the correct destination to the line and raises an error if the 
+        line does not appear in any corpus.
+
+        Args: 
+            line         : dict containg one row of the dataframe.
+        Returns:
+            string       : a string containing the correct file destination
+        Raises:
+            RuntimeError : File not found in the datasets
+    """
     global dev_inquiries, test_inquiries
 
     if '/alip/' in line['file_path'].lower():
+        # convert the file_path to integer (id)
         file_path_id = int(os.path.basename(
             line['file_path']).replace('_alip_.wav', ''))
         for interval in dev_inquiries['alip']:
@@ -119,7 +201,7 @@ def get_destination(line):
                 return 'test'
         return 'train'
     elif '/sp/' in line['file_path'].lower():
-
+        # convert the file_path to integer (id)
         file_path_id = int(os.path.basename(line['file_path']).replace(
             '_sp_.wav', '').replace('data/', '').replace('wavs/SP2010/', ''))
         for interval in dev_inquiries['sp']:
@@ -129,25 +211,72 @@ def get_destination(line):
             if(file_path_id >= interval[0] and file_path_id <= interval[1]):
                 return 'test'
         return 'train'
-
+    # Raise an error if the line is not present in any corpus
     raise RuntimeError(
         "File não pertencente a nenhum dos datasets estabelecidos: "+line['file_path'])
 
+# |\ Utils
+
+
+def sum_two_int_strings(a, b="1"):
+    return str(int(a)+int(b))
+
+# |\ Update audio characteristics
+
+
+def upadate_audio_characteristics(valids_user, c1, c2, c3, c4, c5):
+    one, two, three, four, five = re.sub('[\[\]]', '', valids_user).split(',')
+    if "1" in one:
+        c1 = sum_two_int_strings(c1)
+    if "2" in two:
+        c2 = sum_two_int_strings(c2)
+    if "3" in three:
+        c3 = sum_two_int_strings(c3)
+    if "4" in four:
+        c4 = sum_two_int_strings(c4)
+    if "5" in five:
+        c5 = sum_two_int_strings(c5)
+    return c1, c2, c3, c4, c5
+# |\ Filter the dataset
+
 
 def filter_dataset(data_df):
+    """Filters a dataset.
 
+        Remove all incorrect files from the dataset using Bruno's normalization,
+        some rules specific to annotation and some rules specific to 
+        transcription.
+
+        Args: 
+            data_df   : pandas dataframe containing rows from the database.
+        Returns:
+            df_output : list of dicts containing only valid files.
+        Raises:
+    """
     df_output = []
+
     for index, line in data_df.iterrows():
+        has_no_identified_problem = 0  # valids_user [1,0,0,0,0]
+        has_filled_pause = 0  # valids_user [0,2,0,0,0]
+        has_hesitation = 0  # valids_user [0,0,3,0,0]
+        has_noise_or_low_voice = 0  # valids_user [0,0,0,4,0]
+        has_second_voice = 0  # valids_user [0,0,0,0,5]
         text = line['text']
         text = re.sub("[^{}]".format(alphabet), '', text)
 
         text = text.lower()
         text = re.sub(' +', ' ', text)
+        # Removes files that have *, $ or @ in the text
+        if (("@" in text) or ("$" in text) or ("*" in text)):
+            FAILED_FILES.append(line['file_path'])
+            continue
+        # Normalize the text using Bruno's script
+        text = coraa_normalizacao.normalize(text)
 
-        if not len(text.replace(" ", '')):
+        if ((not len(text.replace(" ", ''))) or ("#" in text)):
+            FAILED_FILES.append(line['file_path'])
             continue
 
-        text = coraa_normalizacao.normalize(text)
         invalid_score = 0
         valid_score = 0
 
@@ -160,15 +289,31 @@ def filter_dataset(data_df):
 
         if line['valids_user1'] != '' and line['valids_user1'] != 'None':
             valid_score += 1
+            has_no_identified_problem, has_filled_pause, has_hesitation, has_noise_or_low_voice, has_second_voice = upadate_audio_characteristics(
+                line['valids_user1'], has_no_identified_problem, has_filled_pause, has_hesitation, has_noise_or_low_voice, has_second_voice)
         if line['valids_user2'] != '' and line['valids_user2'] != 'None':
             valid_score += 1
+            has_no_identified_problem, has_filled_pause, has_hesitation, has_noise_or_low_voice, has_second_voice = upadate_audio_characteristics(
+                line['valids_user2'], has_no_identified_problem, has_filled_pause, has_hesitation, has_noise_or_low_voice, has_second_voice)
         if line['valids_user3'] != '' and line['valids_user3'] != 'None':
             valid_score += 1
+            has_no_identified_problem, has_filled_pause, has_hesitation, has_noise_or_low_voice, has_second_voice = upadate_audio_characteristics(
+                line['valids_user3'], has_no_identified_problem, has_filled_pause, has_hesitation, has_noise_or_low_voice, has_second_voice)
 
-        if line['task'] == 1:
+        # This rule was made due to inconsistencies in the database.
+        if line['task'] == 1 and (not '/CORAL/' in line['file_path']) and (not '/NURC_RE/' in line['file_path']) and (not '/sp/' in line['file_path']):
             line['task'] = 'transcription'
-        else:
+            has_no_identified_problem = has_filled_pause = has_hesitation = has_second_voice = has_noise_or_low_voice = None
+            valid_score = invalid_score = 0
+        elif line['task'] == 0:
             line['task'] = 'annotation'
+        else:
+            line['task'] = 'annotation_and_transcription'
+
+        # Remove files that were invalidated more than validated. This rule only applies to audios of annotation
+        if(valid_score <= invalid_score and (line['task'] == 'annotation' or line['task'] == 'annotation_and_transcription')):
+            FAILED_FILES.append(line['file_path'])
+            continue
 
         variety = "pt_br"
 
@@ -177,22 +322,16 @@ def filter_dataset(data_df):
             accent = 'São Paulo (int.)'
             speech_genre = 'Interview or Dialogue'
             speech_style = 'Spontaneous Speech'
-            # hash_object = hashlib.md5(line['file_path'].encode())
-            # line['file_path'] = 'data/alip/' + str(hash_object.hexdigest())
         elif '/CORAL/' in line['file_path']:
             dataset = 'C-ORAL-BRASIL I'
             accent = 'Minas Gerais'
             speech_genre = 'Monologue or Dialogue or Conversation'
             speech_style = 'Spontaneous Speech'
-            # hash_object = hashlib.md5(line['file_path'].encode())
-            # line['file_path'] = 'data/CORAL/' + str(hash_object.hexdigest())
         elif '/NURC_RE/' in line['file_path']:
             dataset = 'NURC-Recife'
             accent = 'Recife'
             speech_genre = 'Dialogue or Interview or Conference and Class Talks'
             speech_style = 'Spontaneous Speech'
-            # hash_object = hashlib.md5(line['file_path'].encode())
-            # line['file_path'] = 'data/NURC_RE/' + str(hash_object.hexdigest())
             if('/NURC_RE_EF/' in line['file_path']):
                 speech_style = 'Prepared Speech'
         elif '/sp/' in line['file_path']:
@@ -200,38 +339,57 @@ def filter_dataset(data_df):
             accent = 'São Paulo (cap.)'
             speech_genre = 'Conversation or Interview or Reading'
             speech_style = 'Spontaneous and Read Speech'
-            # hash_object = hashlib.md5(line['file_path'].encode())
-            # line['file_path'] = 'data/sp/' + str(hash_object.hexdigest())
         elif '/Ted_' in line['file_path']:
             dataset = 'TEDx Talks'
             accent = 'Misc.'
             speech_genre = 'Stage Talks'
             variety = cav.check_variety(line['file_path'].split("/")[2][:-9])
+            # Remove files that are from indigenous people
             if(not variety):
+                FAILED_FILES.append(line['file_path'])
                 continue
             speech_style = 'Prepared Speech'
-            # hash_object = hashlib.md5(line['file_path'].encode())
-            # line['file_path'] = 'data/Ted_/' + str(hash_object.hexdigest())
 
-        data_dict = {"text": text, "file_path": line['file_path'], "task": line['task'], "valid_score": valid_score, "invalid_score": invalid_score,
-                     "dataset": dataset, "accent": accent, "speech_genre": speech_genre, "speech_style": speech_style, "variety": variety}
+        # data_dict = {"text": text, "file_path": line['file_path'], "task": line['task'], "up_votes": valid_score, "down_votes": invalid_score,
+            #  "dataset": dataset, "accent": accent, "speech_genre": speech_genre, "speech_style": speech_style, "variety": variety}
+        data_dict = {"file_path": line['file_path'], "task": line['task'], "variety": variety, "dataset": dataset, "accent": accent,
+                     "speech_genre": speech_genre, "speech_style": speech_style,
+                     "up_votes": valid_score, "down_votes": invalid_score, "has_hesitation": has_hesitation,
+                     "has_filled_pause": has_filled_pause, "has_noise_or_low_voice": has_noise_or_low_voice,
+                     "has_second_voice": has_second_voice, "has_no_identified_problem": has_no_identified_problem, "text": text}
         df_output.append(data_dict)
 
     return df_output
 
+# |\ Split the dataset
+
 
 def split_dataset_on_train_test_eval(dataframe):
+    """Splits a dataframe.
 
-    # buffer de linhas----------------------------
+        Split CORAA dataset into train,test and eval datasets.
+        Args:
+            dataframe : pandas dataframe containing only valid rows.
+        Returns:
+            train_df  : dataframe containing rows for training.
+            dev_df    : dataframe containing rows for evaluation.
+            test_df   : dataframe containing rows for testing.
+            failed_df : dataframe containing audio paths that do not appear 
+                        in any corpus.
+        Raises:
+    """
+
     final_dev = []
     final_train = []
     final_test = []
-    failed_files = []
 
-    # loop principal-------------------------------
+    # Loop all rows and place them in it's correct CSV
     for index, line in dataframe.iterrows():
-        data_dict = {"file_path": line['file_path'], "task": line['task'], "votes_for_valid": line['valid_score'], "votes_for_invalid": line['invalid_score'], "variety": line['variety'],
-                     "dataset": line['dataset'], "accent": line['accent'], "speech_genre": line['speech_genre'], "speech_style": line['speech_style'], "text": line['text']}
+        data_dict = {"file_path": line['file_path'], "task": line['task'], "variety": line['variety'], "dataset": line['dataset'], "accent": line['accent'],
+                     "speech_genre": line['speech_genre'], "speech_style": line['speech_style'],
+                     "up_votes": line['up_votes'], "down_votes": line['down_votes'], "votes_for_hesitation": line['has_hesitation'],
+                     "votes_for_filled_pause": line['has_filled_pause'], "votes_for_noise_or_low_voice": line['has_noise_or_low_voice'],
+                     "votes_for_second_voice": line['has_second_voice'], "votes_for_no_identified_problem": line['has_no_identified_problem'], "text": line['text']}
         try:
             dest = get_destination(line)
             if(dest == 'dev'):
@@ -242,45 +400,47 @@ def split_dataset_on_train_test_eval(dataframe):
                 final_train.append(data_dict)
 
         except Exception as e:
-            failed_files.append(line['file_path'])
+            FAILED_FILES.append(line['file_path'])
             print(e)
 
-    # escrevendo arquivos----------------------------------------
+    print(len(FAILED_FILES))
 
     train_df = pd.DataFrame.from_dict(final_train, orient='columns')
-    # train_df.to_csv(out_train, sep=',', encoding='utf-8', header=True, index=False)
-    # print("Train samples saved in: ", out_train)
 
     dev_df = pd.DataFrame.from_dict(final_dev, orient='columns')
-    # dev_df.to_csv(out_dev, sep=',', encoding='utf-8', header=True, index=False)
-    # print("Dev samples saved in: ", out_dev)
 
     test_df = pd.DataFrame.from_dict(final_test, orient='columns')
-    # test_df.to_csv(out_test, sep=',', encoding='utf-8', header=True, index=False)
-    # print("Test samples saved in: ", out_test)
 
-    failed_df = pd.DataFrame.from_dict(failed_files, orient='columns')
-    # failed_df.to_csv(out_failed, sep=',', encoding='utf-8', header=True, index=False)
+    failed_df = pd.DataFrame.from_dict(FAILED_FILES, orient='columns')
 
     return train_df, dev_df, test_df, failed_df
 
+# |\ Generate all CSVs (main function)
+
 
 def generate_csv():
+    """Generates many CSVs.
+
+        Generate all CVSs of CORAA.
+
+        Args:
+        Returns:
+        Raises:
+    """
     conn = pymysql.connect(host=DB_HOST, user=DB_USER,
                            password=DB_PASSWORD, db=DB_DATABASE)
     cur = conn.cursor()
 
+    # The query below must only return rows with data_gold equals 0
     cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3 FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND (duration <= 40 OR LENGTH(text)<=200)')
 
     output = cur.fetchall()
 
-    compression_opts = dict(method='zip', archive_name='resultado.csv')
     data_df = pd.DataFrame(output, columns=['text', 'file_path', 'task', 'valids_user1',
                                             'valids_user2', 'valids_user3', 'invalid_user1', 'invalid_user2', 'invalid_user3'])
 
     data_df['valid_score'] = 0
     data_df['invalid_score'] = 0
-
     df_output = filter_dataset(data_df)
 
     final_df = pd.DataFrame.from_dict(df_output, orient='columns')
@@ -297,10 +457,18 @@ def generate_csv():
     failed_df.to_csv(CSV_SAVE_PATH+"failed_files.txt", sep="|",
                      encoding='utf-8', header=True, index=False)
 
-    # final_df.to_csv('dataset.zip',encoding='utf-8', index=False,sep='|',compression=compression_opts)
+# |\ Compress all CSVs in a zip file
 
 
 def compress_all_csv_in_one_file():
+    """Compresses all CSVs.
+
+        Compress all CSVs into a zip file.
+
+        Args:
+        Returns:
+        Raises:
+    """
     with ZipFile(CSV_SAVE_PATH+"dataset.zip", "w") as zipObj:
         zipObj.write(CSV_SAVE_PATH+"metadata_train.csv", "metadata_train.csv")
         zipObj.write(CSV_SAVE_PATH+"metadata_test.csv", "metadata_test.csv")
@@ -308,6 +476,7 @@ def compress_all_csv_in_one_file():
         zipObj.write(CSV_SAVE_PATH+"failed_files.txt", "failed_files.txt")
 
 
+# |\ Generate the CSVs and then compress them
 with open('./common/enviroment.json') as json_file:
     JSON = json.load(json_file)
     DB_PASSWORD = JSON['dbPassword']

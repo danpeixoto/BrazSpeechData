@@ -48,10 +48,12 @@ def normalize(text):
     elif '/' in text:
         text = '###'
         return text
-
+    # Remove string vazia
+    if(len(text) == 0):
+        text = "###"
+        return text
     # Remove qualquer caractere fora do alfabeto
     text = re.sub("[^{}]".format(alphabet), '', text)
-
     # Converte maiúsculas para minúsculas
     text = text.lower()
 
