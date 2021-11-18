@@ -257,7 +257,7 @@ def filter_dataset(data_df):
     df_output = []
 
     for index, line in data_df.iterrows():
-        if pd.isna(line["CER"]):
+        if pd.isnull(line["CER"]):
             CER_NULL_FILES.append(line['file_path'])
             # continue
 
@@ -438,7 +438,7 @@ def generate_csv():
     cur = conn.cursor()
 
     # The query below must only return rows with data_gold equals 0
-    cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3, CER FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND (duration <= 40 OR LENGTH(text)<=200)')
+    cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3, CER FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND duration <= 40 AND LENGTH(text)<=200')
 
     output = cur.fetchall()
 
