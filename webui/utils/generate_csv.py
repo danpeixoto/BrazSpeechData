@@ -26,6 +26,7 @@ DB_HOST = ''
 # path based on where the script is called
 CSV_SAVE_PATH = "./static/Dataset/export-v2/"
 FAILED_FILES = []
+CER_NULL_FILES = []
 
 # dev_inquiries_old = {'alip': [(5101, 5611), (69594, 69901), (90223, 91256), (62920, 63181)],
 #                  'nurc': ['NURC_RE_D2_026', 'NURC_RE_DID_012', 'NURC_RE_EF_171'],
@@ -256,6 +257,10 @@ def filter_dataset(data_df):
     df_output = []
 
     for index, line in data_df.iterrows():
+        if pd.isna(line["CER"]):
+            CER_NULL_FILES.append(line['file_path'])
+            # continue
+
         has_no_identified_problem = 0  # valids_user [1,0,0,0,0]
         has_filled_pause = 0  # valids_user [0,2,0,0,0]
         has_hesitation = 0  # valids_user [0,0,3,0,0]
@@ -266,6 +271,7 @@ def filter_dataset(data_df):
 
         text = text.lower()
         text = re.sub(' +', ' ', text)
+        text = text.replace("\n", "")
         # Removes files that have *, $ or @ in the text
         if (("@" in text) or ("$" in text) or ("*" in text)):
             FAILED_FILES.append(line['file_path'])
@@ -432,12 +438,12 @@ def generate_csv():
     cur = conn.cursor()
 
     # The query below must only return rows with data_gold equals 0
-    cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3 FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND (duration <= 40 OR LENGTH(text)<=200)')
+    cur.execute('SELECT text,file_path,task,valids_user1,valids_user2,valids_user3,invalid_user1,invalid_user2,invalid_user3, CER FROM Dataset WHERE text NOT LIKE \'%#%\' AND number_validated >= 1 AND data_gold = 0 AND file_path NOT LIKE \'%wpp%\' AND (duration <= 40 OR LENGTH(text)<=200)')
 
     output = cur.fetchall()
 
     data_df = pd.DataFrame(output, columns=['text', 'file_path', 'task', 'valids_user1',
-                                            'valids_user2', 'valids_user3', 'invalid_user1', 'invalid_user2', 'invalid_user3'])
+                                            'valids_user2', 'valids_user3', 'invalid_user1', 'invalid_user2', 'invalid_user3', "CER"])
 
     data_df['valid_score'] = 0
     data_df['invalid_score'] = 0
@@ -448,15 +454,20 @@ def generate_csv():
     train_df, dev_df, test_df, failed_df = split_dataset_on_train_test_eval(
         final_df)
 
-    train_df.to_csv(CSV_SAVE_PATH+"metadata_train.csv", sep="|",
+    train_df.to_csv(CSV_SAVE_PATH+"metadata_train.csv", sep=",",
                     encoding='utf-8', header=True, index=False)
-    dev_df.to_csv(CSV_SAVE_PATH+"metadata_dev.csv", sep="|",
+    dev_df.to_csv(CSV_SAVE_PATH+"metadata_dev.csv", sep=",",
                   encoding='utf-8', header=True, index=False)
-    test_df.to_csv(CSV_SAVE_PATH+"metadata_test.csv", sep="|",
+    test_df.to_csv(CSV_SAVE_PATH+"metadata_test.csv", sep=",",
                    encoding='utf-8', header=True, index=False)
-    failed_df.to_csv(CSV_SAVE_PATH+"failed_files.txt", sep="|",
+    failed_df.to_csv(CSV_SAVE_PATH+"failed_files.txt", sep=",",
                      encoding='utf-8', header=True, index=False)
 
+    invalid_cer_files = pd.DataFrame.from_dict(
+        CER_NULL_FILES, orient='columns')
+
+    invalid_cer_files.to_csv(CSV_SAVE_PATH+"invalid_cer_files.txt", sep=",",
+                             encoding='utf-8', header=True, index=False)
 # |\ Compress all CSVs in a zip file
 
 
